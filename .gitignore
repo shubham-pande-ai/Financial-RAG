@@ -70,3 +70,5 @@ dist/
 # Jupyter Notebook checkpoints
 # ================================
 .ipynb_checkpoints/
+# Chroma / vector DB
+chroma_store/

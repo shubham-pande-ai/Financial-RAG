@@ -17,9 +17,10 @@ import json
 import os
 import sys
 
-from config.settings import LOG_DIR
+from config.settings import LOG_DIR, COMBINED_ANNUAL_CHUNKS, COMBINED_CONCALL_CHUNKS
 from db.database import init_db
-from pipeline.retrieval import retrieve, rerank
+from pipeline.retrieval import retrieve
+from pipeline.retrieval.reranker import rerank, rerank_separate
 from rag.rag_engine import generate_answer
 from utils.logger import get_logger
 
@@ -74,9 +75,9 @@ def run_query(
     log.info(f"Query: '{query}'")
     log.info(f"  doc_type={doc_type} | symbol={symbol} | year={year}")
 
-    # Step 1: Retrieve
+    # Step 1: Retrieve (year resolution happens inside retrieve())
     print(f"\n🔍 Retrieving relevant chunks...")
-    candidates = retrieve(
+    result = retrieve(
         query=query,
         doc_type=doc_type,
         symbol=symbol,
@@ -84,18 +85,46 @@ def run_query(
         year_range=year_range,
     )
 
-    if not candidates:
-        print("❌ No relevant documents found.")
-        print("Have you ingested documents? Run: python ingest.py --symbol <SYMBOL>")
-        return
+    # Resolve years the same way retrieve() does — for passing to generate_answer
+    from pipeline.retrieval.retriever import parse_year_intent
+    if year:
+        resolved_years = [year]
+    elif year_range:
+        resolved_years = list(range(year_range[0], year_range[1] + 1))
+    else:
+        resolved_years = parse_year_intent(query)
 
-    # Step 2: Re-rank
-    print(f"📊 Re-ranking {len(candidates)} candidates...")
-    top_chunks = rerank(query, candidates, doc_type)
+    print(f"  📅 Year filter applied: FY{resolved_years}")
 
-    # Step 3: Generate
+    # "both" returns (annual_list, concall_list) — rerank separately
+    if doc_type == "both":
+        annual_candidates, concall_candidates = result
+        if not annual_candidates and not concall_candidates:
+            print("❌ No relevant documents found.")
+            print("Have you ingested documents? Run: python ingest.py --symbol <SYMBOL>")
+            return
+        total = len(annual_candidates) + len(concall_candidates)
+        print(f"📊 Re-ranking {total} candidates "
+              f"({len(annual_candidates)} annual + {len(concall_candidates)} concall) separately...")
+        top_chunks = rerank_separate(
+            query,
+            annual_candidates,
+            concall_candidates,
+            annual_top_k=COMBINED_ANNUAL_CHUNKS,
+            concall_top_k=COMBINED_CONCALL_CHUNKS,
+        )
+    else:
+        candidates = result
+        if not candidates:
+            print("❌ No relevant documents found.")
+            print("Have you ingested documents? Run: python ingest.py --symbol <SYMBOL>")
+            return
+        print(f"📊 Re-ranking {len(candidates)} candidates...")
+        top_chunks = rerank(query, candidates, doc_type)
+
+    # Step 3: Generate — pass resolved years so prompt can flag missing ones
     print(f"🤖 Generating answer with Groq ({len(top_chunks)} chunks)...")
-    response = generate_answer(query, top_chunks, doc_type)
+    response = generate_answer(query, top_chunks, doc_type, years=resolved_years)
 
     print_answer(response, verbose)
 

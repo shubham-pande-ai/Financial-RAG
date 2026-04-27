@@ -94,18 +94,24 @@ CONCALL = {
 # Retrieval
 # ─────────────────────────────────────────────
 ANNUAL_RETRIEVAL = {
-    "top_k_vector": 20,
+    "top_k_vector": 30,
     "top_k_bm25": 10,
-    "top_k_rerank": 5,          # final chunks sent to LLM
-    "search_type": "hybrid",    # vector + BM25
+    "top_k_rerank": 8,
+    "search_type": "hybrid",
 }
 
 CONCALL_RETRIEVAL = {
-    "top_k_vector": 10,
+    "top_k_vector": 15,
     "top_k_rerank": 4,
-    "search_type": "semantic",  # pure vector
+    "search_type": "semantic",
 }
 
+# "both" mode — rerank each collection independently, then merge
+COMBINED_ANNUAL_CHUNKS = 6
+COMBINED_CONCALL_CHUNKS = 3
+
+# ─────────────────────────────────────────────
+# Ingestion
 # ─────────────────────────────────────────────
 # Ingestion
 # ─────────────────────────────────────────────
