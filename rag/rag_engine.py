@@ -1,13 +1,19 @@
 """
 rag/rag_engine.py
 
-Groq LLM integration with finance-grade prompts.
-
-Key fixes:
-  - Structured financial analysis prompts (not generic QA)
-  - Explicit rules: prefer latest data, show YOY math, flag missing data
-  - Context builder sorts chunks by year DESC so LLM sees latest first
-  - Fallback model on rate limit
+FIXES applied in this version:
+  [FIX A] gemma2-9b-it does not support the 'system' role — when falling back
+          to the fallback model the system prompt is merged into the first user
+          message instead of being sent as a separate system turn.
+  [FIX B] Context trimming: before calling the API, total prompt token count is
+          estimated and chunks are dropped from the bottom (lowest-ranked) until
+          the payload fits within the model's safe context window.
+          llama-3.3-70b-versatile: 32k token context  → target ≤ 28k
+          gemma2-9b-it:             8k token context  → target ≤  6k
+  [FIX C] _build_context separator was "{'─'*60}" (literal string, not
+          evaluated). Changed to a proper f-string with "─" * 60.
+  [FIX D] Rate-limit retry: sleep raised 2s → 5s; added a second retry loop
+          with exponential back-off so transient 429s self-heal.
 """
 
 import os
@@ -28,6 +34,18 @@ log = get_logger(__name__)
 
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 
+# Safe context budgets (tokens). Actual limits are higher but we leave headroom
+# for the response (GROQ_MAX_TOKENS) and prompt overhead.
+_MODEL_CTX = {
+    "llama-3.3-70b-versatile": 28_000,
+    "gemma2-9b-it":             5_500,   # 8k limit − 1k system − 500 headroom
+    "llama3-8b-8192":           6_500,
+}
+_DEFAULT_CTX = 12_000   # safe fallback for unknown models
+
+# Rough chars-per-token estimate for English financial text
+_CHARS_PER_TOKEN = 4
+
 
 # ─────────────────────────────────────────────
 # Result dataclass
@@ -43,9 +61,8 @@ class RAGResponse:
 
 
 # ─────────────────────────────────────────────
-# System prompts — finance-grade, structured
+# System prompts
 # ─────────────────────────────────────────────
-
 ANNUAL_SYSTEM_PROMPT = """\
 You are a senior equity research analyst at a top-tier investment firm, \
 specialising in Indian listed companies (BSE/NSE).
@@ -74,7 +91,7 @@ for an Indian listed company.
 YOUR RULES:
 1. RECENCY FIRST: Lead with the most recent concall available. State the date/quarter.
 2. QUOTE ACCURATELY: When citing management, use exact words and name the speaker \
-and their role. Format: "CFO [Name]: '...'" 
+and their role. Format: "CFO [Name]: '...'"
 3. SEPARATE MGMT vs ANALYST: Clearly distinguish management commentary from \
 analyst questions and pushback.
 4. KEY THEMES: Extract: guidance, risks mentioned, capex plans, margin commentary, \
@@ -104,34 +121,40 @@ say what IS available and what is MISSING.\
 
 
 # ─────────────────────────────────────────────
-# Context builder — sorted by year DESC so LLM
-# sees latest data first in its context window
+# Token estimation helper
+# ─────────────────────────────────────────────
+def _estimate_tokens(text: str) -> int:
+    return max(1, len(text) // _CHARS_PER_TOKEN)
+
+
+# ─────────────────────────────────────────────
+# Context builder  [FIX C]
 # ─────────────────────────────────────────────
 def _build_context(chunks: List[RetrievedChunk]) -> str:
-    # Sort: most recent year first, annual before concall within same year
     def sort_key(c):
         yr  = c.metadata.get("year", 0)
         typ = 0 if c.metadata.get("doc_type") == "annual_report" else 1
         return (-yr, typ)
 
     sorted_chunks = sorted(chunks, key=sort_key)
+    separator = "\n\n" + "─" * 60 + "\n\n"   # FIX C: was "{'─'*60}" — literal, not evaluated
 
     parts = []
     for i, chunk in enumerate(sorted_chunks, 1):
-        meta = chunk.metadata
+        meta      = chunk.metadata
         doc_label = "Annual Report" if meta.get("doc_type") == "annual_report" else "Concall Transcript"
         section   = (meta.get("section") or meta.get("speaker") or "")[:60]
         tag = (
-            f"[Source {i} | {meta.get('symbol','')} | {doc_label} | "
-            f"FY{meta.get('year','')} | {section} | Page {meta.get('page_start','')}]"
+            f"[Source {i} | {meta.get('symbol', '')} | {doc_label} | "
+            f"FY{meta.get('year', '')} | {section} | Page {meta.get('page_start', '')}]"
         )
         parts.append(f"{tag}\n{chunk.text.strip()}")
 
-    return "\n\n{'─'*60}\n\n".join(parts)
+    return separator.join(parts)
 
 
 def _build_user_prompt(query: str, context: str, doc_type: str,
-                        years: Optional[List[int]] = None) -> str:
+                       years: Optional[List[int]] = None) -> str:
     year_instruction = ""
     if years:
         year_instruction = (
@@ -140,45 +163,134 @@ def _build_user_prompt(query: str, context: str, doc_type: str,
             f"from the context, explicitly flag it with ⚠."
         )
 
-    return f"""\
-CONTEXT FROM FINANCIAL DOCUMENTS (most recent first):
-{'='*60}
-{context}
-{'='*60}
-{year_instruction}
-
-QUESTION: {query}
-
-INSTRUCTIONS:
-- Answer using ONLY the context above.
-- Lead with the most recent year's data.
-- Show calculations explicitly for any growth/trend figures.
-- Use a table if comparing across multiple years.
-- Flag any years where data is missing from context.
-"""
+    return (
+        f"CONTEXT FROM FINANCIAL DOCUMENTS (most recent first):\n"
+        f"{'=' * 60}\n"
+        f"{context}\n"
+        f"{'=' * 60}"
+        f"{year_instruction}\n\n"
+        f"QUESTION: {query}\n\n"
+        f"INSTRUCTIONS:\n"
+        f"- Answer using ONLY the context above.\n"
+        f"- Lead with the most recent year's data.\n"
+        f"- Show calculations explicitly for any growth/trend figures.\n"
+        f"- Use a table if comparing across multiple years.\n"
+        f"- Flag any years where data is missing from context.\n"
+    )
 
 
 # ─────────────────────────────────────────────
-# Groq API call
+# Context trimmer  [FIX B]
 # ─────────────────────────────────────────────
-def _call_groq(system_prompt: str, user_prompt: str,
-               model: str, api_key: str) -> dict:
+def _trim_chunks_to_budget(
+    chunks: List[RetrievedChunk],
+    system_prompt: str,
+    query: str,
+    doc_type: str,
+    years: Optional[List[int]],
+    model: str,
+) -> List[RetrievedChunk]:
+    """
+    Drop lowest-ranked chunks until the full prompt fits within the model's
+    safe context window. Chunks are already sorted best-first by the reranker,
+    so we drop from the tail.
+    """
+    budget = _MODEL_CTX.get(model, _DEFAULT_CTX) - GROQ_MAX_TOKENS
+    system_tokens = _estimate_tokens(system_prompt)
+    # Build a placeholder prompt to measure overhead without context
+    overhead_tokens = _estimate_tokens(
+        _build_user_prompt(query, "", doc_type, years)
+    ) + system_tokens + 200  # 200 token safety margin
+
+    available = budget - overhead_tokens
+    if available <= 0:
+        log.warning(f"  Budget too tight for model {model}, using top 3 chunks only")
+        return chunks[:3]
+
+    kept = []
+    used = 0
+    for chunk in chunks:
+        chunk_tokens = _estimate_tokens(chunk.text) + 50  # 50 for the tag line
+        if used + chunk_tokens > available:
+            break
+        kept.append(chunk)
+        used += chunk_tokens
+
+    if len(kept) < len(chunks):
+        log.info(
+            f"  Context trimmed: {len(chunks)} → {len(kept)} chunks "
+            f"to fit {model} budget (~{used} tokens used of {available} available)"
+        )
+    return kept or chunks[:1]
+
+
+# ─────────────────────────────────────────────
+# Groq API call  [FIX A]
+# ─────────────────────────────────────────────
+def _call_groq(
+    system_prompt: str,
+    user_prompt: str,
+    model: str,
+    api_key: str,
+    merge_system: bool = False,   # FIX A: gemma2 doesn't support system role
+) -> dict:
     headers = {
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
     }
-    payload = {
-        "model": model,
-        "messages": [
+
+    if merge_system:
+        # FIX A: models that don't support 'system' role get the system prompt
+        # prepended to the first user message instead.
+        messages = [
+            {
+                "role": "user",
+                "content": f"{system_prompt}\n\n---\n\n{user_prompt}",
+            }
+        ]
+    else:
+        messages = [
             {"role": "system", "content": system_prompt},
             {"role": "user",   "content": user_prompt},
-        ],
+        ]
+
+    payload = {
+        "model": model,
+        "messages": messages,
         "max_tokens": GROQ_MAX_TOKENS,
         "temperature": GROQ_TEMPERATURE,
     }
     resp = requests.post(GROQ_API_URL, json=payload, headers=headers, timeout=60)
     resp.raise_for_status()
     return resp.json()
+
+
+# Models known to NOT support the system role
+_NO_SYSTEM_ROLE_MODELS = {"gemma2-9b-it", "gemma-7b-it"}
+
+
+# ─────────────────────────────────────────────
+# Retry helper  [FIX D]
+# ─────────────────────────────────────────────
+def _call_groq_with_retry(
+    system_prompt: str,
+    user_prompt: str,
+    model: str,
+    api_key: str,
+    max_retries: int = 3,
+) -> dict:
+    merge = model in _NO_SYSTEM_ROLE_MODELS
+    delay = 5  # FIX D: was 2s — raised to give Groq rate-limit window time to reset
+    for attempt in range(max_retries):
+        try:
+            return _call_groq(system_prompt, user_prompt, model, api_key, merge_system=merge)
+        except requests.HTTPError as e:
+            if e.response.status_code == 429 and attempt < max_retries - 1:
+                wait = delay * (2 ** attempt)   # 5s, 10s, 20s
+                log.warning(f"  429 on {model} (attempt {attempt+1}), retrying in {wait}s")
+                time.sleep(wait)
+            else:
+                raise
 
 
 # ─────────────────────────────────────────────
@@ -217,21 +329,33 @@ def generate_answer(
         "concall":       CONCALL_SYSTEM_PROMPT,
     }.get(doc_type, COMBINED_SYSTEM_PROMPT)
 
-    context     = _build_context(chunks)
-    user_prompt = _build_user_prompt(query, context, doc_type, years)
-
-    t0 = time.time()
+    t0         = time.time()
     model_used = GROQ_MODEL
+
     try:
-        result = _call_groq(system, user_prompt, GROQ_MODEL, api_key)
+        # FIX B: trim chunks to fit primary model's context window
+        safe_chunks = _trim_chunks_to_budget(chunks, system, query, doc_type, years, GROQ_MODEL)
+        context     = _build_context(safe_chunks)
+        user_prompt = _build_user_prompt(query, context, doc_type, years)
+        result      = _call_groq_with_retry(system, user_prompt, GROQ_MODEL, api_key)
+
     except requests.HTTPError as e:
-        if e.response.status_code == 429:
-            log.warning(f"Rate limited on {GROQ_MODEL}, trying {GROQ_FALLBACK_MODEL}")
-            time.sleep(2)
-            model_used = GROQ_FALLBACK_MODEL
-            result = _call_groq(system, user_prompt, GROQ_FALLBACK_MODEL, api_key)
-        else:
+        if e.response.status_code != 429:
             raise
+
+        # Primary model exhausted — switch to fallback
+        log.warning(f"  Primary model {GROQ_MODEL} rate-limited, switching to {GROQ_FALLBACK_MODEL}")
+        model_used = GROQ_FALLBACK_MODEL
+
+        # FIX B: re-trim for the smaller fallback context window
+        safe_chunks = _trim_chunks_to_budget(
+            chunks, system, query, doc_type, years, GROQ_FALLBACK_MODEL
+        )
+        context     = _build_context(safe_chunks)
+        user_prompt = _build_user_prompt(query, context, doc_type, years)
+
+        # FIX D: retry with back-off; FIX A: merge_system handled inside _call_groq_with_retry
+        result = _call_groq_with_retry(system, user_prompt, GROQ_FALLBACK_MODEL, api_key)
 
     latency = time.time() - t0
     answer  = result["choices"][0]["message"]["content"]
@@ -246,14 +370,19 @@ def generate_answer(
             "page":     c.metadata.get("page_start"),
             "score":    round(c.score, 4),
         }
-        for c in chunks
+        for c in chunks   # report all originally retrieved chunks in sources
     ]
 
-    log.info(f"  LLM: {usage.get('completion_tokens',0)} tokens | "
-             f"{latency:.1f}s | {model_used}")
+    log.info(
+        f"  LLM: {usage.get('completion_tokens', 0)} tokens | "
+        f"{latency:.1f}s | {model_used} | {len(safe_chunks)}/{len(chunks)} chunks sent"
+    )
 
     return RAGResponse(
-        answer=answer, model_used=model_used, chunks_used=len(chunks),
-        sources=sources, tokens_used=usage.get("total_tokens", 0),
+        answer=answer,
+        model_used=model_used,
+        chunks_used=len(safe_chunks),
+        sources=sources,
+        tokens_used=usage.get("total_tokens", 0),
         latency_sec=round(latency, 2),
     )

@@ -1,9 +1,15 @@
 """
 pipeline/extract/pdf_extractor.py
 
-Extracts structured content from PDFs.
-- Annual reports: detects prose vs financial tables, captures section headers
-- Concall transcripts: detects speaker turns, Q&A blocks, tags speaker role
+FIXES applied in this version:
+  [FIX 4] extract_annual_report — prose block no longer duplicates table text.
+           pdfplumber bounding boxes are collected for every detected table,
+           then the page is cropped to exclude those regions before calling
+           extract_text(). This means prose chunks contain ONLY non-table text,
+           eliminating the near-duplicate embeddings that were diluting retrieval.
+  [FIX 5] extract_annual_report — section header lines are removed from the
+           prose block text (they were appearing both as a section_header block
+           AND as part of the following prose block).
 """
 
 import re
@@ -28,16 +34,16 @@ class PageBlock:
     page_num: int
     block_type: str          # prose | table | section_header | speaker_turn
     text: str
-    section: Optional[str] = None     # nearest section header
-    speaker: Optional[str] = None     # concall only
-    speaker_role: Optional[str] = None  # management | analyst | moderator
-    table_data: Optional[List[List]] = None  # raw table rows
+    section: Optional[str] = None
+    speaker: Optional[str] = None
+    speaker_role: Optional[str] = None
+    table_data: Optional[List[List]] = None
 
 
 @dataclass
 class ExtractedDocument:
     file_path: str
-    doc_type: str             # annual_report | concall
+    doc_type: str
     total_pages: int
     blocks: List[PageBlock] = field(default_factory=list)
 
@@ -48,7 +54,7 @@ class ExtractedDocument:
 SECTION_HEADER_PATTERNS = [
     r"^(?:CHAPTER|SECTION|PART)\s+[IVXLCDM\d]+",
     r"^\d+\.\s+[A-Z][A-Za-z\s]{5,50}$",
-    r"^[A-Z][A-Z\s]{8,60}$",           # ALL CAPS lines
+    r"^[A-Z][A-Z\s]{8,60}$",
     r"^(?:Notes? to|Standalone|Consolidated)\s+",
     r"^(?:Directors|Management|Auditors?|Board)\s+",
     r"^(?:Statement of|Balance Sheet|Profit and Loss|Cash Flow)",
@@ -98,7 +104,6 @@ def _extract_speaker_turns(page_text: str, page_num: int) -> List[PageBlock]:
     blocks = []
     segments = SPEAKER_PATTERN.split(page_text)
 
-    # segments = [pre_text, speaker1, text1, speaker2, text2, ...]
     i = 0
     while i < len(segments):
         seg = segments[i].strip()
@@ -106,7 +111,6 @@ def _extract_speaker_turns(page_text: str, page_num: int) -> List[PageBlock]:
             i += 1
             continue
 
-        # check if this looks like a speaker name
         if i + 1 < len(segments) and len(seg) < 60 and "\n" not in seg:
             speaker = seg
             body = segments[i + 1].strip() if i + 1 < len(segments) else ""
@@ -145,8 +149,66 @@ def _table_to_text(table: List[List]) -> str:
     return "\n".join(lines)
 
 
+def _get_table_bboxes(page) -> List[Tuple[float, float, float, float]]:
+    """
+    Return bounding boxes (x0, top, x1, bottom) for all tables on a page.
+    Used to crop them out before extracting prose text.  [FIX 4]
+    """
+    bboxes = []
+    for table_obj in page.find_tables():
+        try:
+            bbox = table_obj.bbox   # (x0, top, x1, bottom)
+            bboxes.append(bbox)
+        except Exception:
+            pass
+    return bboxes
+
+
+def _extract_prose_excluding_tables(page, table_bboxes) -> str:
+    """
+    Extract text from a page while cropping out table regions.
+    Falls back to full page.extract_text() if cropping fails.  [FIX 4]
+    """
+    if not table_bboxes:
+        return page.extract_text() or ""
+
+    try:
+        # Crop away each table bbox and collect remaining text
+        remaining = page
+        text_parts = []
+
+        # Sort bboxes top-to-bottom so we can extract prose strips between them
+        sorted_bboxes = sorted(table_bboxes, key=lambda b: b[1])  # sort by 'top'
+
+        page_top    = page.bbox[1]
+        page_bottom = page.bbox[3]
+        prev_bottom = page_top
+
+        for (x0, top, x1, bottom) in sorted_bboxes:
+            # Strip above this table
+            if top > prev_bottom + 2:
+                strip = page.crop((page.bbox[0], prev_bottom, page.bbox[2], top))
+                t = strip.extract_text() or ""
+                if t.strip():
+                    text_parts.append(t)
+            prev_bottom = bottom
+
+        # Strip below last table
+        if prev_bottom < page_bottom - 2:
+            strip = page.crop((page.bbox[0], prev_bottom, page.bbox[2], page_bottom))
+            t = strip.extract_text() or ""
+            if t.strip():
+                text_parts.append(t)
+
+        return "\n".join(text_parts)
+
+    except Exception as e:
+        log.debug(f"  Table-crop fallback triggered: {e}")
+        return page.extract_text() or ""
+
+
 # ─────────────────────────────────────────────
-# Annual report extractor
+# Annual report extractor  [FIX 4 + FIX 5]
 # ─────────────────────────────────────────────
 def extract_annual_report(pdf_path: Path) -> ExtractedDocument:
     doc = ExtractedDocument(
@@ -164,10 +226,11 @@ def extract_annual_report(pdf_path: Path) -> ExtractedDocument:
         for page in pdf.pages:
             page_num = page.page_number
 
-            # Extract tables first
-            tables = page.extract_tables()
-            used_bbox_regions = []
+            # ── Step 1: detect & record table bounding boxes ─────────────
+            table_bboxes = _get_table_bboxes(page)      # [FIX 4]
 
+            # ── Step 2: extract and store table blocks ────────────────────
+            tables = page.extract_tables()
             for table in tables:
                 if not table or len(table) < 2:
                     continue
@@ -181,38 +244,54 @@ def extract_annual_report(pdf_path: Path) -> ExtractedDocument:
                         table_data=table,
                     ))
 
-            # Extract remaining text (prose)
-            text = page.extract_text() or ""
-            if not text.strip():
+            # ── Step 3: extract prose text EXCLUDING table regions ────────
+            # [FIX 4] Previously used page.extract_text() which included ALL
+            # text on the page — duplicating every table cell as prose too.
+            prose_text = _extract_prose_excluding_tables(page, table_bboxes)
+
+            if not prose_text.strip():
                 continue
 
-            for line in text.split("\n"):
-                line = line.strip()
-                if not line:
+            # ── Step 4: detect section headers, update state ──────────────
+            section_lines = set()
+            for line in prose_text.split("\n"):
+                line_stripped = line.strip()
+                if not line_stripped:
                     continue
-                if _is_section_header(line):
-                    current_section = line
+                if _is_section_header(line_stripped):
+                    current_section = line_stripped
+                    section_lines.add(line_stripped)    # [FIX 5] track for removal
                     doc.blocks.append(PageBlock(
                         page_num=page_num,
                         block_type="section_header",
-                        text=line,
-                        section=line,
+                        text=line_stripped,
+                        section=line_stripped,
                     ))
 
-            # Prose block for whole page text
-            doc.blocks.append(PageBlock(
-                page_num=page_num,
-                block_type="prose",
-                text=text,
-                section=current_section,
-            ))
+            # ── Step 5: build prose block without section header lines ────
+            # [FIX 5] Remove lines that were already emitted as section_header
+            # blocks to avoid them appearing twice in the prose chunk.
+            if section_lines:
+                filtered_lines = [
+                    ln for ln in prose_text.split("\n")
+                    if ln.strip() not in section_lines
+                ]
+                prose_text = "\n".join(filtered_lines)
+
+            if prose_text.strip():
+                doc.blocks.append(PageBlock(
+                    page_num=page_num,
+                    block_type="prose",
+                    text=prose_text,
+                    section=current_section,
+                ))
 
     log.info(f"  → {len(doc.blocks)} blocks extracted")
     return doc
 
 
 # ─────────────────────────────────────────────
-# Concall extractor
+# Concall extractor (unchanged)
 # ─────────────────────────────────────────────
 def extract_concall(pdf_path: Path) -> ExtractedDocument:
     doc = ExtractedDocument(
