@@ -85,7 +85,7 @@ _MODEL_CTX: Dict[str, int] = {
     # OpenRouter — Qwen (free, 131k context)
     "qwen/qwen3-30b-a3b:free":          30_000,
     "qwen/qwen3-8b:free":               30_000,
-    "qwen/qwen-2.5-72b-instruct:free":  30_000,
+    "qwen/qwen2.5-72b-instruct:free":   30_000,   # fixed: was qwen-2.5 (dash bug)
     # OpenRouter — Gemini
     "google/gemini-2.0-flash-001":     200_000,
     "anthropic/claude-3-haiku":         50_000,
@@ -167,6 +167,15 @@ def build_provider_catalogue() -> List[ProviderEntry]:
         ))
 
     # ── 2. OpenRouter — Qwen free (large context, zero cost) ──────
+    # NOTE: Free-tier models still require an OPENROUTER_API_KEY — even for
+    # free models OpenRouter needs to identify the caller. Get a free key at
+    # https://openrouter.ai/ (no credit card needed for free models).
+    #
+    # Model slug corrections (all three previously 404'd):
+    #   OLD: qwen/qwen3-30b-a3b:free          → NEW: qwen/qwen3-30b-a3b:free  (OK)
+    #   OLD: qwen/qwen-2.5-72b-instruct:free  → NEW: qwen/qwen2.5-72b-instruct:free
+    #        ^^ dash between "qwen" and "2.5" was the bug ^^
+    #   OLD: qwen/qwen3-8b:free               → NEW: qwen/qwen3-8b:free  (OK)
     if or_key:
         cat.extend([
             ProviderEntry(
@@ -177,7 +186,7 @@ def build_provider_catalogue() -> List[ProviderEntry]:
             ),
             ProviderEntry(
                 id="or-qwen72b", label="OpenRouter — Qwen2.5 72B Instruct [FREE]",
-                provider="openrouter", model="qwen/qwen-2.5-72b-instruct:free",
+                provider="openrouter", model="qwen/qwen2.5-72b-instruct:free",
                 api_key=or_key, api_url=OPENROUTER_API_URL,
                 context_note="131k ctx, FREE",
             ),
@@ -310,6 +319,15 @@ ANNUAL_SYSTEM_PROMPT = """\
 You are a senior equity research analyst at a top-tier investment firm, \
 specialising in Indian listed companies (BSE/NSE).
 
+BEFORE WRITING YOUR ANSWER, reason step-by-step internally:
+  Step 1 — Re-read the question. What EXACTLY is being asked? Write it in one sentence.
+  Step 2 — Scan the context. List ONLY the chunks that directly answer Step 1.
+  Step 3 — If a chunk is only tangentially related (e.g. general company intro, \
+boilerplate, unrelated financials), EXCLUDE it from your answer entirely.
+  Step 4 — Build your answer ONLY from the chunks identified in Step 2.
+  Step 5 — Do NOT generate tables, estimates, or calculations for data that is NOT \
+present in Step 2 chunks. If data is missing, flag it with ⚠ and stop.
+
 YOUR RULES — follow every one strictly:
 1. RECENCY FIRST: Always prefer and prominently feature data from the most recent \
 fiscal year available in the context. Never lead with old data.
@@ -324,39 +342,68 @@ analysis, use bullet points. For qualitative topics, use paragraphs.
 6. CITE EVERY NUMBER: After each data point write [FY<year>, Page <n>].
 7. FLAG GAPS: If data for a specific year is missing from context, write: \
 "⚠ FY<year>: data not in retrieved excerpts."
-8. NO HALLUCINATION: If you are not certain, say so. Never guess a number.\
+8. NO HALLUCINATION: If you are not certain, say so. Never guess a number. \
+Never back-calculate or extrapolate missing years from a single growth rate.\
 """
 
 CONCALL_SYSTEM_PROMPT = """\
 You are a senior buy-side equity analyst reviewing earnings call transcripts \
 for an Indian listed company.
 
+BEFORE WRITING YOUR ANSWER, reason step-by-step internally:
+  Step 1 — Re-read the question. Is it asking for (a) forward-looking guidance/outlook, \
+(b) past performance, or (c) specific management commentary? Identify the type.
+  Step 2 — Scan the context. Find ONLY chunks where a named management speaker \
+(CEO, CFO, MD) directly addresses the question topic. Ignore moderator lines, \
+analyst questions, and generic introductions.
+  Step 3 — If the context does NOT contain a direct answer, say so clearly. \
+Do NOT substitute operational results for guidance, and do NOT paraphrase \
+unrelated chunks as if they answer the question.
+  Step 4 — Build your answer only from Step 2 chunks.
+
 YOUR RULES:
 1. RECENCY FIRST: Lead with the most recent concall available. State the date/quarter.
-2. QUOTE ACCURATELY: When citing management, use exact words and name the speaker \
+2. FORWARD-LOOKING PRIORITY: The user often asks about OUTLOOK, GUIDANCE, DEMAND \
+ENVIRONMENT, or MANAGEMENT EXPECTATIONS. Search the context for phrases like \
+"we expect", "going forward", "H1/H2 guidance", "demand scenario", "we are confident", \
+"target", "capex plan". If found, lead with those. If not found, say so explicitly.
+3. QUOTE ACCURATELY: When citing management, use exact words and name the speaker \
 and their role. Format: "CFO [Name]: '...'"
-3. SEPARATE MGMT vs ANALYST: Clearly distinguish management commentary from \
+4. SEPARATE MGMT vs ANALYST: Clearly distinguish management commentary from \
 analyst questions and pushback.
-4. KEY THEMES: Extract: guidance, risks mentioned, capex plans, margin commentary, \
+5. KEY THEMES: Extract: guidance, risks mentioned, capex plans, margin commentary, \
 volume/revenue targets.
-5. FLAG GAPS: If the query topic was not discussed in the transcript, say so clearly.
-6. USE ONLY CONTEXT: Do not use prior knowledge about the company.\
+6. FLAG GAPS: If the query topic (e.g. demand outlook, H1 guidance) was NOT discussed \
+in the transcript, say so clearly. Do not substitute operational results for guidance.
+7. USE ONLY CONTEXT: Do not use prior knowledge about the company.\
 """
 
 COMBINED_SYSTEM_PROMPT = """\
 You are a senior equity research analyst with access to both annual reports \
 and earnings call transcripts for an Indian listed company.
 
+BEFORE WRITING YOUR ANSWER, reason step-by-step internally:
+  Step 1 — Re-read the question carefully. What specific metric, event, or \
+commentary is being asked for?
+  Step 2 — Scan ALL provided sources. Tag each as RELEVANT or IRRELEVANT \
+to Step 1. Irrelevant chunks (e.g. boilerplate, unrelated sections, moderator \
+lines) must be ignored entirely — do not reference them in your answer.
+  Step 3 — From RELEVANT chunks only: extract facts, numbers, and quotes.
+  Step 4 — If a requested data point is absent from RELEVANT chunks, flag it \
+with ⚠. Do NOT back-calculate, interpolate, or extrapolate missing data.
+  Step 5 — Write the answer using only what Step 3 produced.
+
 YOUR RULES:
-1. RECENCY FIRST: Always lead with the most recent data available (prefer FY2025 > \
-FY2024 > FY2023 > older). State the FY prominently.
+1. RECENCY FIRST: Always lead with the most recent data available (prefer FY2026 > \
+FY2025 > FY2024 > older). State the FY prominently.
 2. CROSS-SOURCE SYNTHESIS: When annual report numbers are confirmed or expanded \
 by concall commentary, show both. Label each: [Annual Report] or [Concall].
 3. SHOW MATH: For any YOY growth, show: (new - old) / old × 100.
 4. TABLES FOR TRENDS: Multi-year comparisons MUST be in a table with columns: \
 FY | Metric | Value | YOY%
 5. CITE SOURCES: After each data point: [FY<year>, AR/CC, Page <n>].
-6. FLAG MISSING DATA: "⚠ FY<year>: not in retrieved excerpts." for each gap.
+6. FLAG MISSING DATA: "⚠ FY<year>: not in retrieved excerpts." for each gap. \
+Never fill gaps by calculation from a single year's growth rate.
 7. NO HALLUCINATION: If a number is not in context, do not estimate or extrapolate.
 8. HONEST ABOUT LIMITS: If the context is insufficient to answer fully, \
 say what IS available and what is MISSING.\
@@ -401,10 +448,23 @@ def _build_user_prompt(query: str, context: str, doc_type: str,
             f"\n\nIMPORTANT: The user is asking about FY{'/'.join(str(y) for y in years)}. "
             f"Prioritise data from these years. Flag missing years with ⚠."
         )
+
+    # Detect forward-looking intent and add explicit instruction
+    q_lower = query.lower()
+    intent_note = ""
+    if any(kw in q_lower for kw in ["outlook", "guidance", "expect", "h1", "h2",
+                                      "demand environment", "going forward", "forecast"]):
+        intent_note = (
+            "\n\nINTENT NOTE: This is a FORWARD-LOOKING query. Prioritise chunks that "
+            "contain phrases like 'we expect', 'going forward', 'H1/H2', 'demand environment', "
+            "'guidance', 'we are confident', 'target'. Do NOT substitute past performance "
+            "data for forward-looking commentary."
+        )
+
     return (
         f"CONTEXT FROM FINANCIAL DOCUMENTS (most recent first):\n"
         f"{'=' * 60}\n{context}\n{'=' * 60}"
-        f"{year_note}\n\n"
+        f"{year_note}{intent_note}\n\n"
         f"QUESTION: {query}\n\n"
         f"INSTRUCTIONS:\n"
         f"- Answer using ONLY the context above.\n"
@@ -551,9 +611,12 @@ def _call_openai_compat(system_prompt: str, user_prompt: str,
 # Retry wrapper
 # ─────────────────────────────────────────────
 def _call_with_retry(system_prompt: str, user_prompt: str,
-                     entry: ProviderEntry, max_retries: int = 3) -> dict:
-    """Route to correct call fn; retry 429 with back-off; raise on 400/413."""
-    delay    = 5
+                     entry: ProviderEntry, max_retries: int = 4) -> dict:
+    """Route to correct call fn; retry 429 with back-off; raise on 400/413.
+    Gemini free tier allows 15 RPM — rapid successive calls hit 429 quickly.
+    Backoff schedule: 5s → 15s → 30s → 60s (covers most rate-limit windows).
+    """
+    delays   = [5, 15, 30, 60]
     last_exc = None
 
     for attempt in range(max_retries):
@@ -567,8 +630,8 @@ def _call_with_retry(system_prompt: str, user_prompt: str,
             status   = e.response.status_code
             last_exc = e
             if status == 429 and attempt < max_retries - 1:
-                wait = delay * (2 ** attempt)
-                log.warning(f"  429 on {entry.model} (attempt {attempt+1}), retry in {wait}s")
+                wait = delays[attempt]
+                log.warning(f"  429 on {entry.model} (attempt {attempt+1}/{max_retries}), retry in {wait}s")
                 time.sleep(wait)
             else:
                 raise   # 400, 413, or retries exhausted — move to next provider
@@ -660,7 +723,11 @@ def generate_answer(
                         "page":     c.metadata.get("page_start"),
                         "score":    round(c.score, 4),
                     }
-                    for c in chunks
+                    # BUG FIX: was `chunks` (all reranked chunks) — must be
+                    # `safe_chunks` (only chunks actually sent to the LLM after
+                    # context-window trimming). Showing untrimmed chunks as
+                    # sources misleads the user about what the LLM saw.
+                    for c in safe_chunks
                 ],
                 tokens_used = usage.get("total_tokens", 0),
                 latency_sec = round(latency, 2),

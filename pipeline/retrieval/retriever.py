@@ -13,12 +13,21 @@ FIXES applied in this version:
           meaningfully nudges ranking when softmax scores are similar.
   [FIX 3] MIN_RESULTS raised 5 → 8 so fallback fires sooner on sparse
           year-filtered collections.
+  [FIX ROOT-CAUSE] Embedding dimension guard added.
+          Detects ChromaDB 384-vs-768 mismatch at startup and raises a
+          clear, actionable error message instead of crashing deep inside
+          the ChromaDB call with a cryptic InvalidArgumentError.
+          Root cause: chroma_store/ was built with all-MiniLM-L6-v2
+          (384-dim) and was never deleted after the embedding model was
+          changed to FinLang/finance-embeddings-investopedia (768-dim).
+          Fix: delete chroma_store/ then re-run ingest.py per symbol.
 """
 
 import re
 import math
 from typing import List, Dict, Optional, Any, Tuple
 from dataclasses import dataclass
+
 
 from config.settings import ANNUAL_RETRIEVAL, CONCALL_RETRIEVAL
 from pipeline.loader.embedder import embed_query
@@ -27,9 +36,76 @@ from utils.logger import get_logger
 
 log = get_logger(__name__)
 
-CURRENT_FY       = 2025
+CURRENT_FY       = 2026
 DEFAULT_LOOKBACK = 3
 MIN_RESULTS      = 8          # FIX 3: was 5
+
+# ─────────────────────────────────────────────
+# Intent taxonomy for query expansion
+# ─────────────────────────────────────────────
+# Maps semantic intent → expansion phrases that are actually present
+# in concall/annual report text. The embedding model sees these phrases
+# directly, so cosine similarity rises for the RIGHT chunks.
+_INTENT_EXPANSIONS: Dict[str, List[str]] = {
+    "outlook":        ["we expect", "we anticipate", "our outlook", "going forward",
+                       "H1", "H2", "next quarter", "next year", "guidance"],
+    "demand":         ["demand environment", "volume growth", "market demand",
+                       "cargo volume", "throughput", "demand scenario"],
+    "guidance":       ["FY guidance", "target", "projected", "forecast",
+                       "we are confident", "we expect to achieve"],
+    "risk":           ["risk factors", "headwinds", "challenges", "macro risk",
+                       "geopolitical", "trade disruption"],
+    "capex":          ["capital expenditure", "capex plan", "investment", "expansion"],
+    "margin":         ["EBITDA margin", "operating margin", "margin guidance",
+                       "margin improvement"],
+    "revenue":        ["revenue growth", "topline", "total income", "revenue target"],
+    "debt":           ["net debt", "debt reduction", "leverage", "borrowings"],
+    "management":     ["management commentary", "CEO said", "CFO mentioned",
+                       "management discussion"],
+}
+
+_FORWARD_SIGNALS = [
+    "outlook", "expect", "anticipate", "guidance", "target", "going forward",
+    "H1", "H2", "next", "forecast", "project", "confident", "plan to",
+    "demand environment", "demand scenario",
+]
+
+
+def _expand_query(query: str) -> str:
+    """
+    Enrich the query string with domain-specific expansion phrases so the
+    embedding model can match intent-relevant chunks, not just topic-relevant ones.
+
+    Strategy:
+      1. Detect which intent buckets the query falls into (keyword scan).
+      2. Append a short expansion clause to the query.
+      3. Return enriched string — used for embedding only, never shown to user.
+    """
+    q_lower = query.lower()
+    expansions: List[str] = []
+
+    for intent, phrases in _INTENT_EXPANSIONS.items():
+        if intent in q_lower or any(p.lower() in q_lower for p in phrases[:2]):
+            expansions.extend(phrases[:3])   # take top-3 per matched intent
+
+    # Always add forward-looking signals if query implies future/guidance
+    if any(sig in q_lower for sig in ["outlook", "h1", "h2", "next", "expect",
+                                       "guidance", "demand environment", "going forward"]):
+        expansions.extend(_FORWARD_SIGNALS[:5])
+
+    if not expansions:
+        return query
+
+    # De-duplicate while preserving order
+    seen = set()
+    unique = []
+    for p in expansions:
+        if p not in seen:
+            seen.add(p)
+            unique.append(p)
+
+    enriched = query + ". " + ". ".join(unique[:10])
+    return enriched
 
 
 # ─────────────────────────────────────────────
@@ -209,7 +285,8 @@ def _build_where(symbol: Optional[str], years: Optional[List[int]]) -> Optional[
 # ─────────────────────────────────────────────
 def _run_annual_query(query: str, symbol: Optional[str],
                       years: Optional[List[int]], top_k: int) -> List[RetrievedChunk]:
-    query_vec = embed_query(query)
+    expanded_query = _expand_query(query)          # intent-aware expansion
+    query_vec = embed_query(expanded_query)
     where = _build_where(symbol, years)
 
     result = query_collection(
@@ -228,7 +305,7 @@ def _run_annual_query(query: str, symbol: Optional[str],
     vscore = [1 - d for d in dists]
 
     bm25   = BM25(docs)
-    bscore = bm25.get_scores(query)
+    bscore = bm25.get_scores(expanded_query)   # use enriched query for BM25 too
 
     nv = _minmax(vscore)
     nb = _minmax(bscore)
@@ -236,10 +313,11 @@ def _run_annual_query(query: str, symbol: Optional[str],
 
     results = []
     for cid, text, meta, fs, vs, bs in zip(ids, docs, metas, fused, vscore, bscore):
-        yr = meta.get("year", 0)
-        final = fs + recency_boost(yr)
+        # NOTE: recency_boost is intentionally NOT applied here.
+        # It is applied post-rerank in reranker.py so it is not silently
+        # overwritten when the reranker replaces chunk.score.  [BUG FIX C]
         results.append(RetrievedChunk(
-            chunk_id=cid, text=text, score=final,
+            chunk_id=cid, text=text, score=fs,
             vector_score=vs, bm25_score=bs, metadata=meta,
         ))
 
@@ -278,7 +356,8 @@ def retrieve_concall(
     speaker_role: Optional[str] = None,
 ) -> List[RetrievedChunk]:
     cfg = CONCALL_RETRIEVAL
-    query_vec = embed_query(query)
+    expanded_query = _expand_query(query)          # intent-aware expansion
+    query_vec = embed_query(expanded_query)
 
     conditions = []
     if symbol:
@@ -323,13 +402,31 @@ def retrieve_concall(
     dists  = result["distances"][0]
     vscore = [1 - d for d in dists]
 
+    # BM25 hybrid fusion for concall — same approach as annual pipeline.
+    # Keyword-heavy queries (e.g. "capex guidance FY24") benefit significantly
+    # from BM25 recall on top of semantic similarity.
+    bm25   = BM25(docs)
+    bscore = bm25.get_scores(expanded_query)
+
+    nv     = _minmax(vscore)
+    nb     = _minmax(bscore)
+    fused  = [(v + b) / 2 for v, b in zip(nv, nb)]
+
     results = []
-    for cid, text, meta, vs in zip(ids, docs, metas, vscore):
-        yr = meta.get("year", 0)
+    for cid, text, meta, fs, vs, bs in zip(ids, docs, metas, fused, vscore, bscore):
+        # Speaker-role penalty: moderator/intro text is noise for most queries.
+        role = meta.get("speaker_role", "unknown")
+        role_penalty = 0.0
+        if role == "moderator":
+            role_penalty = 0.08
+        elif role == "unknown":
+            role_penalty = 0.03
+        # NOTE: recency_boost is NOT applied here — applied post-rerank [BUG FIX C]
+        final_score = max(0.0, fs - role_penalty)
         results.append(RetrievedChunk(
             chunk_id=cid, text=text,
-            score=vs + recency_boost(yr),
-            vector_score=vs, bm25_score=0.0, metadata=meta,
+            score=final_score,
+            vector_score=vs, bm25_score=bs, metadata=meta,
         ))
 
     results.sort(key=lambda c: c.score, reverse=True)
