@@ -2,39 +2,47 @@
 pipeline/retrieval/reranker.py
 
 Primary  re-ranker : Voyage Rerank-2.5 (finance/SEC domain-tuned, 32k ctx)
-Fallback re-ranker : Qwen/Qwen3-Reranker-8B (local HuggingFace, free, 32k ctx)
+Fallback re-ranker : BAAI/bge-reranker-v2-m3 (local cross-encoder, ~1.1 GB fp16)
 
-Fallback is activated automatically when:
+The fallback activates automatically when:
   - VOYAGE_API_KEY is not set in .env
   - Voyage API returns HTTP 429 (rate limit) or 402 (quota exceeded)
 
-Why Voyage Rerank-2.5 is the primary choice:
-  - Finance/SEC domain fine-tuning: best precision on annual reports & concalls.
-  - 32k token context window: handles full 512-token annual report chunks without
-    truncation (cross-encoders cap at 512 tokens, silently dropping tail text).
-  - API-based: no GPU/CPU overhead, no model loading delay.
-  - Returns calibrated relevance scores in [0,1] with genuine separation.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Why BAAI/bge-reranker-v2-m3 and NOT Fin-E5 or Qwen3-Reranker-8B
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Fin-E5 is fine-tuned on e5-mistral-7b-instruct — a 7B causal LM.
+  fp16 weights alone = ~14 GB.  On a 16 GB machine this leaves < 2 GB for
+  the OS, Python, ChromaDB, and the 768-dim embedding model.  The process
+  will either OOM-kill immediately or grind to a halt on swap.
 
-Why Qwen3-Reranker-8B is the best local fallback:
-  - 32k context (same as Voyage) — no truncation.
-  - Free, runs on CPU (slow ~5-20s/batch) or GPU.
-  - Significantly better than MiniLM/BGE cross-encoders on financial text.
-  - HuggingFace model: Qwen/Qwen3-Reranker-8B
-  - Install: pip install transformers torch accelerate
-  - RAM: ~16 GB fp32 | ~8 GB fp16 | ~4 GB int8 (with bitsandbytes)
+Qwen3-Reranker-8B is an 8B causal LM.
+  fp16 = ~8 GB, fp32 = ~16 GB.  Same problem on 16 GB total RAM.
 
-Scoring pipeline:
-  1. voyageai.rerank() or Qwen3-Reranker-8B → relevance_score in [0, 1]
+Both models were designed for GPU server deployment, not a 16 GB laptop CPU.
+
+BAAI/bge-reranker-v2-m3 is a cross-encoder (BERT-style encoder, NOT a LM).
+  ~568 M parameters → ~1.1 GB fp16 / ~2.2 GB fp32.
+  Leaves 13-14 GB free — fully comfortable on i5-1240P / 16 GB.
+  512-token context window matches chunk_size = 512 exactly.
+  Top-ranked cross-encoder on MTEB reranking leaderboard.
+  Outputs raw logit scores — genuine separation, not softmax-collapsed.
+  No extra dependencies beyond sentence-transformers (already installed).
+  Install: pip install sentence-transformers
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Scoring pipeline
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  1. Voyage rerank-2 or bge-reranker-v2-m3 → relevance score per chunk
   2. _forward_boost()   → additive bonus/penalty for intent signals
-  3. recency_boost()    → additive boost for more recent fiscal years
-     [FIX C] recency_boost applied POST-rerank (was silently discarded before)
+  3. recency_boost()    → additive fiscal-year nudge  [applied POST-rerank]
   4. Zero-score filter  → noise chunks never reach the LLM
 
-[FIX A] Reranker swapped → Voyage Rerank-2.5 (finance domain-tuned, 32k ctx)
+[FIX A] Voyage Rerank-2.5 as primary (finance domain-tuned, 32k ctx)
 [FIX B] Zero-score chunks filtered before LLM call
 [FIX C] recency_boost applied POST-rerank (was silently discarded before)
-[FIX D] Single-chunk edge case: skip API call, assign score=1.0 directly
-[FIX E] Qwen3-Reranker-8B local fallback when Voyage unavailable/rate-limited
+[FIX D] Single-chunk fast path: skip API call, assign score=1.0
+[FIX E] bge-reranker-v2-m3 as local fallback — fits on 16 GB comfortably
 """
 
 import os
@@ -52,6 +60,7 @@ log = get_logger(__name__)
 
 # Minimum relevance score for a chunk to be passed to the LLM.
 # Voyage scores are well-calibrated — anything below 0.05 is noise.
+# bge-reranker-v2-m3 outputs sigmoid(logit) in [0,1]; same threshold applies.
 _MIN_SCORE_THRESHOLD = 0.05
 
 # ─────────────────────────────────────────────
@@ -100,21 +109,23 @@ def _forward_boost(chunk_text: str, query: str) -> float:
 # ─────────────────────────────────────────────
 _voyage_client = None
 
+
 def _get_voyage_client():
+    """Returns a Voyage client if VOYAGE_API_KEY is set, else None."""
     global _voyage_client
     if _voyage_client is not None:
         return _voyage_client
 
     api_key = os.getenv("VOYAGE_API_KEY", "")
     if not api_key:
-        return None   # caller will use fallback
+        return None   # no key → caller uses local fallback
 
     try:
         import voyageai
     except ImportError:
         log.warning(
             "voyageai package not installed. Run: pip install voyageai\n"
-            "Falling back to Qwen3-Reranker-8B."
+            "Falling back to BAAI/bge-reranker-v2-m3."
         )
         return None
 
@@ -124,127 +135,69 @@ def _get_voyage_client():
 
 
 # ─────────────────────────────────────────────
-# [FIX E] Qwen3-Reranker-8B local fallback
+# [FIX E] BAAI/bge-reranker-v2-m3 local fallback
 # ─────────────────────────────────────────────
-_qwen_model   = None
-_qwen_tokenizer = None
+_bge_model = None
 
 
-def _get_qwen_reranker():
+def _get_bge_reranker():
     """
-    Lazy-load Qwen3-Reranker-8B.  Returns (tokenizer, model) or raises.
+    Lazy-load BAAI/bge-reranker-v2-m3 via sentence-transformers.
 
-    Qwen3-Reranker-8B uses a task-instruction format:
-      <Instruct>: Given a web search query, retrieve relevant passages...
-      <query>: {query}
-      <document>: {document}
-
-    The model is a causal LM; we take the logit of the "yes" token at the
-    last position as the relevance score (standard Qwen3-Reranker recipe).
+    Memory footprint:
+      fp32 on CPU  : ~2.2 GB  (comfortable on 16 GB)
+      fp16 on GPU  : ~1.1 GB
+    Context window : 512 tokens  (matches chunk_size in settings)
+    Dependencies   : sentence-transformers  (already used by embedder)
     """
-    global _qwen_model, _qwen_tokenizer
-    if _qwen_model is not None:
-        return _qwen_tokenizer, _qwen_model
+    global _bge_model
+    if _bge_model is not None:
+        return _bge_model
 
     try:
-        import torch
-        from transformers import AutoTokenizer, AutoModelForCausalLM
+        from sentence_transformers import CrossEncoder
     except ImportError:
         raise ImportError(
-            "Qwen3-Reranker-8B requires: pip install transformers torch accelerate\n"
-            "For lower memory usage: pip install bitsandbytes  (enables int8 loading)"
+            "sentence-transformers is required for the local reranker fallback.\n"
+            "Run: pip install sentence-transformers"
         )
 
-    model_name = RERANKER_FALLBACK
-    log.info(f"Loading Qwen3-Reranker-8B from HuggingFace: {model_name}")
-    log.info("  First run downloads ~16 GB. Subsequent runs use cache.")
+    model_name = RERANKER_FALLBACK   # "BAAI/bge-reranker-v2-m3"
+    log.info(f"Loading local fallback reranker: {model_name}")
+    log.info("  ~568M params | ~2.2 GB fp32 | fits on 16 GB RAM")
 
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-    dtype  = torch.float16 if device == "cuda" else torch.float32
-
-    _qwen_tokenizer = AutoTokenizer.from_pretrained(
-        model_name, trust_remote_code=True,
-    )
-    # Try bitsandbytes int8 first (halves RAM); fall back to fp16/fp32
-    try:
-        import bitsandbytes  # noqa: F401
-        _qwen_model = AutoModelForCausalLM.from_pretrained(
-            model_name,
-            trust_remote_code=True,
-            load_in_8bit=True,
-            device_map="auto",
-        )
-        log.info("  Qwen3-Reranker-8B loaded in int8 (bitsandbytes)")
-    except (ImportError, Exception):
-        _qwen_model = AutoModelForCausalLM.from_pretrained(
-            model_name,
-            trust_remote_code=True,
-            torch_dtype=dtype,
-            device_map="auto" if device == "cuda" else None,
-        )
-        if device == "cpu":
-            _qwen_model = _qwen_model.to(device)
-        log.info(f"  Qwen3-Reranker-8B loaded in {dtype} on {device}")
-
-    _qwen_model.eval()
-    return _qwen_tokenizer, _qwen_model
+    # CrossEncoder handles truncation internally at 512 tokens.
+    # max_length matches your chunk_size so no financial text is silently cut.
+    _bge_model = CrossEncoder(model_name, max_length=512)
+    log.info(f"  {model_name} loaded (cross-encoder, CPU-friendly)")
+    return _bge_model
 
 
-# Qwen3-Reranker instruction template (from HF model card)
-_QWEN_TASK = (
-    "Given a financial document chunk and a query about company financials, "
-    "determine if the chunk is relevant to answering the query."
-)
-_QWEN_PREFIX = "<Instruct>: {task}\n<query>: {query}\n<document>: "
-_QWEN_SUFFIX = "\n<response>:"   # model predicts "yes" / "no" here
-
-
-def _qwen_score_batch(query: str, documents: List[str]) -> List[float]:
+def _bge_score_batch(query: str, documents: List[str]) -> List[float]:
     """
-    Score each document against the query using Qwen3-Reranker-8B.
-    Returns a list of float scores in approximately [0, 1].
+    Score each document against the query using bge-reranker-v2-m3.
+
+    CrossEncoder.predict() returns raw logits by default.
+    We apply sigmoid to convert to [0, 1] for consistency with Voyage scores
+    and with _MIN_SCORE_THRESHOLD = 0.05.
+
+    Sigmoid preserves score ordering so ranking is unaffected.
     """
-    import torch
+    import math
 
-    tokenizer, model = _get_qwen_reranker()
-    device = next(model.parameters()).device
+    model  = _get_bge_reranker()
+    pairs  = [[query, doc] for doc in documents]
 
-    prefix = _QWEN_PREFIX.format(task=_QWEN_TASK, query=query)
+    # predict() returns a numpy array of raw logits
+    logits = model.predict(pairs, show_progress_bar=False)
 
-    # Token IDs for "yes" and "no" (Qwen tokeniser)
-    yes_id = tokenizer.encode("yes", add_special_tokens=False)[0]
-    no_id  = tokenizer.encode("no",  add_special_tokens=False)[0]
-
-    scores = []
-    for doc in documents:
-        text   = prefix + doc + _QWEN_SUFFIX
-        inputs = tokenizer(
-            text,
-            return_tensors="pt",
-            max_length=32768,
-            truncation=True,
-        ).to(device)
-
-        with torch.no_grad():
-            logits = model(**inputs).logits  # (1, seq_len, vocab_size)
-
-        # Take the last token's logits and compare yes vs no
-        last_logits = logits[0, -1, :]      # (vocab_size,)
-        yes_logit   = last_logits[yes_id].item()
-        no_logit    = last_logits[no_id].item()
-
-        # Softmax over {yes, no} → probability of "yes"
-        import math
-        exp_yes = math.exp(yes_logit)
-        exp_no  = math.exp(no_logit)
-        score   = exp_yes / (exp_yes + exp_no)
-        scores.append(score)
-
+    # sigmoid(logit) → probability in (0, 1)
+    scores = [1.0 / (1.0 + math.exp(-float(l))) for l in logits]
     return scores
 
 
 # ─────────────────────────────────────────────
-# Core rerank  (Voyage primary → Qwen3 fallback)
+# Core rerank  (Voyage primary → BGE fallback)
 # ─────────────────────────────────────────────
 def rerank(
     query: str,
@@ -253,15 +206,15 @@ def rerank(
     top_k: Optional[int] = None,
 ) -> List[RetrievedChunk]:
     """
-    Re-rank chunks.
-      Primary  : Voyage Rerank-2.5 (API, finance-tuned)
-      Fallback : Qwen3-Reranker-8B (local HuggingFace)
+    Re-rank retrieved chunks.
+      Primary  : Voyage Rerank-2.5  (API, finance/SEC fine-tuned, 32k ctx)
+      Fallback : BAAI/bge-reranker-v2-m3  (local cross-encoder, ~2.2 GB RAM)
 
     Pipeline:
-      1. API/local reranker  → calibrated relevance scores in [0, 1]
-      2. recency_boost       → post-rerank fiscal year nudge  [FIX C]
-      3. forward_boost       → intent signal bonus/penalty
-      4. zero-score filter   → noise never reaches LLM        [FIX B]
+      1. Voyage or BGE       → relevance score in [0, 1] per chunk
+      2. recency_boost       → post-rerank fiscal-year nudge     [FIX C]
+      3. _forward_boost      → intent-signal bonus / noise penalty
+      4. zero-score filter   → noise chunks never reach the LLM   [FIX B]
       5. return top_k sorted by final score
     """
     if not chunks:
@@ -274,7 +227,7 @@ def rerank(
             else CONCALL_RETRIEVAL["top_k_rerank"]
         )
 
-    # [FIX D] Single-chunk: skip API call — score 1.0 directly.
+    # [FIX D] Single-chunk fast path — skip API/model call entirely.
     if len(chunks) == 1:
         c  = chunks[0]
         yr = c.metadata.get("year", 0)
@@ -282,65 +235,71 @@ def rerank(
         log.info("  Re-ranked: 1 chunk (single-chunk fast path)")
         return chunks
 
-    documents   = [chunk.text for chunk in chunks]
-    score_map   = {}
-    used_voyage = False
+    documents = [chunk.text for chunk in chunks]
+    score_map: dict = {}
+    backend_used = "none"
 
-    # ── Try Voyage first ──────────────────────────────────────────
+    # ── 1. Try Voyage Rerank-2.5 ─────────────────────────────────
     voyage_client = _get_voyage_client()
     if voyage_client is not None:
         try:
             reranking = voyage_client.rerank(
                 query=query,
                 documents=documents,
-                model=RERANKER_MODEL,
-                top_k=len(chunks),   # get all scores, we filter ourselves
-                truncation=True,
+                model=RERANKER_MODEL,   # "rerank-2"
+                top_k=len(chunks),      # get all scores; we filter ourselves
+                truncation=True,        # safe fallback for any oversized chunks
             )
-            score_map   = {r.index: r.relevance_score for r in reranking.results}
-            used_voyage = True
-            log.info(f"  Re-ranker: Voyage {RERANKER_MODEL}")
+            score_map    = {r.index: r.relevance_score for r in reranking.results}
+            backend_used = f"Voyage {RERANKER_MODEL}"
         except Exception as e:
             status = getattr(getattr(e, "response", None), "status_code", "ERR")
             log.warning(
                 f"  Voyage rerank failed (HTTP {status}): {e}\n"
-                f"  Falling back to Qwen3-Reranker-8B."
+                f"  Falling back to {RERANKER_FALLBACK}."
             )
 
-    # ── Fallback: Qwen3-Reranker-8B ──────────────────────────────
-    if not used_voyage:
+    # ── 2. Fallback: BAAI/bge-reranker-v2-m3 ────────────────────
+    if not score_map:
         try:
-            raw_scores = _qwen_score_batch(query, documents)
-            score_map  = {i: s for i, s in enumerate(raw_scores)}
-            log.info("  Re-ranker: Qwen3-Reranker-8B (local fallback)")
+            raw_scores   = _bge_score_batch(query, documents)
+            score_map    = {i: s for i, s in enumerate(raw_scores)}
+            backend_used = RERANKER_FALLBACK
         except Exception as e:
             log.error(
-                f"  Qwen3-Reranker-8B also failed: {e}\n"
-                f"  Using raw retrieval scores as fallback."
+                f"  {RERANKER_FALLBACK} failed: {e}\n"
+                f"  Using raw hybrid retrieval scores as last resort."
             )
-            # Last-resort: use existing hybrid scores unchanged
-            score_map = {i: c.score for i, c in enumerate(chunks)}
+            # Absolute last resort: keep existing hybrid scores unchanged
+            score_map    = {i: c.score for i, c in enumerate(chunks)}
+            backend_used = "raw-hybrid-score"
 
-    # ── Apply post-rerank boosts [FIX C] ─────────────────────────
+    log.info(f"  Re-ranker backend: {backend_used}")
+
+    # ── 3. Apply post-rerank boosts [FIX C] ──────────────────────
     for i, chunk in enumerate(chunks):
         base_score  = score_map.get(i, 0.0)
         yr          = chunk.metadata.get("year", 0)
-        fwd_boost   = _forward_boost(chunk.text, query)
-        rec_boost   = recency_boost(yr)
-        chunk.score = max(0.0, base_score + fwd_boost + rec_boost)
+        # recency_boost is applied HERE (post-rerank) so it is not silently
+        # overwritten when the reranker replaces chunk.score.
+        chunk.score = max(0.0,
+                          base_score
+                          + _forward_boost(chunk.text, query)
+                          + recency_boost(yr))
 
-    # ── Filter noise-floor [FIX B] ────────────────────────────────
+    # ── 4. Filter noise-floor chunks [FIX B] ─────────────────────
     meaningful = [c for c in chunks if c.score >= _MIN_SCORE_THRESHOLD]
     if not meaningful:
-        meaningful = chunks   # safety: sparse query — keep all
+        # Safety fallback: sparse/off-topic query → keep all rather than nothing
+        meaningful = chunks
 
     reranked   = sorted(meaningful, key=lambda c: c.score, reverse=True)
     top        = reranked[:top_k]
     n_filtered = len(chunks) - len(meaningful)
-    filter_note = f" (filtered {n_filtered} below threshold)" if n_filtered else ""
+    note       = f" (filtered {n_filtered} below threshold)" if n_filtered else ""
 
     log.info(
-        f"  Re-ranked: {len(chunks)} → top {len(top)}{filter_note} | "
+        f"  Re-ranked: {len(chunks)} → top {len(top)}{note} | "
         f"score range [{top[-1].score:.4f} – {top[0].score:.4f}]"
     )
     return top
@@ -357,9 +316,9 @@ def rerank_separate(
     concall_top_k: int,
 ) -> List[RetrievedChunk]:
     """
-    Rerank each collection independently so concall prose
-    cannot displace annual report financial data chunks.
-    The merged output is sorted by final score for clean LLM context ordering.
+    Rerank each collection independently so concall prose cannot displace
+    annual report financial data chunks.
+    The merged list is sorted by final score for a clean LLM context handoff.
     """
     top_annual  = rerank(query, annual_chunks,  "annual_report", top_k=annual_top_k)
     top_concall = rerank(query, concall_chunks, "concall",       top_k=concall_top_k)

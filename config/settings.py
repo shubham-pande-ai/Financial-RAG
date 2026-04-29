@@ -8,6 +8,7 @@ FIXES applied in this version:
   [FIX 3] ANNUAL_RETRIEVAL top_k_rerank raised 8 → 15
           CONCALL_RETRIEVAL top_k_rerank raised 4 →  8
   [FIX 3] CONCALL_RETRIEVAL top_k_vector raised 15 → 25
+          search_type "semantic" → "hybrid" (BM25 fusion now applied to concall)
 
   ══════════════════════════════════════════════════════════════════════
   [FIX ROOT-CAUSE] ChromaDB dimension mismatch  384 vs 768
@@ -17,24 +18,42 @@ FIXES applied in this version:
       Collection expecting embedding with dimension of 384, got 768
 
   ROOT CAUSE:
-    chroma_store/ was created with all-MiniLM-L6-v2 (384-dim).
+    chroma_store/ was created with all-MiniLM-L6-v2 (384-dim vectors).
     EMBEDDING_MODEL was later changed to
-    FinLang/finance-embeddings-investopedia (768-dim) but the store
-    was never deleted — ChromaDB locked the dimension to 384 on first
+    FinLang/finance-embeddings-investopedia (768-dim vectors) but the
+    store was never deleted — ChromaDB locked the dimension on first
     write and now rejects 768-dim query vectors at runtime.
 
-  ONE-TIME FIX — run these commands, then re-ingest:
+  ONE-TIME FIX — run ONCE, then re-ingest:
     Windows : rmdir /s /q chroma_store
     Linux   : rm -rf chroma_store/
-    Then    : python ingest.py --symbol ADANIPORTS  (repeat per symbol)
+    Then    : python ingest.py --symbol ADANIPORTS   (repeat per symbol)
   ══════════════════════════════════════════════════════════════════════
 
-  [FIX RERANKER] CONCALL_RETRIEVAL search_type changed "semantic" → "hybrid"
-                 Concall now uses BM25 + vector fusion (same as annual).
-                 Keyword-heavy queries (e.g. "capex FY24") benefit from BM25.
+  ══════════════════════════════════════════════════════════════════════
+  [FIX RERANKER FALLBACK] Qwen3-Reranker-8B replaced with
+  BAAI/bge-reranker-v2-m3 as the local fallback.
 
-  [FIX RERANKER-FALLBACK] Qwen3-Reranker-8B added as local fallback when
-                 VOYAGE_API_KEY is absent or Voyage quota is exhausted.
+  WHY NOT Fin-E5 or Qwen3-Reranker-8B on i5-1240P / 16 GB RAM:
+    - Fin-E5 is fine-tuned on e5-mistral-7b-instruct (7B causal LM).
+      fp16 weight size alone is ~14 GB — leaves <2 GB for OS + Python +
+      ChromaDB + the 768-dim embedding model. Will OOM or swap-thrash.
+    - Qwen3-Reranker-8B is 8B parameters: ~16 GB fp32, ~8 GB fp16.
+      Same problem — competes directly with available system RAM.
+    Both are causal LLMs repurposed as rerankers; they were designed for
+    GPU servers, not a 16 GB laptop CPU.
+
+  WHY BAAI/bge-reranker-v2-m3 is the right choice here:
+    - Cross-encoder architecture (BERT-style), NOT a causal LM.
+    - ~568 M parameters → ~1.1 GB fp16 / ~2.2 GB fp32.
+    - Leaves 13-14 GB free for everything else — fully comfortable.
+    - 512-token context window matches your chunk_size exactly.
+    - Top-ranked cross-encoder on MTEB reranking leaderboard.
+    - Produces raw logit scores (not softmax-collapsed), giving real
+      separation between relevant and irrelevant chunks.
+    - Install: pip install sentence-transformers   (~already present)
+    - No extra dependencies, no bitsandbytes, no CUDA required.
+  ══════════════════════════════════════════════════════════════════════
 """
 
 import os
@@ -90,10 +109,10 @@ GROQ_TEMPERATURE    = 0.1
 # FinLang/finance-embeddings-investopedia → 768-dim vectors.
 #
 # ⚠  If you see "Collection expecting dimension 384, got 768":
-#    → Delete chroma_store/ and re-run ingest.py for every symbol.
+#    Delete chroma_store/ and re-run ingest.py for every symbol.
 #    Changing EMBEDDING_MODEL always requires full re-ingestion.
 EMBEDDING_MODEL      = "FinLang/finance-embeddings-investopedia"
-EMBEDDING_DIM        = 768    # must match model output; used for validation
+EMBEDDING_DIM        = 768    # must match model output — used for validation
 EMBEDDING_BATCH_SIZE = 64
 
 # ─────────────────────────────────────────────
@@ -101,15 +120,28 @@ EMBEDDING_BATCH_SIZE = 64
 # ─────────────────────────────────────────────
 # Primary  : Voyage Rerank-2.5 — finance/SEC domain-tuned, 32k ctx.
 #            Requires VOYAGE_API_KEY → https://dash.voyageai.com/
+#            Auto-used when key is present.
 #
-# Fallback : Qwen/Qwen3-Reranker-8B (local HuggingFace) — free, 32k ctx.
-#            Auto-activated when VOYAGE_API_KEY is absent or Voyage returns
-#            a rate-limit / quota error (HTTP 429/402).
-#            Install: pip install transformers torch accelerate
-#            RAM  : ~16 GB fp32 | ~8 GB fp16 | ~4 GB int8 (with bitsandbytes)
-#            Speed: ~5-20s/batch on CPU; GPU recommended for production.
-RERANKER_MODEL    = "rerank-2"                # Voyage Rerank-2.5
-RERANKER_FALLBACK = "Qwen/Qwen3-Reranker-8B" # local HF fallback
+# Fallback : BAAI/bge-reranker-v2-m3 — cross-encoder, ~1.1 GB fp16.
+#            Activates automatically when VOYAGE_API_KEY is absent or
+#            Voyage returns HTTP 429/402 (rate limit / quota exceeded).
+#
+#            ✅ Fits comfortably on 16 GB RAM (i5-1240P or similar).
+#            ✅ 512-token context — matches chunk_size exactly.
+#            ✅ Top cross-encoder on MTEB reranking leaderboard.
+#            ✅ No extra dependencies beyond sentence-transformers.
+#
+#            Install: pip install sentence-transformers
+#            (sentence-transformers is almost certainly already installed
+#             for the embedding pipeline — no new packages needed.)
+#
+#  ❌ DO NOT use Fin-E5 or Qwen3-Reranker-8B on this machine:
+#     Both are 7-8B causal LLMs repurposed as rerankers.
+#     Fin-E5 (e5-mistral-7b base) = ~14 GB fp16 alone.
+#     Qwen3-Reranker-8B          = ~8  GB fp16 alone.
+#     On 16 GB total RAM this leaves nothing for OS + Python + ChromaDB.
+RERANKER_MODEL    = "rerank-2"                    # Voyage Rerank-2.5
+RERANKER_FALLBACK = "BAAI/bge-reranker-v2-m3"    # local cross-encoder fallback
 VOYAGE_API_KEY    = os.getenv("VOYAGE_API_KEY", "")
 
 # ─────────────────────────────────────────────
@@ -148,7 +180,7 @@ ANNUAL_RETRIEVAL = {
 CONCALL_RETRIEVAL = {
     "top_k_vector": 25,       # was 15
     "top_k_rerank":  8,       # was 4
-    "search_type":  "hybrid", # FIX: was "semantic" — now uses BM25 fusion too
+    "search_type":  "hybrid", # FIX: was "semantic" — now BM25 hybrid too
 }
 
 # "both" mode chunk budget  [FIX 3]
