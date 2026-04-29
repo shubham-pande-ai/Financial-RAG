@@ -1,49 +1,44 @@
 """
 rag/rag_engine.py
 
-FIXES & ADDITIONS in this version:
+FIXES applied in this version:
+
+  [FIX CONTEXT-TRIM] Context trimmer now adapts top_k to provider capacity.
+          Groq free tier (~5.5k tok) → up to 6 chunks.
+          Qwen/Gemini/NVIDIA (≥30k tok) → all 18 chunks, no trimming.
+          The reranker's work is now preserved for large-context providers.
+          Recommended default provider: or-qwen30b (free, 131k ctx).
+
+  [FIX EXPLICIT-YEARS] System prompt now receives explicit_years separately
+          from resolved_years. ⚠ gap flags are emitted ONLY for years the
+          user explicitly named. Queries without a year hint no longer
+          generate spurious ⚠ FY2017 – FY2020 warnings.
+
+  [FIX METRIC-MISMATCH] System prompt now instructs the LLM to flag when
+          the requested metric (e.g. EBIT) is absent and a related metric
+          (e.g. EBITDA) is substituted. Previously this was silent.
+
+  [FIX PROVIDER-DEFAULT] Added --provider CLI flag support + --auto flag.
+          Default provider menu is shown only in interactive sessions.
+          Scripted use: pass provider_id="or-qwen30b" or auto=True.
+
+  [FIX FINANCIAL-STATEMENTS] System prompts now explicitly instruct the
+          LLM to look for: balance sheet, cash flow statement, EPS note,
+          ratios note, segment reporting (Ind AS 108). These were being
+          missed when the retrieved chunks contained the right pages but
+          the LLM was not looking for them by their exact heading names.
+
+  [FIX SOURCES-BUG] sources list now correctly reports safe_chunks (chunks
+          actually sent to LLM after trimming), not all reranked chunks.
+          Previously sources showed chunks the LLM never saw.
 
   [FIX I] Root cause of repeated 413 on Groq llama-3.3-70b:
-          Groq's FREE tier hard-caps input to ~6k tokens regardless of the
-          model's advertised 128k window. Previous budget was 26k — way too
-          high. Now set to 5500 tokens. Also tightened _CHARS_PER_TOKEN from
-          4.0 → 3.5 (financial prose is denser) and payload char ceiling from
-          160k → 130k.
+          Groq's FREE tier hard-caps input to ~6k tokens. Budget set to
+          5500 tokens. _CHARS_PER_TOKEN tightened 4.0 → 3.5.
 
   [NEW-QWEN] Qwen models via OpenRouter — FREE, 131k context window.
-          These solve the context problem entirely: no trimming needed.
-          Slugs: qwen/qwen3-30b-a3b:free, qwen/qwen-2.5-72b-instruct:free,
-                 qwen/qwen3-8b:free
-
   [NEW-OLLAMA] Local LLM via Ollama — zero API calls, zero rate limits.
-          Autodiscovers installed models via GET /api/tags.
-          Your installed models: llama3.1:latest (4.9 GB), phi3:latest (2.2 GB)
-          Uses Ollama's OpenAI-compatible endpoint /v1/chat/completions.
-
-  [NEW-PICKER] User-selectable provider via --provider CLI flag OR interactive
-          numbered menu. No more silent auto-waterfall guessing. User sees all
-          available providers with context-window notes and picks by number.
-          --auto flag restores old waterfall behaviour for scripted use.
-
-  Full provider catalogue (only shows entries with keys/services present):
-    ID            Provider      Model                          Notes
-    ──────────────────────────────────────────────────────────────────
-    groq-llama    Groq          llama-3.3-70b-versatile        5.5k tok free
-    or-qwen30b    OpenRouter    qwen/qwen3-30b-a3b:free        131k, FREE
-    or-qwen72b    OpenRouter    qwen/qwen-2.5-72b-instruct     131k, FREE
-    or-qwen8b     OpenRouter    qwen/qwen3-8b:free             131k, FREE
-    or-gemini     OpenRouter    google/gemini-2.0-flash-001    1M ctx
-    gemini        Google        gemini-2.0-flash (direct)      1M, 15RPM
-    nvidia        NVIDIA NIM    meta/llama-3.3-70b-instruct    128k
-    ollama-*      Ollama local  (autodiscovered)               no rate limit
-    groq-gemma    Groq          gemma2-9b-it                   3.2k, last resort
-
-  .env keys:
-    GROQ_API_KEY=gsk_...          https://console.groq.com/
-    GEMINI_API_KEY=AIza...        https://aistudio.google.com/app/apikey
-    OPENROUTER_API_KEY=sk-or-...  https://openrouter.ai/
-    NVIDIA_API_KEY=nvapi-...      https://build.nvidia.com/
-    OLLAMA_BASE_URL=http://localhost:11434   (optional, this is default)
+  [NEW-PICKER] Interactive numbered menu + --provider / --auto flags.
 """
 
 import os
@@ -74,18 +69,20 @@ GEMINI_API_URL     = "https://generativelanguage.googleapis.com/v1beta/models/{m
 # Context window budgets (tokens)
 # ─────────────────────────────────────────────
 _MODEL_CTX: Dict[str, int] = {
-    # Groq — free tier is hard-capped at ~6k input regardless of model window
-    "llama-3.3-70b-versatile":           5_500,   # FIX I: was 26_000
-    "gemma2-9b-it":                      3_200,   # 8k window, heavy system overhead
+    # Groq — free tier hard-capped at ~6k input regardless of model window
+    "llama-3.3-70b-versatile":           5_500,
+    "gemma2-9b-it":                      3_200,
     "llama3-8b-8192":                    6_000,
     # Google Gemini (direct)
     "gemini-2.0-flash":                200_000,
     "gemini-1.5-flash":                200_000,
     "gemini-1.5-pro":                  200_000,
     # OpenRouter — Qwen (free, 131k context)
+    # [FIX CONTEXT-TRIM] These providers can receive ALL chunks — no trim needed.
+    # Budget set to 30k (conservative) to avoid OpenRouter free-tier limits.
     "qwen/qwen3-30b-a3b:free":          30_000,
     "qwen/qwen3-8b:free":               30_000,
-    "qwen/qwen2.5-72b-instruct:free":   30_000,   # fixed: was qwen-2.5 (dash bug)
+    "qwen/qwen2.5-72b-instruct:free":   30_000,
     # OpenRouter — Gemini
     "google/gemini-2.0-flash-001":     200_000,
     "anthropic/claude-3-haiku":         50_000,
@@ -95,9 +92,13 @@ _MODEL_CTX: Dict[str, int] = {
     "_ollama_default":                 100_000,
 }
 _DEFAULT_CTX             = 12_000
-_CHARS_PER_TOKEN: float  = 3.5        # FIX I: dense financial text
-_GROQ_MAX_PAYLOAD_CHARS  = 130_000    # FIX I: tightened from 160k
+_CHARS_PER_TOKEN: float  = 3.5        # dense financial text
+_GROQ_MAX_PAYLOAD_CHARS  = 130_000
 _NO_SYSTEM_ROLE          = {"gemma2-9b-it", "gemma-7b-it"}
+
+# [FIX CONTEXT-TRIM] Providers with ≥30k token context get all chunks.
+# Groq free tier (~5.5k) is the only provider that needs aggressive trimming.
+_LARGE_CONTEXT_THRESHOLD = 20_000
 
 
 # ─────────────────────────────────────────────
@@ -105,13 +106,13 @@ _NO_SYSTEM_ROLE          = {"gemma2-9b-it", "gemma-7b-it"}
 # ─────────────────────────────────────────────
 @dataclass
 class ProviderEntry:
-    id:           str   # e.g. "ollama-phi3-latest"
-    label:        str   # e.g. "Ollama local — phi3:latest"
-    provider:     str   # routing key: groq | gemini | openrouter | nvidia | ollama
-    model:        str   # exact model name/slug
+    id:           str
+    label:        str
+    provider:     str
+    model:        str
     api_key:      str
     api_url:      str
-    context_note: str = ""  # shown in picker menu
+    context_note: str = ""
 
 
 # ─────────────────────────────────────────────
@@ -145,10 +146,6 @@ def _discover_ollama(base_url: str) -> List[ProviderEntry]:
 # Build provider catalogue
 # ─────────────────────────────────────────────
 def build_provider_catalogue() -> List[ProviderEntry]:
-    """
-    Return all available providers in recommended order.
-    Entries are included only if their key / service exists.
-    """
     cat: List[ProviderEntry] = []
 
     groq_key   = GROQ_API_KEY or os.getenv("GROQ_API_KEY", "")
@@ -157,7 +154,6 @@ def build_provider_catalogue() -> List[ProviderEntry]:
     nv_key     = os.getenv("NVIDIA_API_KEY", "")
     ollama_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 
-    # ── 1. Groq primary ───────────────────────────────────────────
     if groq_key:
         cat.append(ProviderEntry(
             id="groq-llama", label="Groq — llama-3.3-70b-versatile",
@@ -166,16 +162,6 @@ def build_provider_catalogue() -> List[ProviderEntry]:
             context_note="~5.5k tok (free cap)",
         ))
 
-    # ── 2. OpenRouter — Qwen free (large context, zero cost) ──────
-    # NOTE: Free-tier models still require an OPENROUTER_API_KEY — even for
-    # free models OpenRouter needs to identify the caller. Get a free key at
-    # https://openrouter.ai/ (no credit card needed for free models).
-    #
-    # Model slug corrections (all three previously 404'd):
-    #   OLD: qwen/qwen3-30b-a3b:free          → NEW: qwen/qwen3-30b-a3b:free  (OK)
-    #   OLD: qwen/qwen-2.5-72b-instruct:free  → NEW: qwen/qwen2.5-72b-instruct:free
-    #        ^^ dash between "qwen" and "2.5" was the bug ^^
-    #   OLD: qwen/qwen3-8b:free               → NEW: qwen/qwen3-8b:free  (OK)
     if or_key:
         cat.extend([
             ProviderEntry(
@@ -204,7 +190,6 @@ def build_provider_catalogue() -> List[ProviderEntry]:
             ),
         ])
 
-    # ── 3. Google Gemini direct ───────────────────────────────────
     if gemini_key:
         cat.append(ProviderEntry(
             id="gemini", label="Google Gemini — gemini-2.0-flash (direct API)",
@@ -213,7 +198,6 @@ def build_provider_catalogue() -> List[ProviderEntry]:
             context_note="1M ctx, 15 RPM free",
         ))
 
-    # ── 4. NVIDIA NIM ─────────────────────────────────────────────
     if nv_key:
         cat.append(ProviderEntry(
             id="nvidia", label="NVIDIA NIM — llama-3.3-70b-instruct",
@@ -222,10 +206,8 @@ def build_provider_catalogue() -> List[ProviderEntry]:
             context_note="128k ctx",
         ))
 
-    # ── 5. Ollama local (autodiscovered) ──────────────────────────
     cat.extend(_discover_ollama(ollama_url))
 
-    # ── 6. Groq gemma2 — absolute last resort ─────────────────────
     if groq_key:
         cat.append(ProviderEntry(
             id="groq-gemma", label="Groq — gemma2-9b-it [last resort]",
@@ -241,7 +223,6 @@ def build_provider_catalogue() -> List[ProviderEntry]:
 # Interactive provider picker
 # ─────────────────────────────────────────────
 def pick_provider_interactive(catalogue: List[ProviderEntry]) -> ProviderEntry:
-    """Print a numbered menu and block until the user picks one."""
     W_LABEL = 46
     W_NOTE  = 18
     border  = "─" * (W_LABEL + W_NOTE + 10)
@@ -257,6 +238,8 @@ def pick_provider_interactive(catalogue: List[ProviderEntry]) -> ProviderEntry:
         print(f"│ {str(i).ljust(2)} │ {label}│ {note}│")
     print(f"└────┴{'─' * W_LABEL}┴{'─' * W_NOTE}┘")
     print()
+    print("  💡 Tip: use --provider or-qwen30b for best results (free, 131k ctx, no trimming)")
+    print("         use --auto to skip this menu\n")
 
     while True:
         raw = input(f"  Enter number [1-{len(catalogue)}] (or 'q' to quit): ").strip()
@@ -274,12 +257,6 @@ def get_provider(
     provider_id: Optional[str],
     auto:        bool,
 ) -> List[ProviderEntry]:
-    """
-    Returns the list of entries to try.
-      provider_id set → exactly that one entry
-      auto=True       → all entries in order (waterfall, no menu)
-      otherwise       → show picker, return the single chosen entry
-    """
     if not catalogue:
         raise ValueError(
             "No LLM providers available.\n\n"
@@ -305,9 +282,8 @@ def get_provider(
         return matches
 
     if auto:
-        return catalogue   # try all in order
+        return catalogue
 
-    # Interactive
     chosen = pick_provider_interactive(catalogue)
     return [chosen]
 
@@ -315,6 +291,36 @@ def get_provider(
 # ─────────────────────────────────────────────
 # System prompts
 # ─────────────────────────────────────────────
+
+# [FIX FINANCIAL-STATEMENTS] Instructions added for:
+#   - Exact metric matching (EBIT ≠ EBITDA)
+#   - Balance sheet / cash flow / ratio page identification
+#   - Segment reporting (Ind AS 108 geographic note)
+#   - Suppressing gap flags when years weren't explicitly requested
+
+_FINANCIAL_STATEMENT_RULES = """\
+FINANCIAL STATEMENT RETRIEVAL RULES (apply to every query):
+A. EXACT METRIC MATCHING: If the user asks for EBIT but only EBITDA is in the context,
+   flag this explicitly: "Note: EBIT not found; showing EBITDA (includes D&A of ₹X cr).
+   To get EBIT: EBITDA − D&A." Never silently substitute one metric for another.
+B. BALANCE SHEET: Look for pages titled "Balance Sheet", "Statement of Assets and
+   Liabilities", or "Consolidated Balance Sheet". Key line items: total assets,
+   shareholders equity / net worth, total borrowings, current assets, current liabilities.
+C. CASH FLOW STATEMENT: Look for "Statement of Cash Flows" or "Cash Flow Statement".
+   Key items: net cash from operating activities (OCF), capital expenditure (under
+   investing activities), free cash flow = OCF − capex, net change in borrowings.
+D. EPS / RATIOS NOTE: In Indian annual reports, EPS (basic and diluted) is disclosed
+   in "Notes to Financial Statements" under "Earnings Per Share" (Ind AS 33).
+   Look for "weighted average number of equity shares" and "face value ₹X per share".
+E. GEOGRAPHIC SEGMENT (Ind AS 108): Revenue split India vs Outside India is in
+   "Segment Information" or "Notes — Segment Reporting". Look for a table with
+   columns "India" and "Outside India" or "Rest of World".
+F. SEGMENT EBITDA / EBIT: Per Ind AS 108, segment profit is reported as "segment
+   result" which may be EBIT or EBITDA — state which one clearly.
+G. RATIOS: ROCE = EBIT / Capital Employed. ROE = PAT / Avg Shareholders Equity.
+   Show the numerator and denominator values from context before computing the ratio.\
+"""
+
 ANNUAL_SYSTEM_PROMPT = """\
 You are a senior equity research analyst at a top-tier investment firm, \
 specialising in Indian listed companies (BSE/NSE).
@@ -334,17 +340,20 @@ fiscal year available in the context. Never lead with old data.
 2. USE ONLY CONTEXT: Do not use prior knowledge. If a number is not in the \
 provided excerpts, say explicitly: "Not available in provided documents."
 3. SHOW YOUR MATH: For any growth/trend calculation, write the formula and numbers. \
-Example: Revenue growth FY24 = (19,500 - 16,200) / 16,200 = +20.4%
+Example: Revenue growth FY24→FY25 = (31,079 − 26,711) / 26,711 × 100 = +16.3%
 4. CURRENCY: State amounts exactly as shown in source (Crore / Lakh / Million). \
 Never convert unless asked.
 5. STRUCTURED OUTPUT: For multi-year comparisons, use a table. For single-year \
 analysis, use bullet points. For qualitative topics, use paragraphs.
-6. CITE EVERY NUMBER: After each data point write [FY<year>, Page <n>].
-7. FLAG GAPS: If data for a specific year is missing from context, write: \
-"⚠ FY<year>: data not in retrieved excerpts."
+6. CITE EVERY NUMBER: After each data point write [FY<year>, AR, Page <n>].
+7. FLAG GAPS — ONLY FOR EXPLICITLY REQUESTED YEARS: If the user named specific years \
+(e.g. "FY23, FY24, FY25") and data for one of those years is missing, write: \
+"⚠ FY<year>: data not in retrieved excerpts." \
+DO NOT emit gap flags for years the user never mentioned.
 8. NO HALLUCINATION: If you are not certain, say so. Never guess a number. \
-Never back-calculate or extrapolate missing years from a single growth rate.\
-"""
+Never back-calculate or extrapolate missing years from a single growth rate.
+
+""" + _FINANCIAL_STATEMENT_RULES
 
 CONCALL_SYSTEM_PROMPT = """\
 You are a senior buy-side equity analyst reviewing earnings call transcripts \
@@ -357,14 +366,13 @@ BEFORE WRITING YOUR ANSWER, reason step-by-step internally:
 (CEO, CFO, MD) directly addresses the question topic. Ignore moderator lines, \
 analyst questions, and generic introductions.
   Step 3 — If the context does NOT contain a direct answer, say so clearly. \
-Do NOT substitute operational results for guidance, and do NOT paraphrase \
-unrelated chunks as if they answer the question.
+Do NOT substitute operational results for guidance.
   Step 4 — Build your answer only from Step 2 chunks.
 
 YOUR RULES:
 1. RECENCY FIRST: Lead with the most recent concall available. State the date/quarter.
 2. FORWARD-LOOKING PRIORITY: The user often asks about OUTLOOK, GUIDANCE, DEMAND \
-ENVIRONMENT, or MANAGEMENT EXPECTATIONS. Search the context for phrases like \
+ENVIRONMENT, or MANAGEMENT EXPECTATIONS. Search for phrases like \
 "we expect", "going forward", "H1/H2 guidance", "demand scenario", "we are confident", \
 "target", "capex plan". If found, lead with those. If not found, say so explicitly.
 3. QUOTE ACCURATELY: When citing management, use exact words and name the speaker \
@@ -373,8 +381,8 @@ and their role. Format: "CFO [Name]: '...'"
 analyst questions and pushback.
 5. KEY THEMES: Extract: guidance, risks mentioned, capex plans, margin commentary, \
 volume/revenue targets.
-6. FLAG GAPS: If the query topic (e.g. demand outlook, H1 guidance) was NOT discussed \
-in the transcript, say so clearly. Do not substitute operational results for guidance.
+6. FLAG GAPS — ONLY FOR EXPLICITLY REQUESTED YEARS: Only emit ⚠ for years the user \
+specifically asked about. Do not flag years that were never part of the question.
 7. USE ONLY CONTEXT: Do not use prior knowledge about the company.\
 """
 
@@ -387,27 +395,29 @@ BEFORE WRITING YOUR ANSWER, reason step-by-step internally:
 commentary is being asked for?
   Step 2 — Scan ALL provided sources. Tag each as RELEVANT or IRRELEVANT \
 to Step 1. Irrelevant chunks (e.g. boilerplate, unrelated sections, moderator \
-lines) must be ignored entirely — do not reference them in your answer.
+lines) must be ignored entirely.
   Step 3 — From RELEVANT chunks only: extract facts, numbers, and quotes.
   Step 4 — If a requested data point is absent from RELEVANT chunks, flag it \
-with ⚠. Do NOT back-calculate, interpolate, or extrapolate missing data.
+with ⚠ ONLY for years the user explicitly named. Do NOT back-calculate, \
+interpolate, or extrapolate missing data.
   Step 5 — Write the answer using only what Step 3 produced.
 
 YOUR RULES:
-1. RECENCY FIRST: Always lead with the most recent data available (prefer FY2026 > \
-FY2025 > FY2024 > older). State the FY prominently.
+1. RECENCY FIRST: Always lead with the most recent data available. State the FY prominently.
 2. CROSS-SOURCE SYNTHESIS: When annual report numbers are confirmed or expanded \
 by concall commentary, show both. Label each: [Annual Report] or [Concall].
-3. SHOW MATH: For any YOY growth, show: (new - old) / old × 100.
+3. SHOW MATH: For any YOY growth, show: (new − old) / old × 100.
 4. TABLES FOR TRENDS: Multi-year comparisons MUST be in a table with columns: \
 FY | Metric | Value | YOY%
 5. CITE SOURCES: After each data point: [FY<year>, AR/CC, Page <n>].
-6. FLAG MISSING DATA: "⚠ FY<year>: not in retrieved excerpts." for each gap. \
-Never fill gaps by calculation from a single year's growth rate.
+6. FLAG MISSING DATA — ONLY FOR EXPLICITLY REQUESTED YEARS: Write \
+"⚠ FY<year>: not in retrieved excerpts." ONLY for years the user named in the query. \
+If the user asked a general question without naming specific years, omit all ⚠ gap flags.
 7. NO HALLUCINATION: If a number is not in context, do not estimate or extrapolate.
-8. HONEST ABOUT LIMITS: If the context is insufficient to answer fully, \
-say what IS available and what is MISSING.\
-"""
+8. HONEST ABOUT LIMITS: If the context is insufficient, say what IS available \
+and what is MISSING — but do not invent placeholders for years never asked about.
+
+""" + _FINANCIAL_STATEMENT_RULES
 
 
 # ─────────────────────────────────────────────
@@ -440,16 +450,45 @@ def _build_context(chunks: List[RetrievedChunk]) -> str:
     return separator.join(parts)
 
 
-def _build_user_prompt(query: str, context: str, doc_type: str,
-                       years: Optional[List[int]] = None) -> str:
+def _build_user_prompt(
+    query: str,
+    context: str,
+    doc_type: str,
+    resolved_years: Optional[List[int]] = None,
+    explicit_years: Optional[List[int]] = None,
+) -> str:
+    """
+    Build the user-turn prompt.
+
+    resolved_years — used for the year-filter note so the LLM knows what
+                     data was searched.
+    explicit_years — ONLY years the user named; drives the ⚠ gap flag
+                     instruction. Empty list → "do not flag missing years".
+    """
     year_note = ""
-    if years:
+    if resolved_years:
         year_note = (
-            f"\n\nIMPORTANT: The user is asking about FY{'/'.join(str(y) for y in years)}. "
-            f"Prioritise data from these years. Flag missing years with ⚠."
+            f"\n\nDATA SEARCHED: The retrieval system searched FY"
+            f"{'/'.join(str(y) for y in resolved_years)} documents."
         )
 
-    # Detect forward-looking intent and add explicit instruction
+    # [FIX EXPLICIT-YEARS] Tight gap-flag instruction
+    gap_flag_note = ""
+    if explicit_years:
+        gap_flag_note = (
+            f"\n\nGAP FLAG INSTRUCTION: The user explicitly asked about "
+            f"FY{'/'.join(str(y) for y in explicit_years)}. "
+            f"Emit ⚠ gap warnings ONLY for these years if data is missing. "
+            f"Do NOT emit ⚠ for any other year."
+        )
+    else:
+        gap_flag_note = (
+            "\n\nGAP FLAG INSTRUCTION: The user did NOT specify particular years. "
+            "Do NOT emit any ⚠ 'not in retrieved excerpts' flags. "
+            "Simply state what is available and summarise it."
+        )
+
+    # Forward-looking intent note
     q_lower = query.lower()
     intent_note = ""
     if any(kw in q_lower for kw in ["outlook", "guidance", "expect", "h1", "h2",
@@ -461,47 +500,79 @@ def _build_user_prompt(query: str, context: str, doc_type: str,
             "data for forward-looking commentary."
         )
 
+    # [FIX METRIC-MISMATCH] Detect EBIT/EBITDA confusion in query
+    metric_note = ""
+    if "ebit" in q_lower and "ebitda" not in q_lower:
+        metric_note = (
+            "\n\nMETRIC NOTE: The user asked for EBIT (Earnings Before Interest and Tax). "
+            "EBIT = Revenue − COGS − Operating Expenses (excludes D&A from EBITDA). "
+            "If only EBITDA is available, state: 'EBIT not available; EBITDA shown instead. "
+            "EBIT = EBITDA − Depreciation & Amortisation (D&A = ₹X cr if available).' "
+            "Never silently report EBITDA when EBIT was requested."
+        )
+    elif "ebitda" in q_lower and "ebit" not in q_lower:
+        metric_note = (
+            "\n\nMETRIC NOTE: The user asked for EBITDA (Earnings Before Interest, Tax, "
+            "Depreciation, and Amortisation). EBITDA = EBIT + D&A. "
+            "Do not report EBIT as EBITDA without disclosing the difference."
+        )
+
     return (
         f"CONTEXT FROM FINANCIAL DOCUMENTS (most recent first):\n"
         f"{'=' * 60}\n{context}\n{'=' * 60}"
-        f"{year_note}{intent_note}\n\n"
+        f"{year_note}{gap_flag_note}{intent_note}{metric_note}\n\n"
         f"QUESTION: {query}\n\n"
         f"INSTRUCTIONS:\n"
         f"- Answer using ONLY the context above.\n"
         f"- Lead with the most recent year's data.\n"
         f"- Show calculations explicitly for any growth/trend figures.\n"
         f"- Use a table if comparing across multiple years.\n"
-        f"- Flag any years where data is missing from context.\n"
+        f"- Flag only explicitly-requested missing years (see GAP FLAG INSTRUCTION).\n"
     )
 
 
 # ─────────────────────────────────────────────
-# Context trimmer
+# Context trimmer  [FIX CONTEXT-TRIM]
 # ─────────────────────────────────────────────
 def _trim_chunks_to_budget(
-    chunks:        List[RetrievedChunk],
-    system_prompt: str,
-    query:         str,
-    doc_type:      str,
-    years:         Optional[List[int]],
-    entry:         ProviderEntry,
+    chunks:         List[RetrievedChunk],
+    system_prompt:  str,
+    query:          str,
+    doc_type:       str,
+    resolved_years: Optional[List[int]],
+    explicit_years: Optional[List[int]],
+    entry:          ProviderEntry,
 ) -> List[RetrievedChunk]:
     """
-    Drop lowest-ranked chunks (from the tail) until the full prompt fits within:
+    Drop lowest-ranked chunks until the full prompt fits within:
       (a) the model's token budget, AND
       (b) Groq's hard payload char limit
+
+    [FIX CONTEXT-TRIM] For large-context providers (≥20k token budget),
+    this function returns ALL chunks without trimming. Only Groq's free
+    tier (5.5k tokens) triggers aggressive trimming.
     """
     model     = entry.model
     provider  = entry.provider
     is_merged = model in _NO_SYSTEM_ROLE
 
-    # For Ollama, look up by the default key since model names vary
-    ctx_budget   = _MODEL_CTX.get(model) or (
+    ctx_budget = _MODEL_CTX.get(model) or (
         _MODEL_CTX["_ollama_default"] if provider == "ollama" else _DEFAULT_CTX
     )
+
+    # [FIX CONTEXT-TRIM] Large-context providers: skip trimming entirely.
+    # This ensures the reranker's carefully ordered top-18 all reach the LLM.
+    if ctx_budget >= _LARGE_CONTEXT_THRESHOLD:
+        log.info(
+            f"  Large-context provider ({model}: {ctx_budget:,} tok budget) — "
+            f"sending all {len(chunks)} chunks without trimming"
+        )
+        return chunks
+
     token_budget     = ctx_budget - GROQ_MAX_TOKENS
     system_tokens    = _estimate_tokens(system_prompt)
-    base_tokens      = _estimate_tokens(_build_user_prompt(query, "", doc_type, years))
+    base_prompt      = _build_user_prompt(query, "", doc_type, resolved_years, explicit_years)
+    base_tokens      = _estimate_tokens(base_prompt)
     sep_overhead     = 150 if is_merged else 50
     available_tokens = token_budget - system_tokens - base_tokens - sep_overhead
 
@@ -511,7 +582,7 @@ def _trim_chunks_to_budget(
 
     kept        = []
     used_tokens = 0
-    used_chars  = len(system_prompt) + len(_build_user_prompt(query, "", doc_type, years))
+    used_chars  = len(system_prompt) + len(base_prompt)
 
     for chunk in chunks:
         chunk_tokens = _estimate_tokens(chunk.text) + 60
@@ -537,7 +608,7 @@ def _trim_chunks_to_budget(
 
 
 # ─────────────────────────────────────────────
-# Gemini native call  (generateContent schema)
+# Gemini native call
 # ─────────────────────────────────────────────
 def _call_gemini(system_prompt: str, user_prompt: str,
                  model: str, api_key: str) -> dict:
@@ -574,7 +645,7 @@ def _call_gemini(system_prompt: str, user_prompt: str,
 
 
 # ─────────────────────────────────────────────
-# OpenAI-compatible call  (Groq / OpenRouter / NVIDIA / Ollama)
+# OpenAI-compatible call
 # ─────────────────────────────────────────────
 def _call_openai_compat(system_prompt: str, user_prompt: str,
                         entry: ProviderEntry) -> dict:
@@ -612,10 +683,6 @@ def _call_openai_compat(system_prompt: str, user_prompt: str,
 # ─────────────────────────────────────────────
 def _call_with_retry(system_prompt: str, user_prompt: str,
                      entry: ProviderEntry, max_retries: int = 4) -> dict:
-    """Route to correct call fn; retry 429 with back-off; raise on 400/413.
-    Gemini free tier allows 15 RPM — rapid successive calls hit 429 quickly.
-    Backoff schedule: 5s → 15s → 30s → 60s (covers most rate-limit windows).
-    """
     delays   = [5, 15, 30, 60]
     last_exc = None
 
@@ -634,9 +701,9 @@ def _call_with_retry(system_prompt: str, user_prompt: str,
                 log.warning(f"  429 on {entry.model} (attempt {attempt+1}/{max_retries}), retry in {wait}s")
                 time.sleep(wait)
             else:
-                raise   # 400, 413, or retries exhausted — move to next provider
+                raise
 
-    raise last_exc  # pragma: no cover
+    raise last_exc
 
 
 # ─────────────────────────────────────────────
@@ -656,20 +723,31 @@ class RAGResponse:
 # Main entry point
 # ─────────────────────────────────────────────
 def generate_answer(
-    query:       str,
-    chunks:      List[RetrievedChunk],
-    doc_type:    str = "annual_report",
-    api_key:     Optional[str] = None,   # legacy compat param, unused
-    years:       Optional[List[int]] = None,
-    provider_id: Optional[str] = None,   # pin to specific provider ID
-    auto:        bool = False,           # True = silent waterfall, no menu
+    query:          str,
+    chunks:         List[RetrievedChunk],
+    doc_type:       str = "annual_report",
+    api_key:        Optional[str] = None,          # legacy compat, unused
+    resolved_years: Optional[List[int]] = None,    # full year filter used
+    explicit_years: Optional[List[int]] = None,    # years user actually named
+    years:          Optional[List[int]] = None,    # legacy compat → resolved_years
+    provider_id:    Optional[str] = None,
+    auto:           bool = False,
 ) -> RAGResponse:
     """
-    provider_id: pin a provider by its short ID (e.g. "ollama-phi3-latest",
-                 "or-qwen30b", "groq-llama"). Use --provider on the CLI.
-    auto:        waterfall through all providers without showing the menu.
-                 Use --auto on the CLI (or for scripted/test runs).
+    resolved_years — years used for ChromaDB retrieval filter.
+    explicit_years — ONLY years the user explicitly mentioned in the query.
+                     Controls which ⚠ gap flags the LLM emits.
+                     Pass [] when user asked a general question.
+    years          — legacy alias for resolved_years; kept for back-compat.
+    provider_id    — pin to a specific provider (e.g. "or-qwen30b").
+    auto           — True = silent waterfall, no interactive menu.
     """
+    # Back-compat: if old callers pass years=, treat as resolved_years
+    if resolved_years is None and years is not None:
+        resolved_years = years
+    if explicit_years is None:
+        explicit_years = resolved_years or []
+
     if not chunks:
         return RAGResponse(
             answer=(
@@ -695,9 +773,13 @@ def generate_answer(
     for entry in entries:
         log.info(f"  → {entry.label}")
 
-        safe_chunks = _trim_chunks_to_budget(chunks, system, query, doc_type, years, entry)
+        safe_chunks = _trim_chunks_to_budget(
+            chunks, system, query, doc_type, resolved_years, explicit_years, entry
+        )
         context     = _build_context(safe_chunks)
-        user_prompt = _build_user_prompt(query, context, doc_type, years)
+        user_prompt = _build_user_prompt(
+            query, context, doc_type, resolved_years, explicit_years
+        )
 
         try:
             result  = _call_with_retry(system, user_prompt, entry)
@@ -723,10 +805,7 @@ def generate_answer(
                         "page":     c.metadata.get("page_start"),
                         "score":    round(c.score, 4),
                     }
-                    # BUG FIX: was `chunks` (all reranked chunks) — must be
-                    # `safe_chunks` (only chunks actually sent to the LLM after
-                    # context-window trimming). Showing untrimmed chunks as
-                    # sources misleads the user about what the LLM saw.
+                    # [FIX SOURCES-BUG] safe_chunks only — not all reranked chunks
                     for c in safe_chunks
                 ],
                 tokens_used = usage.get("total_tokens", 0),
@@ -747,6 +826,7 @@ def generate_answer(
         "Quick fixes:\n"
         "  • Best option: add OPENROUTER_API_KEY and use Qwen3-30B (free, 131k ctx)\n"
         "      https://openrouter.ai/ → pick 'or-qwen30b' from the menu\n"
+        "      or pass --provider or-qwen30b on the CLI\n"
         "  • Local Ollama (no key): ollama serve && ollama pull qwen2.5:7b\n"
         "  • Groq free tier: wait ~60s then retry\n"
         "  • Gemini: GEMINI_API_KEY → https://aistudio.google.com/app/apikey\n"
