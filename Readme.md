@@ -12,6 +12,13 @@ Free, fully local vector DB + Groq (free cloud LLM) — no GPU, no paid APIs.
 | LLM | Groq API (llama-3.3-70b) | Free tier |
 | Metadata DB | SQLite | Free |
 
+## Architecture
+
+### High-Level Architecture
+![High Level Architecture](./images/ai_hedge_rag_high_level.svg)
+
+### Low-Level Pipeline Design
+![Low Level Pipeline](./images/ai_hedge_rag_low_level.svg)
 ## Directory Structure
 ```
 Financial-Rag/
