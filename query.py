@@ -8,7 +8,7 @@ Usage:
     python query.py --symbol RELIANCE "What is the revenue growth trend?"
     python query.py --symbol RELIANCE --type concall "What did management say about capex?"
     python query.py --symbol RELIANCE --year 2024 "Summarise the MD&A section"
-    python query.py --symbol RELIANCE --year-range 2021 2024 "Debt trend over 3 years"
+    python query.py --symbol ADANIPORTS --year-range 2021 2024 "Debt trend over 3 years"
     python query.py --interactive   # REPL mode
 """
 

@@ -19,6 +19,11 @@ Free, fully local vector DB + Groq (free cloud LLM) — no GPU, no paid APIs.
 
 ### Low-Level Pipeline Design
 ![Low Level Pipeline](./images/ai_hedge_rag_low_level.svg)
+### Structured-Semantic Fusion RAG
+![Low Level Pipeline](./images/quant_copilot_intent_architecture.svg)
+
+This architecture utilizes atomic decomposition to route queries through a Schema Bridge, bridging the gap between SQLite and Vector DB. By executing parallel retrievals and using a dedicated Fusion Layer to cross-reference quantitative stats with qualitative narratives, the system ensures high-fidelity attribution. Final responses are generated via typed templates to deliver structured, data-driven financial insights.
+
 ## Directory Structure
 ```
 Financial-Rag/
