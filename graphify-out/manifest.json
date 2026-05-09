@@ -1,0 +1,314 @@
+{
+  "C:\\Users\\hp\\Downloads\\FinRag\\Ingest.py": {
+    "mtime": 1777273739.4768798,
+    "hash": "289e2838ad657eb5c99916d1ef642442"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\query.py": {
+    "mtime": 1778171864.0307474,
+    "hash": "72ac2ecfcfdae21348fad6a402cd023e"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\screener_downloader.py": {
+    "mtime": 1776957786.1739545,
+    "hash": "783d17f5db11a24b7419610e2947033a"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\config\\settings.py": {
+    "mtime": 1777444253.1199012,
+    "hash": "cbfadd08c1d0dd42d27b28b4bb35a77e"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\config\\__init__.py": {
+    "mtime": 1777273966.1459556,
+    "hash": "43d16a290ee34cb378a6c6244e8c0a32"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\db\\database.py": {
+    "mtime": 1777273294.1836836,
+    "hash": "8e626e44927a89b566db5d0f2a56f504"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\db\\__init__.py": {
+    "mtime": 1777274071.784293,
+    "hash": "a4293a401df6568f4e9060de273785ac"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\pipeline\\extract\\pdf_extractor.py": {
+    "mtime": 1777315435.2239764,
+    "hash": "510fe6f1a2eb167423091181403e7bdc"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\pipeline\\extract\\text_cleaner.py": {
+    "mtime": 1777273882.0278933,
+    "hash": "ca7ef769e4efca2a2fd9cd3da268bd62"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\pipeline\\extract\\__init__.py": {
+    "mtime": 1777274924.5443254,
+    "hash": "2e11892d2a5b2bb4b98aac104bb87609"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\pipeline\\loader\\chroma_loader.py": {
+    "mtime": 1777270869.6460814,
+    "hash": "00f3fd57b61d3ef1e0ba358d33020958"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\pipeline\\loader\\chunker.py": {
+    "mtime": 1777269284.48764,
+    "hash": "67f386d9b84e1038e9efba92b07db856"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\pipeline\\loader\\embedder.py": {
+    "mtime": 1777291688.4028945,
+    "hash": "9836e2de8950b9676908f48b6922b4f9"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\pipeline\\loader\\__init__.py": {
+    "mtime": 1777281371.811198,
+    "hash": "fd6dfd54510d4303c565a3fbf49a1515"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\pipeline\\retrieval\\reranker.py": {
+    "mtime": 1777444241.9002485,
+    "hash": "78c89bd229b818fa1191fe89ef73a81f"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\pipeline\\retrieval\\retriever.py": {
+    "mtime": 1777459292.8384342,
+    "hash": "003b21b04a9e0e8c7066be2f3be61dcb"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\pipeline\\retrieval\\__init__.py": {
+    "mtime": 1777380516.5068216,
+    "hash": "8a5919f63fb4c9ca478a194032432f11"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\rag\\rag_engine.py": {
+    "mtime": 1777459307.9492407,
+    "hash": "a34d3077d27cbceae433708d750da1a9"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\rag\\__init__.py": {
+    "mtime": 1777280143.3362348,
+    "hash": "7b444a388898cc05516e35b1943bfdaf"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\utils\\logger.py": {
+    "mtime": 1777273528.0202153,
+    "hash": "c067a3b4d594e764f65448c30f319ab6"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\utils\\__init__.py": {
+    "mtime": 1777274021.5835052,
+    "hash": "2c18fbf0e9cfb28ab1aa9e2e820b8580"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\Readme.md": {
+    "mtime": 1778321941.8372476,
+    "hash": "bd13a82620214b69526e4c52b4199600"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\Requirements.txt": {
+    "mtime": 1777200382.5962403,
+    "hash": "f081867aa4719df8c6305702c4ac6288"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\data\\raw\\screener_docs\\ADANIPORTS\\annual_report\\2012\\2012_Financial Year 2012 from bse.pdf": {
+    "mtime": 1777016426.8060603,
+    "hash": "b2d6acbe06ef47690e3ad930b72e5e1c"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\data\\raw\\screener_docs\\ADANIPORTS\\annual_report\\2013\\2013_Financial Year 2013 from bse.pdf": {
+    "mtime": 1777016425.028549,
+    "hash": "af02cd93ae053ba79790847c18b1d96f"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\data\\raw\\screener_docs\\ADANIPORTS\\annual_report\\2013\\2013_Financial Year 2013 from nse.pdf": {
+    "mtime": 1777016423.3180203,
+    "hash": "d1d692a991672fb95fad07785c79a44b"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\data\\raw\\screener_docs\\ADANIPORTS\\annual_report\\2014\\2014_Financial Year 2014 from bse.pdf": {
+    "mtime": 1777016421.1549423,
+    "hash": "e7b677d1233995ac8fe02a98839a4147"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\data\\raw\\screener_docs\\ADANIPORTS\\annual_report\\2015\\2015_Financial Year 2015 from bse.pdf": {
+    "mtime": 1777016419.4813976,
+    "hash": "9651b81e8a6806fc0db9766ec08613dc"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\data\\raw\\screener_docs\\ADANIPORTS\\annual_report\\2016\\2016_Financial Year 2016 from bse.pdf": {
+    "mtime": 1777016417.7778864,
+    "hash": "bfa9954c345f852ee6b391443b48dddd"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\data\\raw\\screener_docs\\ADANIPORTS\\annual_report\\2017\\2017_Financial Year 2017 from bse.pdf": {
+    "mtime": 1777016415.5137813,
+    "hash": "b7b57ce9fe52d3b9ca853a71fd071d92"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\data\\raw\\screener_docs\\ADANIPORTS\\annual_report\\2018\\2018_Financial Year 2018 from bse.pdf": {
+    "mtime": 1777016413.5958235,
+    "hash": "9cb620405bd157a28f693e4d0e314eaf"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\data\\raw\\screener_docs\\ADANIPORTS\\annual_report\\2019\\2019_Financial Year 2019 from bse.pdf": {
+    "mtime": 1777016411.7756987,
+    "hash": "c0b639d2d8241e97cf73400b3583a480"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\data\\raw\\screener_docs\\ADANIPORTS\\annual_report\\2020\\2020_Financial Year 2020 from bse.pdf": {
+    "mtime": 1777016410.0338268,
+    "hash": "5cc6d95ba93a4a5f2ed4a8103dd79fda"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\data\\raw\\screener_docs\\ADANIPORTS\\annual_report\\2021\\2021_Financial Year 2021 from bse.pdf": {
+    "mtime": 1777016407.98875,
+    "hash": "0a9bc3c0f81fa7e9fc29ccd3918b2737"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\data\\raw\\screener_docs\\ADANIPORTS\\annual_report\\2022\\2022_Financial Year 2022 from bse.pdf": {
+    "mtime": 1777016405.1610162,
+    "hash": "8ce174f8f42cb0e0f9b2733eedcbf4c5"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\data\\raw\\screener_docs\\ADANIPORTS\\annual_report\\2023\\2023_Financial Year 2023 from bse.pdf": {
+    "mtime": 1777016403.1748104,
+    "hash": "d6f18c07843c411a970678f0ce0fb9c5"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\data\\raw\\screener_docs\\ADANIPORTS\\annual_report\\2024\\2024_Financial Year 2024 from bse.pdf": {
+    "mtime": 1777016400.8883224,
+    "hash": "638ac0bea67807d3d33fb70dca3237f9"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\data\\raw\\screener_docs\\ADANIPORTS\\annual_report\\2025\\2025_Financial Year 2025 from bse.pdf": {
+    "mtime": 1777016398.25287,
+    "hash": "18b78a6759e904a000f19ced3deef9f4"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\data\\raw\\screener_docs\\ADANIPORTS\\annual_report\\2026\\2026_Board Meeting Intimation for Considering And Approving The Audited Financial Results For The Quarter.pdf": {
+    "mtime": 1777016394.4034228,
+    "hash": "7139542aabe4e4cf19328c7de837b701"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\data\\raw\\screener_docs\\ADANIPORTS\\annual_report\\2026\\2026_Operational Performance Update 2 Apr - APSEZ crossed 500.8 MMT FY26 cargo_ Mar_26 monthly cargo hit .pdf": {
+    "mtime": 1777016395.980207,
+    "hash": "9a38e384c5abf61d6c601544cfecf842"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\data\\raw\\screener_docs\\ADANIPORTS\\concall\\2019\\2019_Transcript.pdf": {
+    "mtime": 1777016447.293547,
+    "hash": "d3f3e854ac731938e60991884c3593fb"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\data\\raw\\screener_docs\\ADANIPORTS\\concall\\2020\\2020_Transcript.pdf": {
+    "mtime": 1777016445.21527,
+    "hash": "0833eee59e70cdf5a2dc506fbbda88b1"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\data\\raw\\screener_docs\\ADANIPORTS\\concall\\2021\\2021_Transcript.pdf": {
+    "mtime": 1777016443.1645715,
+    "hash": "5ec2f14042bef773abb6c4b48331b6a8"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\data\\raw\\screener_docs\\ADANIPORTS\\concall\\2022\\2022_Transcript.pdf": {
+    "mtime": 1777016441.2190444,
+    "hash": "83b4d9043256b6966c46cff8a2671564"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\data\\raw\\screener_docs\\ADANIPORTS\\concall\\2023\\2023_Transcript.pdf": {
+    "mtime": 1777016439.2807589,
+    "hash": "2dfc7ad646bd3497b3c8e90f9feebfb1"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\data\\raw\\screener_docs\\ADANIPORTS\\concall\\2024\\2024_Transcript.pdf": {
+    "mtime": 1777016435.759845,
+    "hash": "e91fd81a73f2edd473a73255c12ab8ad"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\data\\raw\\screener_docs\\ADANIPORTS\\concall\\2025\\2025_Transcript.pdf": {
+    "mtime": 1777016433.8257172,
+    "hash": "80c824d71fa6b19ed927f6008b32a3c9"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\data\\raw\\screener_docs\\ADANIPORTS\\concall\\2026\\2026_Transcript.pdf": {
+    "mtime": 1777016429.3109615,
+    "hash": "c64d6253ea230d3ec7541a8a995d0d27"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\data\\raw\\screener_docs\\ADANIPORTS\\concall\\unknown\\unknown_Transcript.pdf": {
+    "mtime": 1777016437.343236,
+    "hash": "6f67de70474dfcb18e9ed39237104a43"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\screener_docs\\ADANIPORTS\\annual_report\\2012\\2012_Financial Year 2012 from bse.pdf": {
+    "mtime": 1777280560.3736234,
+    "hash": "b2d6acbe06ef47690e3ad930b72e5e1c"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\screener_docs\\ADANIPORTS\\annual_report\\2013\\2013_Financial Year 2013 from bse.pdf": {
+    "mtime": 1777280554.7067094,
+    "hash": "af02cd93ae053ba79790847c18b1d96f"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\screener_docs\\ADANIPORTS\\annual_report\\2013\\2013_Financial Year 2013 from nse.pdf": {
+    "mtime": 1777280550.6460502,
+    "hash": "d1d692a991672fb95fad07785c79a44b"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\screener_docs\\ADANIPORTS\\annual_report\\2014\\2014_Financial Year 2014 from bse.pdf": {
+    "mtime": 1777280546.4535015,
+    "hash": "e7b677d1233995ac8fe02a98839a4147"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\screener_docs\\ADANIPORTS\\annual_report\\2015\\2015_Financial Year 2015 from bse.pdf": {
+    "mtime": 1777280543.8019989,
+    "hash": "9651b81e8a6806fc0db9766ec08613dc"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\screener_docs\\ADANIPORTS\\annual_report\\2016\\2016_Financial Year 2016 from bse.pdf": {
+    "mtime": 1777280541.1599257,
+    "hash": "bfa9954c345f852ee6b391443b48dddd"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\screener_docs\\ADANIPORTS\\annual_report\\2017\\2017_Financial Year 2017 from bse.pdf": {
+    "mtime": 1777280537.9419925,
+    "hash": "b7b57ce9fe52d3b9ca853a71fd071d92"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\screener_docs\\ADANIPORTS\\annual_report\\2018\\2018_Financial Year 2018 from bse.pdf": {
+    "mtime": 1777280531.3668153,
+    "hash": "9cb620405bd157a28f693e4d0e314eaf"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\screener_docs\\ADANIPORTS\\annual_report\\2019\\2019_Financial Year 2019 from bse.pdf": {
+    "mtime": 1777280526.8843162,
+    "hash": "c0b639d2d8241e97cf73400b3583a480"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\screener_docs\\ADANIPORTS\\annual_report\\2020\\2020_Financial Year 2020 from bse.pdf": {
+    "mtime": 1777280519.3059218,
+    "hash": "5cc6d95ba93a4a5f2ed4a8103dd79fda"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\screener_docs\\ADANIPORTS\\annual_report\\2021\\2021_Financial Year 2021 from bse.pdf": {
+    "mtime": 1777280510.2540011,
+    "hash": "0a9bc3c0f81fa7e9fc29ccd3918b2737"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\screener_docs\\ADANIPORTS\\annual_report\\2022\\2022_Financial Year 2022 from bse.pdf": {
+    "mtime": 1777280490.5392528,
+    "hash": "8ce174f8f42cb0e0f9b2733eedcbf4c5"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\screener_docs\\ADANIPORTS\\annual_report\\2023\\2023_Financial Year 2023 from bse.pdf": {
+    "mtime": 1777280478.9471767,
+    "hash": "d6f18c07843c411a970678f0ce0fb9c5"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\screener_docs\\ADANIPORTS\\annual_report\\2024\\2024_Financial Year 2024 from bse.pdf": {
+    "mtime": 1777280466.6201303,
+    "hash": "638ac0bea67807d3d33fb70dca3237f9"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\screener_docs\\ADANIPORTS\\annual_report\\2025\\2025_Financial Year 2025 from bse.pdf": {
+    "mtime": 1777280439.584631,
+    "hash": "18b78a6759e904a000f19ced3deef9f4"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\screener_docs\\ADANIPORTS\\annual_report\\2026\\2026_Board Meeting Intimation for Considering And Approving The Audited Financial Results For The Quarter.pdf": {
+    "mtime": 1777280420.6148603,
+    "hash": "7139542aabe4e4cf19328c7de837b701"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\screener_docs\\ADANIPORTS\\annual_report\\2026\\2026_Operational Performance Update 2 Apr - APSEZ crossed 500.8 MMT FY26 cargo_ Mar_26 monthly cargo hit .pdf": {
+    "mtime": 1777280422.38003,
+    "hash": "9a38e384c5abf61d6c601544cfecf842"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\screener_docs\\ADANIPORTS\\concall\\2019\\2019_Transcript.pdf": {
+    "mtime": 1777280583.4014068,
+    "hash": "d3f3e854ac731938e60991884c3593fb"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\screener_docs\\ADANIPORTS\\concall\\2020\\2020_Transcript.pdf": {
+    "mtime": 1777280581.084926,
+    "hash": "0833eee59e70cdf5a2dc506fbbda88b1"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\screener_docs\\ADANIPORTS\\concall\\2021\\2021_Transcript.pdf": {
+    "mtime": 1777280578.5793133,
+    "hash": "5ec2f14042bef773abb6c4b48331b6a8"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\screener_docs\\ADANIPORTS\\concall\\2022\\2022_Transcript.pdf": {
+    "mtime": 1777280576.4938817,
+    "hash": "83b4d9043256b6966c46cff8a2671564"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\screener_docs\\ADANIPORTS\\concall\\2023\\2023_Transcript.pdf": {
+    "mtime": 1777280574.2802174,
+    "hash": "2dfc7ad646bd3497b3c8e90f9feebfb1"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\screener_docs\\ADANIPORTS\\concall\\2024\\2024_Transcript.pdf": {
+    "mtime": 1777280570.2188964,
+    "hash": "e91fd81a73f2edd473a73255c12ab8ad"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\screener_docs\\ADANIPORTS\\concall\\2025\\2025_Transcript.pdf": {
+    "mtime": 1777280568.0534363,
+    "hash": "80c824d71fa6b19ed927f6008b32a3c9"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\screener_docs\\ADANIPORTS\\concall\\2026\\2026_Transcript.pdf": {
+    "mtime": 1777280563.2239614,
+    "hash": "c64d6253ea230d3ec7541a8a995d0d27"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\screener_docs\\ADANIPORTS\\concall\\unknown\\unknown_Transcript.pdf": {
+    "mtime": 1777280572.0868726,
+    "hash": "6f67de70474dfcb18e9ed39237104a43"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\images\\ai_hedge_rag_high_level.svg": {
+    "mtime": 1777581149.645869,
+    "hash": "389990fd0ed38cb708551850d5baffdd"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\images\\ai_hedge_rag_low_level.svg": {
+    "mtime": 1777581163.5852616,
+    "hash": "26240213b7d75c9b1c6fd8d9bd894bdd"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\images\\quant_copilot_intent_architecture.svg": {
+    "mtime": 1778321151.4141233,
+    "hash": "92b93eb3d04b1f6168d227d3d5c2b71f"
+  }
+}

@@ -1,0 +1,4673 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {},
+  "nodes": [
+    {
+      "label": "Ingest.py",
+      "file_type": "code",
+      "source_file": "Ingest.py",
+      "source_location": "L1",
+      "id": "ingest_py",
+      "community": 1,
+      "norm_label": "ingest.py"
+    },
+    {
+      "label": "resolve_doc_type()",
+      "file_type": "code",
+      "source_file": "Ingest.py",
+      "source_location": "L40",
+      "id": "finrag_ingest_resolve_doc_type",
+      "community": 1,
+      "norm_label": "resolve_doc_type()"
+    },
+    {
+      "label": "extract_year_from_path()",
+      "file_type": "code",
+      "source_file": "Ingest.py",
+      "source_location": "L49",
+      "id": "finrag_ingest_extract_year_from_path",
+      "community": 1,
+      "norm_label": "extract_year_from_path()"
+    },
+    {
+      "label": "find_pdfs()",
+      "file_type": "code",
+      "source_file": "Ingest.py",
+      "source_location": "L58",
+      "id": "finrag_ingest_find_pdfs",
+      "community": 1,
+      "norm_label": "find_pdfs()"
+    },
+    {
+      "label": "ingest_pdf()",
+      "file_type": "code",
+      "source_file": "Ingest.py",
+      "source_location": "L96",
+      "id": "finrag_ingest_ingest_pdf",
+      "community": 1,
+      "norm_label": "ingest_pdf()"
+    },
+    {
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "Ingest.py",
+      "source_location": "L194",
+      "id": "finrag_ingest_main",
+      "community": 1,
+      "norm_label": "main()"
+    },
+    {
+      "label": "Map screener_downloader output folder name to doc_type.",
+      "file_type": "rationale",
+      "source_file": "Ingest.py",
+      "source_location": "L41",
+      "id": "finrag_ingest_rationale_41",
+      "community": 1,
+      "norm_label": "map screener_downloader output folder name to doc_type."
+    },
+    {
+      "label": "screener_downloader saves to symbol/doc_type/year/filename.pdf",
+      "file_type": "rationale",
+      "source_file": "Ingest.py",
+      "source_location": "L50",
+      "id": "finrag_ingest_rationale_50",
+      "community": 1,
+      "norm_label": "screener_downloader saves to symbol/doc_type/year/filename.pdf"
+    },
+    {
+      "label": "Find all PDF files for a symbol under screener_docs/.",
+      "file_type": "rationale",
+      "source_file": "Ingest.py",
+      "source_location": "L59",
+      "id": "finrag_ingest_rationale_59",
+      "community": 1,
+      "norm_label": "find all pdf files for a symbol under screener_docs/."
+    },
+    {
+      "label": "query.py",
+      "file_type": "code",
+      "source_file": "query.py",
+      "source_location": "L1",
+      "id": "query_py",
+      "community": 2,
+      "norm_label": "query.py"
+    },
+    {
+      "label": "print_answer()",
+      "file_type": "code",
+      "source_file": "query.py",
+      "source_location": "L33",
+      "id": "finrag_query_print_answer",
+      "community": 2,
+      "norm_label": "print_answer()"
+    },
+    {
+      "label": "run_query()",
+      "file_type": "code",
+      "source_file": "query.py",
+      "source_location": "L53",
+      "id": "finrag_query_run_query",
+      "community": 2,
+      "norm_label": "run_query()"
+    },
+    {
+      "label": "interactive_mode()",
+      "file_type": "code",
+      "source_file": "query.py",
+      "source_location": "L135",
+      "id": "finrag_query_interactive_mode",
+      "community": 2,
+      "norm_label": "interactive_mode()"
+    },
+    {
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "query.py",
+      "source_location": "L174",
+      "id": "finrag_query_main",
+      "community": 2,
+      "norm_label": "main()"
+    },
+    {
+      "label": "screener_downloader.py",
+      "file_type": "code",
+      "source_file": "screener_downloader.py",
+      "source_location": "L1",
+      "id": "screener_downloader_py",
+      "community": 8,
+      "norm_label": "screener_downloader.py"
+    },
+    {
+      "label": "fetch_page()",
+      "file_type": "code",
+      "source_file": "screener_downloader.py",
+      "source_location": "L41",
+      "id": "finrag_screener_downloader_fetch_page",
+      "community": 8,
+      "norm_label": "fetch_page()"
+    },
+    {
+      "label": "extract_year()",
+      "file_type": "code",
+      "source_file": "screener_downloader.py",
+      "source_location": "L54",
+      "id": "finrag_screener_downloader_extract_year",
+      "community": 8,
+      "norm_label": "extract_year()"
+    },
+    {
+      "label": "classify_doc()",
+      "file_type": "code",
+      "source_file": "screener_downloader.py",
+      "source_location": "L81",
+      "id": "finrag_screener_downloader_classify_doc",
+      "community": 8,
+      "norm_label": "classify_doc()"
+    },
+    {
+      "label": "extract_documents()",
+      "file_type": "code",
+      "source_file": "screener_downloader.py",
+      "source_location": "L101",
+      "id": "finrag_screener_downloader_extract_documents",
+      "community": 8,
+      "norm_label": "extract_documents()"
+    },
+    {
+      "label": "safe_name()",
+      "file_type": "code",
+      "source_file": "screener_downloader.py",
+      "source_location": "L144",
+      "id": "finrag_screener_downloader_safe_name",
+      "community": 8,
+      "norm_label": "safe_name()"
+    },
+    {
+      "label": "download_pdf()",
+      "file_type": "code",
+      "source_file": "screener_downloader.py",
+      "source_location": "L148",
+      "id": "finrag_screener_downloader_download_pdf",
+      "community": 8,
+      "norm_label": "download_pdf()"
+    },
+    {
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "screener_downloader.py",
+      "source_location": "L201",
+      "id": "finrag_screener_downloader_main",
+      "community": 8,
+      "norm_label": "main()"
+    },
+    {
+      "label": "settings.py",
+      "file_type": "code",
+      "source_file": "config/settings.py",
+      "source_location": "L1",
+      "id": "config_settings_py",
+      "community": 9,
+      "norm_label": "settings.py"
+    },
+    {
+      "label": "_load_dotenv()",
+      "file_type": "code",
+      "source_file": "config/settings.py",
+      "source_location": "L66",
+      "id": "config_settings_load_dotenv",
+      "community": 9,
+      "norm_label": "_load_dotenv()"
+    },
+    {
+      "label": "config/settings.py Central configuration for the Financial RAG system.  FIXES",
+      "file_type": "rationale",
+      "source_file": "config/settings.py",
+      "source_location": "L1",
+      "id": "config_settings_rationale_1",
+      "community": 9,
+      "norm_label": "config/settings.py central configuration for the financial rag system.  fixes"
+    },
+    {
+      "label": "__init__.py",
+      "file_type": "code",
+      "source_file": "config/__init__.py",
+      "source_location": "L1",
+      "id": "config_init_py",
+      "community": 9,
+      "norm_label": "__init__.py"
+    },
+    {
+      "label": "database.py",
+      "file_type": "code",
+      "source_file": "db/database.py",
+      "source_location": "L1",
+      "id": "db_database_py",
+      "community": 1,
+      "norm_label": "database.py"
+    },
+    {
+      "label": "get_conn()",
+      "file_type": "code",
+      "source_file": "db/database.py",
+      "source_location": "L92",
+      "id": "db_database_get_conn",
+      "community": 1,
+      "norm_label": "get_conn()"
+    },
+    {
+      "label": "init_db()",
+      "file_type": "code",
+      "source_file": "db/database.py",
+      "source_location": "L105",
+      "id": "db_database_init_db",
+      "community": 1,
+      "norm_label": "init_db()"
+    },
+    {
+      "label": "upsert_company()",
+      "file_type": "code",
+      "source_file": "db/database.py",
+      "source_location": "L116",
+      "id": "db_database_upsert_company",
+      "community": 1,
+      "norm_label": "upsert_company()"
+    },
+    {
+      "label": "upsert_document()",
+      "file_type": "code",
+      "source_file": "db/database.py",
+      "source_location": "L131",
+      "id": "db_database_upsert_document",
+      "community": 1,
+      "norm_label": "upsert_document()"
+    },
+    {
+      "label": "mark_document_ingested()",
+      "file_type": "code",
+      "source_file": "db/database.py",
+      "source_location": "L157",
+      "id": "db_database_mark_document_ingested",
+      "community": 1,
+      "norm_label": "mark_document_ingested()"
+    },
+    {
+      "label": "mark_document_failed()",
+      "file_type": "code",
+      "source_file": "db/database.py",
+      "source_location": "L167",
+      "id": "db_database_mark_document_failed",
+      "community": 1,
+      "norm_label": "mark_document_failed()"
+    },
+    {
+      "label": "get_pending_documents()",
+      "file_type": "code",
+      "source_file": "db/database.py",
+      "source_location": "L174",
+      "id": "db_database_get_pending_documents",
+      "community": 1,
+      "norm_label": "get_pending_documents()"
+    },
+    {
+      "label": "is_already_ingested()",
+      "file_type": "code",
+      "source_file": "db/database.py",
+      "source_location": "L188",
+      "id": "db_database_is_already_ingested",
+      "community": 1,
+      "norm_label": "is_already_ingested()"
+    },
+    {
+      "label": "insert_chunk()",
+      "file_type": "code",
+      "source_file": "db/database.py",
+      "source_location": "L199",
+      "id": "db_database_insert_chunk",
+      "community": 1,
+      "norm_label": "insert_chunk()"
+    },
+    {
+      "label": "get_chunks_for_doc()",
+      "file_type": "code",
+      "source_file": "db/database.py",
+      "source_location": "L222",
+      "id": "db_database_get_chunks_for_doc",
+      "community": 1,
+      "norm_label": "get_chunks_for_doc()"
+    },
+    {
+      "label": "log_ingestion()",
+      "file_type": "code",
+      "source_file": "db/database.py",
+      "source_location": "L233",
+      "id": "db_database_log_ingestion",
+      "community": 1,
+      "norm_label": "log_ingestion()"
+    },
+    {
+      "label": "get_stats()",
+      "file_type": "code",
+      "source_file": "db/database.py",
+      "source_location": "L254",
+      "id": "db_database_get_stats",
+      "community": 1,
+      "norm_label": "get_stats()"
+    },
+    {
+      "label": "db/database.py SQLite metadata store \u2014 shared across both RAG pipelines.  Tab",
+      "file_type": "rationale",
+      "source_file": "db/database.py",
+      "source_location": "L1",
+      "id": "db_database_rationale_1",
+      "community": 1,
+      "norm_label": "db/database.py sqlite metadata store \u2014 shared across both rag pipelines.  tab"
+    },
+    {
+      "label": "Create tables if they don't exist.",
+      "file_type": "rationale",
+      "source_file": "db/database.py",
+      "source_location": "L106",
+      "id": "db_database_rationale_106",
+      "community": 1,
+      "norm_label": "create tables if they don't exist."
+    },
+    {
+      "label": "__init__.py",
+      "file_type": "code",
+      "source_file": "db/__init__.py",
+      "source_location": "L1",
+      "id": "db_init_py",
+      "community": 1,
+      "norm_label": "__init__.py"
+    },
+    {
+      "label": "pdf_extractor.py",
+      "file_type": "code",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L1",
+      "id": "pipeline_extract_pdf_extractor_py",
+      "community": 5,
+      "norm_label": "pdf_extractor.py"
+    },
+    {
+      "label": "PageBlock",
+      "file_type": "code",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L32",
+      "id": "extract_pdf_extractor_pageblock",
+      "community": 5,
+      "norm_label": "pageblock"
+    },
+    {
+      "label": "ExtractedDocument",
+      "file_type": "code",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L44",
+      "id": "extract_pdf_extractor_extracteddocument",
+      "community": 5,
+      "norm_label": "extracteddocument"
+    },
+    {
+      "label": "_is_section_header()",
+      "file_type": "code",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L65",
+      "id": "extract_pdf_extractor_is_section_header",
+      "community": 5,
+      "norm_label": "_is_section_header()"
+    },
+    {
+      "label": "_detect_speaker_role()",
+      "file_type": "code",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L91",
+      "id": "extract_pdf_extractor_detect_speaker_role",
+      "community": 5,
+      "norm_label": "_detect_speaker_role()"
+    },
+    {
+      "label": "_extract_speaker_turns()",
+      "file_type": "code",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L102",
+      "id": "extract_pdf_extractor_extract_speaker_turns",
+      "community": 5,
+      "norm_label": "_extract_speaker_turns()"
+    },
+    {
+      "label": "_table_to_text()",
+      "file_type": "code",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L141",
+      "id": "extract_pdf_extractor_table_to_text",
+      "community": 5,
+      "norm_label": "_table_to_text()"
+    },
+    {
+      "label": "_get_table_bboxes()",
+      "file_type": "code",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L152",
+      "id": "extract_pdf_extractor_get_table_bboxes",
+      "community": 5,
+      "norm_label": "_get_table_bboxes()"
+    },
+    {
+      "label": "_extract_prose_excluding_tables()",
+      "file_type": "code",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L167",
+      "id": "extract_pdf_extractor_extract_prose_excluding_tables",
+      "community": 5,
+      "norm_label": "_extract_prose_excluding_tables()"
+    },
+    {
+      "label": "extract_annual_report()",
+      "file_type": "code",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L213",
+      "id": "extract_pdf_extractor_extract_annual_report",
+      "community": 5,
+      "norm_label": "extract_annual_report()"
+    },
+    {
+      "label": "extract_concall()",
+      "file_type": "code",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L296",
+      "id": "extract_pdf_extractor_extract_concall",
+      "community": 5,
+      "norm_label": "extract_concall()"
+    },
+    {
+      "label": "extract_pdf()",
+      "file_type": "code",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L323",
+      "id": "extract_pdf_extractor_extract_pdf",
+      "community": 5,
+      "norm_label": "extract_pdf()"
+    },
+    {
+      "label": "pipeline/extract/pdf_extractor.py  FIXES applied in this version:   [FIX 4] e",
+      "file_type": "rationale",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L1",
+      "id": "extract_pdf_extractor_rationale_1",
+      "community": 5,
+      "norm_label": "pipeline/extract/pdf_extractor.py  fixes applied in this version:   [fix 4] e"
+    },
+    {
+      "label": "Atomic block of content from one PDF page.",
+      "file_type": "rationale",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L33",
+      "id": "extract_pdf_extractor_rationale_33",
+      "community": 5,
+      "norm_label": "atomic block of content from one pdf page."
+    },
+    {
+      "label": "Split concall page text into individual speaker turn blocks.",
+      "file_type": "rationale",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L103",
+      "id": "extract_pdf_extractor_rationale_103",
+      "community": 5,
+      "norm_label": "split concall page text into individual speaker turn blocks."
+    },
+    {
+      "label": "Convert pdfplumber table rows to readable text.",
+      "file_type": "rationale",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L142",
+      "id": "extract_pdf_extractor_rationale_142",
+      "community": 5,
+      "norm_label": "convert pdfplumber table rows to readable text."
+    },
+    {
+      "label": "Return bounding boxes (x0, top, x1, bottom) for all tables on a page.     Used",
+      "file_type": "rationale",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L153",
+      "id": "extract_pdf_extractor_rationale_153",
+      "community": 5,
+      "norm_label": "return bounding boxes (x0, top, x1, bottom) for all tables on a page.     used"
+    },
+    {
+      "label": "Extract text from a page while cropping out table regions.     Falls back to fu",
+      "file_type": "rationale",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L168",
+      "id": "extract_pdf_extractor_rationale_168",
+      "community": 5,
+      "norm_label": "extract text from a page while cropping out table regions.     falls back to fu"
+    },
+    {
+      "label": "Extract content from a PDF.     doc_type: 'annual_report' or 'concall'     Ret",
+      "file_type": "rationale",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L324",
+      "id": "extract_pdf_extractor_rationale_324",
+      "community": 5,
+      "norm_label": "extract content from a pdf.     doc_type: 'annual_report' or 'concall'     ret"
+    },
+    {
+      "label": "text_cleaner.py",
+      "file_type": "code",
+      "source_file": "pipeline/extract/text_cleaner.py",
+      "source_location": "L1",
+      "id": "pipeline_extract_text_cleaner_py",
+      "community": 3,
+      "norm_label": "text_cleaner.py"
+    },
+    {
+      "label": "fix_ligatures()",
+      "file_type": "code",
+      "source_file": "pipeline/extract/text_cleaner.py",
+      "source_location": "L27",
+      "id": "extract_text_cleaner_fix_ligatures",
+      "community": 3,
+      "norm_label": "fix_ligatures()"
+    },
+    {
+      "label": "remove_noise()",
+      "file_type": "code",
+      "source_file": "pipeline/extract/text_cleaner.py",
+      "source_location": "L46",
+      "id": "extract_text_cleaner_remove_noise",
+      "community": 3,
+      "norm_label": "remove_noise()"
+    },
+    {
+      "label": "normalize_whitespace()",
+      "file_type": "code",
+      "source_file": "pipeline/extract/text_cleaner.py",
+      "source_location": "L55",
+      "id": "extract_text_cleaner_normalize_whitespace",
+      "community": 3,
+      "norm_label": "normalize_whitespace()"
+    },
+    {
+      "label": "normalize_numbers()",
+      "file_type": "code",
+      "source_file": "pipeline/extract/text_cleaner.py",
+      "source_location": "L68",
+      "id": "extract_text_cleaner_normalize_numbers",
+      "community": 3,
+      "norm_label": "normalize_numbers()"
+    },
+    {
+      "label": "clean_text()",
+      "file_type": "code",
+      "source_file": "pipeline/extract/text_cleaner.py",
+      "source_location": "L81",
+      "id": "extract_text_cleaner_clean_text",
+      "community": 3,
+      "norm_label": "clean_text()"
+    },
+    {
+      "label": "is_garbage_text()",
+      "file_type": "code",
+      "source_file": "pipeline/extract/text_cleaner.py",
+      "source_location": "L101",
+      "id": "extract_text_cleaner_is_garbage_text",
+      "community": 3,
+      "norm_label": "is_garbage_text()"
+    },
+    {
+      "label": "pipeline/extract/text_cleaner.py Normalize and clean text extracted from financ",
+      "file_type": "rationale",
+      "source_file": "pipeline/extract/text_cleaner.py",
+      "source_location": "L1",
+      "id": "extract_text_cleaner_rationale_1",
+      "community": 3,
+      "norm_label": "pipeline/extract/text_cleaner.py normalize and clean text extracted from financ"
+    },
+    {
+      "label": "Clean extracted PDF text.     aggressive=True removes more noise (good for pros",
+      "file_type": "rationale",
+      "source_file": "pipeline/extract/text_cleaner.py",
+      "source_location": "L82",
+      "id": "extract_text_cleaner_rationale_82",
+      "community": 3,
+      "norm_label": "clean extracted pdf text.     aggressive=true removes more noise (good for pros"
+    },
+    {
+      "label": "Return True if text is too short or too noisy to be useful.",
+      "file_type": "rationale",
+      "source_file": "pipeline/extract/text_cleaner.py",
+      "source_location": "L102",
+      "id": "extract_text_cleaner_rationale_102",
+      "community": 3,
+      "norm_label": "return true if text is too short or too noisy to be useful."
+    },
+    {
+      "label": "__init__.py",
+      "file_type": "code",
+      "source_file": "pipeline/extract/__init__.py",
+      "source_location": "L1",
+      "id": "pipeline_extract_init_py",
+      "community": 3,
+      "norm_label": "__init__.py"
+    },
+    {
+      "label": "chroma_loader.py",
+      "file_type": "code",
+      "source_file": "pipeline/loader/chroma_loader.py",
+      "source_location": "L1",
+      "id": "pipeline_loader_chroma_loader_py",
+      "community": 6,
+      "norm_label": "chroma_loader.py"
+    },
+    {
+      "label": "get_chroma_client()",
+      "file_type": "code",
+      "source_file": "pipeline/loader/chroma_loader.py",
+      "source_location": "L30",
+      "id": "loader_chroma_loader_get_chroma_client",
+      "community": 6,
+      "norm_label": "get_chroma_client()"
+    },
+    {
+      "label": "get_collection()",
+      "file_type": "code",
+      "source_file": "pipeline/loader/chroma_loader.py",
+      "source_location": "L42",
+      "id": "loader_chroma_loader_get_collection",
+      "community": 6,
+      "norm_label": "get_collection()"
+    },
+    {
+      "label": "load_chunks_to_chroma()",
+      "file_type": "code",
+      "source_file": "pipeline/loader/chroma_loader.py",
+      "source_location": "L59",
+      "id": "loader_chroma_loader_load_chunks_to_chroma",
+      "community": 6,
+      "norm_label": "load_chunks_to_chroma()"
+    },
+    {
+      "label": "query_collection()",
+      "file_type": "code",
+      "source_file": "pipeline/loader/chroma_loader.py",
+      "source_location": "L117",
+      "id": "loader_chroma_loader_query_collection",
+      "community": 0,
+      "norm_label": "query_collection()"
+    },
+    {
+      "label": "collection_count()",
+      "file_type": "code",
+      "source_file": "pipeline/loader/chroma_loader.py",
+      "source_location": "L140",
+      "id": "loader_chroma_loader_collection_count",
+      "community": 6,
+      "norm_label": "collection_count()"
+    },
+    {
+      "label": "list_symbols()",
+      "file_type": "code",
+      "source_file": "pipeline/loader/chroma_loader.py",
+      "source_location": "L145",
+      "id": "loader_chroma_loader_list_symbols",
+      "community": 6,
+      "norm_label": "list_symbols()"
+    },
+    {
+      "label": "pipeline/loader/chroma_loader.py  Writes chunks + embeddings into ChromaDB. T",
+      "file_type": "rationale",
+      "source_file": "pipeline/loader/chroma_loader.py",
+      "source_location": "L1",
+      "id": "loader_chroma_loader_rationale_1",
+      "community": 6,
+      "norm_label": "pipeline/loader/chroma_loader.py  writes chunks + embeddings into chromadb. t"
+    },
+    {
+      "label": "Get or create the ChromaDB collection for a doc type.",
+      "file_type": "rationale",
+      "source_file": "pipeline/loader/chroma_loader.py",
+      "source_location": "L43",
+      "id": "loader_chroma_loader_rationale_43",
+      "community": 6,
+      "norm_label": "get or create the chromadb collection for a doc type."
+    },
+    {
+      "label": "Embed and upsert chunks into ChromaDB.     Returns collection name.",
+      "file_type": "rationale",
+      "source_file": "pipeline/loader/chroma_loader.py",
+      "source_location": "L64",
+      "id": "loader_chroma_loader_rationale_64",
+      "community": 6,
+      "norm_label": "embed and upsert chunks into chromadb.     returns collection name."
+    },
+    {
+      "label": "Query ChromaDB with a vector.     Returns chromadb QueryResult dict.",
+      "file_type": "rationale",
+      "source_file": "pipeline/loader/chroma_loader.py",
+      "source_location": "L123",
+      "id": "loader_chroma_loader_rationale_123",
+      "community": 0,
+      "norm_label": "query chromadb with a vector.     returns chromadb queryresult dict."
+    },
+    {
+      "label": "List all unique symbols in a collection.",
+      "file_type": "rationale",
+      "source_file": "pipeline/loader/chroma_loader.py",
+      "source_location": "L146",
+      "id": "loader_chroma_loader_rationale_146",
+      "community": 6,
+      "norm_label": "list all unique symbols in a collection."
+    },
+    {
+      "label": "chunker.py",
+      "file_type": "code",
+      "source_file": "pipeline/loader/chunker.py",
+      "source_location": "L1",
+      "id": "pipeline_loader_chunker_py",
+      "community": 3,
+      "norm_label": "chunker.py"
+    },
+    {
+      "label": "Chunk",
+      "file_type": "code",
+      "source_file": "pipeline/loader/chunker.py",
+      "source_location": "L28",
+      "id": "loader_chunker_chunk",
+      "community": 3,
+      "norm_label": "chunk"
+    },
+    {
+      "label": "_make_id()",
+      "file_type": "code",
+      "source_file": "pipeline/loader/chunker.py",
+      "source_location": "L46",
+      "id": "loader_chunker_make_id",
+      "community": 3,
+      "norm_label": "_make_id()"
+    },
+    {
+      "label": "_approx_tokens()",
+      "file_type": "code",
+      "source_file": "pipeline/loader/chunker.py",
+      "source_location": "L54",
+      "id": "loader_chunker_approx_tokens",
+      "community": 3,
+      "norm_label": "_approx_tokens()"
+    },
+    {
+      "label": "_split_by_tokens()",
+      "file_type": "code",
+      "source_file": "pipeline/loader/chunker.py",
+      "source_location": "L58",
+      "id": "loader_chunker_split_by_tokens",
+      "community": 3,
+      "norm_label": "_split_by_tokens()"
+    },
+    {
+      "label": "chunk_annual_report()",
+      "file_type": "code",
+      "source_file": "pipeline/loader/chunker.py",
+      "source_location": "L83",
+      "id": "loader_chunker_chunk_annual_report",
+      "community": 3,
+      "norm_label": "chunk_annual_report()"
+    },
+    {
+      "label": "chunk_concall()",
+      "file_type": "code",
+      "source_file": "pipeline/loader/chunker.py",
+      "source_location": "L201",
+      "id": "loader_chunker_chunk_concall",
+      "community": 3,
+      "norm_label": "chunk_concall()"
+    },
+    {
+      "label": "chunk_document()",
+      "file_type": "code",
+      "source_file": "pipeline/loader/chunker.py",
+      "source_location": "L292",
+      "id": "loader_chunker_chunk_document",
+      "community": 3,
+      "norm_label": "chunk_document()"
+    },
+    {
+      "label": "pipeline/loader/chunker.py  Chunking strategies:   Annual reports \u2192 512-token",
+      "file_type": "rationale",
+      "source_file": "pipeline/loader/chunker.py",
+      "source_location": "L1",
+      "id": "loader_chunker_rationale_1",
+      "community": 3,
+      "norm_label": "pipeline/loader/chunker.py  chunking strategies:   annual reports \u2192 512-token"
+    },
+    {
+      "label": "Split text into overlapping windows by approximate token count.",
+      "file_type": "rationale",
+      "source_file": "pipeline/loader/chunker.py",
+      "source_location": "L59",
+      "id": "loader_chunker_rationale_59",
+      "community": 3,
+      "norm_label": "split text into overlapping windows by approximate token count."
+    },
+    {
+      "label": "embedder.py",
+      "file_type": "code",
+      "source_file": "pipeline/loader/embedder.py",
+      "source_location": "L1",
+      "id": "pipeline_loader_embedder_py",
+      "community": 6,
+      "norm_label": "embedder.py"
+    },
+    {
+      "label": "_get_model()",
+      "file_type": "code",
+      "source_file": "pipeline/loader/embedder.py",
+      "source_location": "L22",
+      "id": "loader_embedder_get_model",
+      "community": 6,
+      "norm_label": "_get_model()"
+    },
+    {
+      "label": "embed_texts()",
+      "file_type": "code",
+      "source_file": "pipeline/loader/embedder.py",
+      "source_location": "L37",
+      "id": "loader_embedder_embed_texts",
+      "community": 6,
+      "norm_label": "embed_texts()"
+    },
+    {
+      "label": "embed_query()",
+      "file_type": "code",
+      "source_file": "pipeline/loader/embedder.py",
+      "source_location": "L59",
+      "id": "loader_embedder_embed_query",
+      "community": 0,
+      "norm_label": "embed_query()"
+    },
+    {
+      "label": "pipeline/loader/embedder.py  Singleton embedding model \u2014 loaded ONCE per proce",
+      "file_type": "rationale",
+      "source_file": "pipeline/loader/embedder.py",
+      "source_location": "L1",
+      "id": "loader_embedder_rationale_1",
+      "community": 6,
+      "norm_label": "pipeline/loader/embedder.py  singleton embedding model \u2014 loaded once per proce"
+    },
+    {
+      "label": "Embed a single query \u2014 same model, no reload.",
+      "file_type": "rationale",
+      "source_file": "pipeline/loader/embedder.py",
+      "source_location": "L60",
+      "id": "loader_embedder_rationale_60",
+      "community": 0,
+      "norm_label": "embed a single query \u2014 same model, no reload."
+    },
+    {
+      "label": "__init__.py",
+      "file_type": "code",
+      "source_file": "pipeline/loader/__init__.py",
+      "source_location": "L1",
+      "id": "pipeline_loader_init_py",
+      "community": 6,
+      "norm_label": "__init__.py"
+    },
+    {
+      "label": "reranker.py",
+      "file_type": "code",
+      "source_file": "pipeline/retrieval/reranker.py",
+      "source_location": "L1",
+      "id": "pipeline_retrieval_reranker_py",
+      "community": 2,
+      "norm_label": "reranker.py"
+    },
+    {
+      "label": "_forward_boost()",
+      "file_type": "code",
+      "source_file": "pipeline/retrieval/reranker.py",
+      "source_location": "L84",
+      "id": "retrieval_reranker_forward_boost",
+      "community": 2,
+      "norm_label": "_forward_boost()"
+    },
+    {
+      "label": "_get_voyage_client()",
+      "file_type": "code",
+      "source_file": "pipeline/retrieval/reranker.py",
+      "source_location": "L113",
+      "id": "retrieval_reranker_get_voyage_client",
+      "community": 2,
+      "norm_label": "_get_voyage_client()"
+    },
+    {
+      "label": "_get_bge_reranker()",
+      "file_type": "code",
+      "source_file": "pipeline/retrieval/reranker.py",
+      "source_location": "L143",
+      "id": "retrieval_reranker_get_bge_reranker",
+      "community": 2,
+      "norm_label": "_get_bge_reranker()"
+    },
+    {
+      "label": "_bge_score_batch()",
+      "file_type": "code",
+      "source_file": "pipeline/retrieval/reranker.py",
+      "source_location": "L176",
+      "id": "retrieval_reranker_bge_score_batch",
+      "community": 2,
+      "norm_label": "_bge_score_batch()"
+    },
+    {
+      "label": "rerank()",
+      "file_type": "code",
+      "source_file": "pipeline/retrieval/reranker.py",
+      "source_location": "L202",
+      "id": "retrieval_reranker_rerank",
+      "community": 2,
+      "norm_label": "rerank()"
+    },
+    {
+      "label": "rerank_separate()",
+      "file_type": "code",
+      "source_file": "pipeline/retrieval/reranker.py",
+      "source_location": "L311",
+      "id": "retrieval_reranker_rerank_separate",
+      "community": 2,
+      "norm_label": "rerank_separate()"
+    },
+    {
+      "label": "pipeline/retrieval/reranker.py  Primary  re-ranker : Voyage Rerank-2.5 (financ",
+      "file_type": "rationale",
+      "source_file": "pipeline/retrieval/reranker.py",
+      "source_location": "L1",
+      "id": "retrieval_reranker_rationale_1",
+      "community": 2,
+      "norm_label": "pipeline/retrieval/reranker.py  primary  re-ranker : voyage rerank-2.5 (financ"
+    },
+    {
+      "label": "Additive score adjustment:       + bonus  when query is forward-looking AND chu",
+      "file_type": "rationale",
+      "source_file": "pipeline/retrieval/reranker.py",
+      "source_location": "L85",
+      "id": "retrieval_reranker_rationale_85",
+      "community": 2,
+      "norm_label": "additive score adjustment:       + bonus  when query is forward-looking and chu"
+    },
+    {
+      "label": "Returns a Voyage client if VOYAGE_API_KEY is set, else None.",
+      "file_type": "rationale",
+      "source_file": "pipeline/retrieval/reranker.py",
+      "source_location": "L114",
+      "id": "retrieval_reranker_rationale_114",
+      "community": 2,
+      "norm_label": "returns a voyage client if voyage_api_key is set, else none."
+    },
+    {
+      "label": "Lazy-load BAAI/bge-reranker-v2-m3 via sentence-transformers.      Memory footp",
+      "file_type": "rationale",
+      "source_file": "pipeline/retrieval/reranker.py",
+      "source_location": "L144",
+      "id": "retrieval_reranker_rationale_144",
+      "community": 2,
+      "norm_label": "lazy-load baai/bge-reranker-v2-m3 via sentence-transformers.      memory footp"
+    },
+    {
+      "label": "Score each document against the query using bge-reranker-v2-m3.      CrossEnco",
+      "file_type": "rationale",
+      "source_file": "pipeline/retrieval/reranker.py",
+      "source_location": "L177",
+      "id": "retrieval_reranker_rationale_177",
+      "community": 2,
+      "norm_label": "score each document against the query using bge-reranker-v2-m3.      crossenco"
+    },
+    {
+      "label": "Re-rank retrieved chunks.       Primary  : Voyage Rerank-2.5  (API, finance/SEC",
+      "file_type": "rationale",
+      "source_file": "pipeline/retrieval/reranker.py",
+      "source_location": "L208",
+      "id": "retrieval_reranker_rationale_208",
+      "community": 2,
+      "norm_label": "re-rank retrieved chunks.       primary  : voyage rerank-2.5  (api, finance/sec"
+    },
+    {
+      "label": "Rerank each collection independently so concall prose cannot displace     annua",
+      "file_type": "rationale",
+      "source_file": "pipeline/retrieval/reranker.py",
+      "source_location": "L318",
+      "id": "retrieval_reranker_rationale_318",
+      "community": 2,
+      "norm_label": "rerank each collection independently so concall prose cannot displace     annua"
+    },
+    {
+      "label": "retriever.py",
+      "file_type": "code",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L1",
+      "id": "pipeline_retrieval_retriever_py",
+      "community": 0,
+      "norm_label": "retriever.py"
+    },
+    {
+      "label": "_expand_query()",
+      "file_type": "code",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L166",
+      "id": "retrieval_retriever_expand_query",
+      "community": 0,
+      "norm_label": "_expand_query()"
+    },
+    {
+      "label": "RetrievedChunk",
+      "file_type": "code",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L202",
+      "id": "retrieval_retriever_retrievedchunk",
+      "community": 0,
+      "norm_label": "retrievedchunk"
+    },
+    {
+      "label": "_normalise_fy()",
+      "file_type": "code",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L214",
+      "id": "retrieval_retriever_normalise_fy",
+      "community": 0,
+      "norm_label": "_normalise_fy()"
+    },
+    {
+      "label": "parse_year_intent()",
+      "file_type": "code",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L220",
+      "id": "retrieval_retriever_parse_year_intent",
+      "community": 0,
+      "norm_label": "parse_year_intent()"
+    },
+    {
+      "label": "recency_boost()",
+      "file_type": "code",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L307",
+      "id": "retrieval_retriever_recency_boost",
+      "community": 2,
+      "norm_label": "recency_boost()"
+    },
+    {
+      "label": "BM25",
+      "file_type": "code",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L319",
+      "id": "retrieval_retriever_bm25",
+      "community": 0,
+      "norm_label": "bm25"
+    },
+    {
+      "label": ".__init__()",
+      "file_type": "code",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L320",
+      "id": "retrieval_retriever_bm25_init",
+      "community": 0,
+      "norm_label": ".__init__()"
+    },
+    {
+      "label": "._tok()",
+      "file_type": "code",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L327",
+      "id": "retrieval_retriever_bm25_tok",
+      "community": 0,
+      "norm_label": "._tok()"
+    },
+    {
+      "label": "._build_idf()",
+      "file_type": "code",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L330",
+      "id": "retrieval_retriever_bm25_build_idf",
+      "community": 0,
+      "norm_label": "._build_idf()"
+    },
+    {
+      "label": ".get_scores()",
+      "file_type": "code",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L338",
+      "id": "retrieval_retriever_bm25_get_scores",
+      "community": 0,
+      "norm_label": ".get_scores()"
+    },
+    {
+      "label": "_minmax()",
+      "file_type": "code",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L355",
+      "id": "retrieval_retriever_minmax",
+      "community": 0,
+      "norm_label": "_minmax()"
+    },
+    {
+      "label": "_build_where()",
+      "file_type": "code",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L365",
+      "id": "retrieval_retriever_build_where",
+      "community": 0,
+      "norm_label": "_build_where()"
+    },
+    {
+      "label": "_run_annual_query()",
+      "file_type": "code",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L382",
+      "id": "retrieval_retriever_run_annual_query",
+      "community": 0,
+      "norm_label": "_run_annual_query()"
+    },
+    {
+      "label": "retrieve_annual()",
+      "file_type": "code",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L423",
+      "id": "retrieval_retriever_retrieve_annual",
+      "community": 0,
+      "norm_label": "retrieve_annual()"
+    },
+    {
+      "label": "retrieve_concall()",
+      "file_type": "code",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L447",
+      "id": "retrieval_retriever_retrieve_concall",
+      "community": 0,
+      "norm_label": "retrieve_concall()"
+    },
+    {
+      "label": "retrieve()",
+      "file_type": "code",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L530",
+      "id": "retrieval_retriever_retrieve",
+      "community": 0,
+      "norm_label": "retrieve()"
+    },
+    {
+      "label": "retrieve_with_years()",
+      "file_type": "code",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L553",
+      "id": "retrieval_retriever_retrieve_with_years",
+      "community": 0,
+      "norm_label": "retrieve_with_years()"
+    },
+    {
+      "label": "pipeline/retrieval/retriever.py  FIXES applied in this version:   [FIX 1] par",
+      "file_type": "rationale",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L1",
+      "id": "retrieval_retriever_rationale_1",
+      "community": 0,
+      "norm_label": "pipeline/retrieval/retriever.py  fixes applied in this version:   [fix 1] par"
+    },
+    {
+      "label": "Enrich the query string with domain-specific expansion phrases so the     embed",
+      "file_type": "rationale",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L167",
+      "id": "retrieval_retriever_rationale_167",
+      "community": 0,
+      "norm_label": "enrich the query string with domain-specific expansion phrases so the     embed"
+    },
+    {
+      "label": "Convert 2-digit or 4-digit FY string to full 4-digit year.",
+      "file_type": "rationale",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L215",
+      "id": "retrieval_retriever_rationale_215",
+      "community": 0,
+      "norm_label": "convert 2-digit or 4-digit fy string to full 4-digit year."
+    },
+    {
+      "label": "Returns (resolved_years, explicit_years).        resolved_years  \u2014 full year l",
+      "file_type": "rationale",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L221",
+      "id": "retrieval_retriever_rationale_221",
+      "community": 0,
+      "norm_label": "returns (resolved_years, explicit_years).        resolved_years  \u2014 full year l"
+    },
+    {
+      "label": "Additive boost so FY2025 ranks above FY2015 at equal semantic similarity.     S",
+      "file_type": "rationale",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L308",
+      "id": "retrieval_retriever_rationale_308",
+      "community": 2,
+      "norm_label": "additive boost so fy2025 ranks above fy2015 at equal semantic similarity.     s"
+    },
+    {
+      "label": "Returns:       - List[RetrievedChunk]                   for doc_type in (annual",
+      "file_type": "rationale",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L538",
+      "id": "retrieval_retriever_rationale_538",
+      "community": 0,
+      "norm_label": "returns:       - list[retrievedchunk]                   for doc_type in (annual"
+    },
+    {
+      "label": "Returns (chunks_or_tuple, resolved_years, explicit_years).      explicit_years",
+      "file_type": "rationale",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L561",
+      "id": "retrieval_retriever_rationale_561",
+      "community": 0,
+      "norm_label": "returns (chunks_or_tuple, resolved_years, explicit_years).      explicit_years"
+    },
+    {
+      "label": "# NOTE: recency_boost is intentionally NOT applied here.",
+      "file_type": "rationale",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L412",
+      "id": "retrieval_retriever_rationale_412",
+      "community": 0,
+      "norm_label": "# note: recency_boost is intentionally not applied here."
+    },
+    {
+      "label": "__init__.py",
+      "file_type": "code",
+      "source_file": "pipeline/retrieval/__init__.py",
+      "source_location": "L1",
+      "id": "pipeline_retrieval_init_py",
+      "community": 2,
+      "norm_label": "__init__.py"
+    },
+    {
+      "label": "rag_engine.py",
+      "file_type": "code",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L1",
+      "id": "rag_rag_engine_py",
+      "community": 4,
+      "norm_label": "rag_engine.py"
+    },
+    {
+      "label": "ProviderEntry",
+      "file_type": "code",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L108",
+      "id": "rag_rag_engine_providerentry",
+      "community": 4,
+      "norm_label": "providerentry"
+    },
+    {
+      "label": "_discover_ollama()",
+      "file_type": "code",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L121",
+      "id": "rag_rag_engine_discover_ollama",
+      "community": 4,
+      "norm_label": "_discover_ollama()"
+    },
+    {
+      "label": "build_provider_catalogue()",
+      "file_type": "code",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L148",
+      "id": "rag_rag_engine_build_provider_catalogue",
+      "community": 4,
+      "norm_label": "build_provider_catalogue()"
+    },
+    {
+      "label": "pick_provider_interactive()",
+      "file_type": "code",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L225",
+      "id": "rag_rag_engine_pick_provider_interactive",
+      "community": 4,
+      "norm_label": "pick_provider_interactive()"
+    },
+    {
+      "label": "get_provider()",
+      "file_type": "code",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L255",
+      "id": "rag_rag_engine_get_provider",
+      "community": 4,
+      "norm_label": "get_provider()"
+    },
+    {
+      "label": "_estimate_tokens()",
+      "file_type": "code",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L426",
+      "id": "rag_rag_engine_estimate_tokens",
+      "community": 4,
+      "norm_label": "_estimate_tokens()"
+    },
+    {
+      "label": "_build_context()",
+      "file_type": "code",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L433",
+      "id": "rag_rag_engine_build_context",
+      "community": 4,
+      "norm_label": "_build_context()"
+    },
+    {
+      "label": "_build_user_prompt()",
+      "file_type": "code",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L453",
+      "id": "rag_rag_engine_build_user_prompt",
+      "community": 4,
+      "norm_label": "_build_user_prompt()"
+    },
+    {
+      "label": "_trim_chunks_to_budget()",
+      "file_type": "code",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L537",
+      "id": "rag_rag_engine_trim_chunks_to_budget",
+      "community": 4,
+      "norm_label": "_trim_chunks_to_budget()"
+    },
+    {
+      "label": "_call_gemini()",
+      "file_type": "code",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L613",
+      "id": "rag_rag_engine_call_gemini",
+      "community": 4,
+      "norm_label": "_call_gemini()"
+    },
+    {
+      "label": "_call_openai_compat()",
+      "file_type": "code",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L650",
+      "id": "rag_rag_engine_call_openai_compat",
+      "community": 4,
+      "norm_label": "_call_openai_compat()"
+    },
+    {
+      "label": "_call_with_retry()",
+      "file_type": "code",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L684",
+      "id": "rag_rag_engine_call_with_retry",
+      "community": 4,
+      "norm_label": "_call_with_retry()"
+    },
+    {
+      "label": "RAGResponse",
+      "file_type": "code",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L713",
+      "id": "rag_rag_engine_ragresponse",
+      "community": 4,
+      "norm_label": "ragresponse"
+    },
+    {
+      "label": "generate_answer()",
+      "file_type": "code",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L725",
+      "id": "rag_rag_engine_generate_answer",
+      "community": 4,
+      "norm_label": "generate_answer()"
+    },
+    {
+      "label": "rag/rag_engine.py  FIXES applied in this version:    [FIX CONTEXT-TRIM] Cont",
+      "file_type": "rationale",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L1",
+      "id": "rag_rag_engine_rationale_1",
+      "community": 4,
+      "norm_label": "rag/rag_engine.py  fixes applied in this version:    [fix context-trim] cont"
+    },
+    {
+      "label": "Query /api/tags; return one entry per installed model. Never raises.",
+      "file_type": "rationale",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L122",
+      "id": "rag_rag_engine_rationale_122",
+      "community": 4,
+      "norm_label": "query /api/tags; return one entry per installed model. never raises."
+    },
+    {
+      "label": "Build the user-turn prompt.      resolved_years \u2014 used for the year-filter not",
+      "file_type": "rationale",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L460",
+      "id": "rag_rag_engine_rationale_460",
+      "community": 4,
+      "norm_label": "build the user-turn prompt.      resolved_years \u2014 used for the year-filter not"
+    },
+    {
+      "label": "Drop lowest-ranked chunks until the full prompt fits within:       (a) the mode",
+      "file_type": "rationale",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L546",
+      "id": "rag_rag_engine_rationale_546",
+      "community": 4,
+      "norm_label": "drop lowest-ranked chunks until the full prompt fits within:       (a) the mode"
+    },
+    {
+      "label": "resolved_years \u2014 years used for ChromaDB retrieval filter.     explicit_years \u2014",
+      "file_type": "rationale",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L736",
+      "id": "rag_rag_engine_rationale_736",
+      "community": 4,
+      "norm_label": "resolved_years \u2014 years used for chromadb retrieval filter.     explicit_years \u2014"
+    },
+    {
+      "label": "__init__.py",
+      "file_type": "code",
+      "source_file": "rag/__init__.py",
+      "source_location": "L1",
+      "id": "rag_init_py",
+      "community": 4,
+      "norm_label": "__init__.py"
+    },
+    {
+      "label": "logger.py",
+      "file_type": "code",
+      "source_file": "utils/logger.py",
+      "source_location": "L1",
+      "id": "utils_logger_py",
+      "community": 10,
+      "norm_label": "logger.py"
+    },
+    {
+      "label": "get_logger()",
+      "file_type": "code",
+      "source_file": "utils/logger.py",
+      "source_location": "L12",
+      "id": "utils_logger_get_logger",
+      "community": 10,
+      "norm_label": "get_logger()"
+    },
+    {
+      "label": "utils/logger.py Structured logging with file + console output.",
+      "file_type": "rationale",
+      "source_file": "utils/logger.py",
+      "source_location": "L1",
+      "id": "utils_logger_rationale_1",
+      "community": 10,
+      "norm_label": "utils/logger.py structured logging with file + console output."
+    },
+    {
+      "label": "__init__.py",
+      "file_type": "code",
+      "source_file": "utils/__init__.py",
+      "source_location": "L1",
+      "id": "utils_init_py",
+      "community": 10,
+      "norm_label": "__init__.py"
+    },
+    {
+      "label": "Readme.md",
+      "file_type": "document",
+      "source_file": "Readme.md",
+      "source_location": "L1",
+      "id": "readme_md",
+      "community": 7,
+      "norm_label": "readme.md"
+    },
+    {
+      "label": "Financial RAG \u2014 Equity Research System",
+      "file_type": "document",
+      "source_file": "Readme.md",
+      "source_location": "L1",
+      "id": "finrag_readme_financial_rag_equity_research_system",
+      "community": 7,
+      "norm_label": "financial rag \u2014 equity research system"
+    },
+    {
+      "label": "Stack",
+      "file_type": "document",
+      "source_file": "Readme.md",
+      "source_location": "L5",
+      "id": "finrag_readme_stack",
+      "community": 7,
+      "norm_label": "stack"
+    },
+    {
+      "label": "Architecture",
+      "file_type": "document",
+      "source_file": "Readme.md",
+      "source_location": "L15",
+      "id": "finrag_readme_architecture",
+      "community": 7,
+      "norm_label": "architecture"
+    },
+    {
+      "label": "High-Level Architecture",
+      "file_type": "document",
+      "source_file": "Readme.md",
+      "source_location": "L17",
+      "id": "finrag_readme_high_level_architecture",
+      "community": 7,
+      "norm_label": "high-level architecture"
+    },
+    {
+      "label": "Low-Level Pipeline Design",
+      "file_type": "document",
+      "source_file": "Readme.md",
+      "source_location": "L20",
+      "id": "finrag_readme_low_level_pipeline_design",
+      "community": 7,
+      "norm_label": "low-level pipeline design"
+    },
+    {
+      "label": "Structured-Semantic Fusion RAG",
+      "file_type": "document",
+      "source_file": "Readme.md",
+      "source_location": "L22",
+      "id": "finrag_readme_structured_semantic_fusion_rag",
+      "community": 7,
+      "norm_label": "structured-semantic fusion rag"
+    },
+    {
+      "label": "Directory Structure",
+      "file_type": "document",
+      "source_file": "Readme.md",
+      "source_location": "L27",
+      "id": "finrag_readme_directory_structure",
+      "community": 7,
+      "norm_label": "directory structure"
+    },
+    {
+      "label": "code:block1 (Financial-Rag/)",
+      "file_type": "document",
+      "source_file": "Readme.md",
+      "source_location": "L28",
+      "id": "finrag_readme_codeblock_1",
+      "community": 7,
+      "norm_label": "code:block1 (financial-rag/)"
+    },
+    {
+      "label": "Setup",
+      "file_type": "document",
+      "source_file": "Readme.md",
+      "source_location": "L55",
+      "id": "finrag_readme_setup",
+      "community": 7,
+      "norm_label": "setup"
+    },
+    {
+      "label": "code:bash (# 1. Clone and install)",
+      "file_type": "document",
+      "source_file": "Readme.md",
+      "source_location": "L57",
+      "id": "finrag_readme_codeblock_2",
+      "community": 7,
+      "norm_label": "code:bash (# 1. clone and install)"
+    },
+    {
+      "label": "Groq Free Tier",
+      "file_type": "document",
+      "source_file": "Readme.md",
+      "source_location": "L81",
+      "id": "finrag_readme_groq_free_tier",
+      "community": 7,
+      "norm_label": "groq free tier"
+    }
+  ],
+  "links": [
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Ingest.py",
+      "source_location": "L40",
+      "weight": 1.0,
+      "source": "ingest_py",
+      "target": "finrag_ingest_resolve_doc_type",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Ingest.py",
+      "source_location": "L49",
+      "weight": 1.0,
+      "source": "ingest_py",
+      "target": "finrag_ingest_extract_year_from_path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Ingest.py",
+      "source_location": "L58",
+      "weight": 1.0,
+      "source": "ingest_py",
+      "target": "finrag_ingest_find_pdfs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Ingest.py",
+      "source_location": "L96",
+      "weight": 1.0,
+      "source": "ingest_py",
+      "target": "finrag_ingest_ingest_pdf",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Ingest.py",
+      "source_location": "L194",
+      "weight": 1.0,
+      "source": "ingest_py",
+      "target": "finrag_ingest_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Ingest.py",
+      "source_location": "L71",
+      "weight": 1.0,
+      "source": "finrag_ingest_find_pdfs",
+      "target": "finrag_ingest_resolve_doc_type",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "Ingest.py",
+      "source_location": "L41",
+      "weight": 1.0,
+      "source": "finrag_ingest_rationale_41",
+      "target": "finrag_ingest_resolve_doc_type",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Ingest.py",
+      "source_location": "L81",
+      "weight": 1.0,
+      "source": "finrag_ingest_find_pdfs",
+      "target": "finrag_ingest_extract_year_from_path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "Ingest.py",
+      "source_location": "L50",
+      "weight": 1.0,
+      "source": "finrag_ingest_rationale_50",
+      "target": "finrag_ingest_extract_year_from_path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Ingest.py",
+      "source_location": "L250",
+      "weight": 1.0,
+      "source": "finrag_ingest_main",
+      "target": "finrag_ingest_find_pdfs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "Ingest.py",
+      "source_location": "L59",
+      "weight": 1.0,
+      "source": "finrag_ingest_rationale_59",
+      "target": "finrag_ingest_find_pdfs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Ingest.py",
+      "source_location": "L257",
+      "weight": 1.0,
+      "source": "finrag_ingest_main",
+      "target": "finrag_ingest_ingest_pdf",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "Ingest.py",
+      "source_location": "L108",
+      "weight": 1.0,
+      "source": "finrag_ingest_ingest_pdf",
+      "target": "db_database_is_already_ingested"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "Ingest.py",
+      "source_location": "L115",
+      "weight": 1.0,
+      "source": "finrag_ingest_ingest_pdf",
+      "target": "db_database_upsert_document"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "Ingest.py",
+      "source_location": "L129",
+      "weight": 1.0,
+      "source": "finrag_ingest_ingest_pdf",
+      "target": "extract_pdf_extractor_extract_pdf"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "Ingest.py",
+      "source_location": "L137",
+      "weight": 1.0,
+      "source": "finrag_ingest_ingest_pdf",
+      "target": "loader_chunker_chunk_document"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "Ingest.py",
+      "source_location": "L145",
+      "weight": 1.0,
+      "source": "finrag_ingest_ingest_pdf",
+      "target": "loader_chroma_loader_load_chunks_to_chroma"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "Ingest.py",
+      "source_location": "L149",
+      "weight": 1.0,
+      "source": "finrag_ingest_ingest_pdf",
+      "target": "db_database_insert_chunk"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "Ingest.py",
+      "source_location": "L163",
+      "weight": 1.0,
+      "source": "finrag_ingest_ingest_pdf",
+      "target": "db_database_mark_document_ingested"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "Ingest.py",
+      "source_location": "L164",
+      "weight": 1.0,
+      "source": "finrag_ingest_ingest_pdf",
+      "target": "db_database_log_ingestion"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "Ingest.py",
+      "source_location": "L179",
+      "weight": 1.0,
+      "source": "finrag_ingest_ingest_pdf",
+      "target": "db_database_mark_document_failed"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "Ingest.py",
+      "source_location": "L208",
+      "weight": 1.0,
+      "source": "finrag_ingest_main",
+      "target": "db_database_init_db"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "Ingest.py",
+      "source_location": "L212",
+      "weight": 1.0,
+      "source": "finrag_ingest_main",
+      "target": "db_database_get_stats"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "query.py",
+      "source_location": "L33",
+      "weight": 1.0,
+      "source": "query_py",
+      "target": "finrag_query_print_answer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "query.py",
+      "source_location": "L53",
+      "weight": 1.0,
+      "source": "query_py",
+      "target": "finrag_query_run_query",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "query.py",
+      "source_location": "L135",
+      "weight": 1.0,
+      "source": "query_py",
+      "target": "finrag_query_interactive_mode",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "query.py",
+      "source_location": "L174",
+      "weight": 1.0,
+      "source": "query_py",
+      "target": "finrag_query_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "query.py",
+      "source_location": "L129",
+      "weight": 1.0,
+      "source": "finrag_query_run_query",
+      "target": "finrag_query_print_answer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "query.py",
+      "source_location": "L168",
+      "weight": 1.0,
+      "source": "finrag_query_interactive_mode",
+      "target": "finrag_query_run_query",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "query.py",
+      "source_location": "L209",
+      "weight": 1.0,
+      "source": "finrag_query_main",
+      "target": "finrag_query_run_query",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "query.py",
+      "source_location": "L80",
+      "weight": 1.0,
+      "source": "finrag_query_run_query",
+      "target": "retrieval_retriever_retrieve"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "query.py",
+      "source_location": "L95",
+      "weight": 1.0,
+      "source": "finrag_query_run_query",
+      "target": "retrieval_retriever_parse_year_intent"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "query.py",
+      "source_location": "L109",
+      "weight": 1.0,
+      "source": "finrag_query_run_query",
+      "target": "retrieval_reranker_rerank_separate"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "query.py",
+      "source_location": "L123",
+      "weight": 1.0,
+      "source": "finrag_query_run_query",
+      "target": "retrieval_reranker_rerank"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "query.py",
+      "source_location": "L127",
+      "weight": 1.0,
+      "source": "finrag_query_run_query",
+      "target": "rag_rag_engine_generate_answer"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "query.py",
+      "source_location": "L194",
+      "weight": 1.0,
+      "source": "finrag_query_main",
+      "target": "finrag_query_interactive_mode",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "query.py",
+      "source_location": "L191",
+      "weight": 1.0,
+      "source": "finrag_query_main",
+      "target": "db_database_init_db"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "screener_downloader.py",
+      "source_location": "L41",
+      "weight": 1.0,
+      "source": "screener_downloader_py",
+      "target": "finrag_screener_downloader_fetch_page",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "screener_downloader.py",
+      "source_location": "L54",
+      "weight": 1.0,
+      "source": "screener_downloader_py",
+      "target": "finrag_screener_downloader_extract_year",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "screener_downloader.py",
+      "source_location": "L81",
+      "weight": 1.0,
+      "source": "screener_downloader_py",
+      "target": "finrag_screener_downloader_classify_doc",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "screener_downloader.py",
+      "source_location": "L101",
+      "weight": 1.0,
+      "source": "screener_downloader_py",
+      "target": "finrag_screener_downloader_extract_documents",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "screener_downloader.py",
+      "source_location": "L144",
+      "weight": 1.0,
+      "source": "screener_downloader_py",
+      "target": "finrag_screener_downloader_safe_name",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "screener_downloader.py",
+      "source_location": "L148",
+      "weight": 1.0,
+      "source": "screener_downloader_py",
+      "target": "finrag_screener_downloader_download_pdf",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "screener_downloader.py",
+      "source_location": "L201",
+      "weight": 1.0,
+      "source": "screener_downloader_py",
+      "target": "finrag_screener_downloader_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "screener_downloader.py",
+      "source_location": "L213",
+      "weight": 1.0,
+      "source": "finrag_screener_downloader_main",
+      "target": "finrag_screener_downloader_fetch_page",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "screener_downloader.py",
+      "source_location": "L120",
+      "weight": 1.0,
+      "source": "finrag_screener_downloader_extract_documents",
+      "target": "finrag_screener_downloader_extract_year",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "screener_downloader.py",
+      "source_location": "L121",
+      "weight": 1.0,
+      "source": "finrag_screener_downloader_extract_documents",
+      "target": "finrag_screener_downloader_classify_doc",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "screener_downloader.py",
+      "source_location": "L216",
+      "weight": 1.0,
+      "source": "finrag_screener_downloader_main",
+      "target": "finrag_screener_downloader_extract_documents",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "screener_downloader.py",
+      "source_location": "L152",
+      "weight": 1.0,
+      "source": "finrag_screener_downloader_download_pdf",
+      "target": "finrag_screener_downloader_safe_name",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "screener_downloader.py",
+      "source_location": "L234",
+      "weight": 1.0,
+      "source": "finrag_screener_downloader_main",
+      "target": "finrag_screener_downloader_download_pdf",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "config/settings.py",
+      "source_location": "L66",
+      "weight": 1.0,
+      "source": "config_settings_py",
+      "target": "config_settings_load_dotenv",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "config/settings.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "config_settings_rationale_1",
+      "target": "config_settings_py",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "config/__init__.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "config_init_py",
+      "target": "config_settings_py",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "db/database.py",
+      "source_location": "L92",
+      "weight": 1.0,
+      "source": "db_database_py",
+      "target": "db_database_get_conn",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "db/database.py",
+      "source_location": "L105",
+      "weight": 1.0,
+      "source": "db_database_py",
+      "target": "db_database_init_db",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "db/database.py",
+      "source_location": "L116",
+      "weight": 1.0,
+      "source": "db_database_py",
+      "target": "db_database_upsert_company",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "db/database.py",
+      "source_location": "L131",
+      "weight": 1.0,
+      "source": "db_database_py",
+      "target": "db_database_upsert_document",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "db/database.py",
+      "source_location": "L157",
+      "weight": 1.0,
+      "source": "db_database_py",
+      "target": "db_database_mark_document_ingested",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "db/database.py",
+      "source_location": "L167",
+      "weight": 1.0,
+      "source": "db_database_py",
+      "target": "db_database_mark_document_failed",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "db/database.py",
+      "source_location": "L174",
+      "weight": 1.0,
+      "source": "db_database_py",
+      "target": "db_database_get_pending_documents",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "db/database.py",
+      "source_location": "L188",
+      "weight": 1.0,
+      "source": "db_database_py",
+      "target": "db_database_is_already_ingested",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "db/database.py",
+      "source_location": "L199",
+      "weight": 1.0,
+      "source": "db_database_py",
+      "target": "db_database_insert_chunk",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "db/database.py",
+      "source_location": "L222",
+      "weight": 1.0,
+      "source": "db_database_py",
+      "target": "db_database_get_chunks_for_doc",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "db/database.py",
+      "source_location": "L233",
+      "weight": 1.0,
+      "source": "db_database_py",
+      "target": "db_database_log_ingestion",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "db/database.py",
+      "source_location": "L254",
+      "weight": 1.0,
+      "source": "db_database_py",
+      "target": "db_database_get_stats",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "db/database.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "db_database_rationale_1",
+      "target": "db_database_py",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "db/__init__.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "db_init_py",
+      "target": "db_database_py",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "db/database.py",
+      "source_location": "L108",
+      "weight": 1.0,
+      "source": "db_database_init_db",
+      "target": "db_database_get_conn",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "db/database.py",
+      "source_location": "L117",
+      "weight": 1.0,
+      "source": "db_database_upsert_company",
+      "target": "db_database_get_conn",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "db/database.py",
+      "source_location": "L140",
+      "weight": 1.0,
+      "source": "db_database_upsert_document",
+      "target": "db_database_get_conn",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "db/database.py",
+      "source_location": "L158",
+      "weight": 1.0,
+      "source": "db_database_mark_document_ingested",
+      "target": "db_database_get_conn",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "db/database.py",
+      "source_location": "L168",
+      "weight": 1.0,
+      "source": "db_database_mark_document_failed",
+      "target": "db_database_get_conn",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "db/database.py",
+      "source_location": "L183",
+      "weight": 1.0,
+      "source": "db_database_get_pending_documents",
+      "target": "db_database_get_conn",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "db/database.py",
+      "source_location": "L189",
+      "weight": 1.0,
+      "source": "db_database_is_already_ingested",
+      "target": "db_database_get_conn",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "db/database.py",
+      "source_location": "L211",
+      "weight": 1.0,
+      "source": "db_database_insert_chunk",
+      "target": "db_database_get_conn",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "db/database.py",
+      "source_location": "L223",
+      "weight": 1.0,
+      "source": "db_database_get_chunks_for_doc",
+      "target": "db_database_get_conn",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "db/database.py",
+      "source_location": "L242",
+      "weight": 1.0,
+      "source": "db_database_log_ingestion",
+      "target": "db_database_get_conn",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "db/database.py",
+      "source_location": "L255",
+      "weight": 1.0,
+      "source": "db_database_get_stats",
+      "target": "db_database_get_conn",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "db/database.py",
+      "source_location": "L106",
+      "weight": 1.0,
+      "source": "db_database_rationale_106",
+      "target": "db_database_init_db",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "db/database.py",
+      "source_location": "L139",
+      "weight": 1.0,
+      "source": "db_database_upsert_document",
+      "target": "db_database_upsert_company",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L32",
+      "weight": 1.0,
+      "source": "pipeline_extract_pdf_extractor_py",
+      "target": "extract_pdf_extractor_pageblock",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L44",
+      "weight": 1.0,
+      "source": "pipeline_extract_pdf_extractor_py",
+      "target": "extract_pdf_extractor_extracteddocument",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L65",
+      "weight": 1.0,
+      "source": "pipeline_extract_pdf_extractor_py",
+      "target": "extract_pdf_extractor_is_section_header",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L91",
+      "weight": 1.0,
+      "source": "pipeline_extract_pdf_extractor_py",
+      "target": "extract_pdf_extractor_detect_speaker_role",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L102",
+      "weight": 1.0,
+      "source": "pipeline_extract_pdf_extractor_py",
+      "target": "extract_pdf_extractor_extract_speaker_turns",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L141",
+      "weight": 1.0,
+      "source": "pipeline_extract_pdf_extractor_py",
+      "target": "extract_pdf_extractor_table_to_text",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L152",
+      "weight": 1.0,
+      "source": "pipeline_extract_pdf_extractor_py",
+      "target": "extract_pdf_extractor_get_table_bboxes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L167",
+      "weight": 1.0,
+      "source": "pipeline_extract_pdf_extractor_py",
+      "target": "extract_pdf_extractor_extract_prose_excluding_tables",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L213",
+      "weight": 1.0,
+      "source": "pipeline_extract_pdf_extractor_py",
+      "target": "extract_pdf_extractor_extract_annual_report",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L296",
+      "weight": 1.0,
+      "source": "pipeline_extract_pdf_extractor_py",
+      "target": "extract_pdf_extractor_extract_concall",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L323",
+      "weight": 1.0,
+      "source": "pipeline_extract_pdf_extractor_py",
+      "target": "extract_pdf_extractor_extract_pdf",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "extract_pdf_extractor_rationale_1",
+      "target": "pipeline_extract_pdf_extractor_py",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/__init__.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "pipeline_extract_init_py",
+      "target": "pipeline_extract_pdf_extractor_py",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L118",
+      "weight": 1.0,
+      "source": "extract_pdf_extractor_extract_speaker_turns",
+      "target": "extract_pdf_extractor_pageblock",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L239",
+      "weight": 1.0,
+      "source": "extract_pdf_extractor_extract_annual_report",
+      "target": "extract_pdf_extractor_pageblock",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L33",
+      "weight": 1.0,
+      "source": "extract_pdf_extractor_rationale_33",
+      "target": "extract_pdf_extractor_pageblock",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "pipeline/loader/chunker.py",
+      "source_location": "L17",
+      "weight": 0.8,
+      "source": "loader_chunker_chunk",
+      "target": "extract_pdf_extractor_pageblock",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L214",
+      "weight": 1.0,
+      "source": "extract_pdf_extractor_extract_annual_report",
+      "target": "extract_pdf_extractor_extracteddocument",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L297",
+      "weight": 1.0,
+      "source": "extract_pdf_extractor_extract_concall",
+      "target": "extract_pdf_extractor_extracteddocument",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "pipeline/loader/chunker.py",
+      "source_location": "L17",
+      "weight": 0.8,
+      "source": "loader_chunker_chunk",
+      "target": "extract_pdf_extractor_extracteddocument",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L261",
+      "weight": 1.0,
+      "source": "extract_pdf_extractor_extract_annual_report",
+      "target": "extract_pdf_extractor_is_section_header",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L123",
+      "weight": 1.0,
+      "source": "extract_pdf_extractor_extract_speaker_turns",
+      "target": "extract_pdf_extractor_detect_speaker_role",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L313",
+      "weight": 1.0,
+      "source": "extract_pdf_extractor_extract_concall",
+      "target": "extract_pdf_extractor_extract_speaker_turns",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L103",
+      "weight": 1.0,
+      "source": "extract_pdf_extractor_rationale_103",
+      "target": "extract_pdf_extractor_extract_speaker_turns",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L237",
+      "weight": 1.0,
+      "source": "extract_pdf_extractor_extract_annual_report",
+      "target": "extract_pdf_extractor_table_to_text",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L142",
+      "weight": 1.0,
+      "source": "extract_pdf_extractor_rationale_142",
+      "target": "extract_pdf_extractor_table_to_text",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L230",
+      "weight": 1.0,
+      "source": "extract_pdf_extractor_extract_annual_report",
+      "target": "extract_pdf_extractor_get_table_bboxes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L153",
+      "weight": 1.0,
+      "source": "extract_pdf_extractor_rationale_153",
+      "target": "extract_pdf_extractor_get_table_bboxes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L250",
+      "weight": 1.0,
+      "source": "extract_pdf_extractor_extract_annual_report",
+      "target": "extract_pdf_extractor_extract_prose_excluding_tables",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L168",
+      "weight": 1.0,
+      "source": "extract_pdf_extractor_rationale_168",
+      "target": "extract_pdf_extractor_extract_prose_excluding_tables",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L342",
+      "weight": 1.0,
+      "source": "extract_pdf_extractor_extract_pdf",
+      "target": "extract_pdf_extractor_extract_annual_report",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L344",
+      "weight": 1.0,
+      "source": "extract_pdf_extractor_extract_pdf",
+      "target": "extract_pdf_extractor_extract_concall",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/pdf_extractor.py",
+      "source_location": "L324",
+      "weight": 1.0,
+      "source": "extract_pdf_extractor_rationale_324",
+      "target": "extract_pdf_extractor_extract_pdf",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/text_cleaner.py",
+      "source_location": "L27",
+      "weight": 1.0,
+      "source": "pipeline_extract_text_cleaner_py",
+      "target": "extract_text_cleaner_fix_ligatures",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/text_cleaner.py",
+      "source_location": "L46",
+      "weight": 1.0,
+      "source": "pipeline_extract_text_cleaner_py",
+      "target": "extract_text_cleaner_remove_noise",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/text_cleaner.py",
+      "source_location": "L55",
+      "weight": 1.0,
+      "source": "pipeline_extract_text_cleaner_py",
+      "target": "extract_text_cleaner_normalize_whitespace",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/text_cleaner.py",
+      "source_location": "L68",
+      "weight": 1.0,
+      "source": "pipeline_extract_text_cleaner_py",
+      "target": "extract_text_cleaner_normalize_numbers",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/text_cleaner.py",
+      "source_location": "L81",
+      "weight": 1.0,
+      "source": "pipeline_extract_text_cleaner_py",
+      "target": "extract_text_cleaner_clean_text",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/text_cleaner.py",
+      "source_location": "L101",
+      "weight": 1.0,
+      "source": "pipeline_extract_text_cleaner_py",
+      "target": "extract_text_cleaner_is_garbage_text",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/text_cleaner.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "extract_text_cleaner_rationale_1",
+      "target": "pipeline_extract_text_cleaner_py",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/__init__.py",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "pipeline_extract_init_py",
+      "target": "pipeline_extract_text_cleaner_py",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/text_cleaner.py",
+      "source_location": "L89",
+      "weight": 1.0,
+      "source": "extract_text_cleaner_clean_text",
+      "target": "extract_text_cleaner_fix_ligatures",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/text_cleaner.py",
+      "source_location": "L93",
+      "weight": 1.0,
+      "source": "extract_text_cleaner_clean_text",
+      "target": "extract_text_cleaner_remove_noise",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/text_cleaner.py",
+      "source_location": "L96",
+      "weight": 1.0,
+      "source": "extract_text_cleaner_clean_text",
+      "target": "extract_text_cleaner_normalize_whitespace",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/text_cleaner.py",
+      "source_location": "L95",
+      "weight": 1.0,
+      "source": "extract_text_cleaner_clean_text",
+      "target": "extract_text_cleaner_normalize_numbers",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/text_cleaner.py",
+      "source_location": "L82",
+      "weight": 1.0,
+      "source": "extract_text_cleaner_rationale_82",
+      "target": "extract_text_cleaner_clean_text",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "pipeline/loader/chunker.py",
+      "source_location": "L161",
+      "weight": 1.0,
+      "source": "loader_chunker_chunk_annual_report",
+      "target": "extract_text_cleaner_clean_text"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/extract/text_cleaner.py",
+      "source_location": "L102",
+      "weight": 1.0,
+      "source": "extract_text_cleaner_rationale_102",
+      "target": "extract_text_cleaner_is_garbage_text",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "pipeline/loader/chunker.py",
+      "source_location": "L162",
+      "weight": 1.0,
+      "source": "loader_chunker_chunk_annual_report",
+      "target": "extract_text_cleaner_is_garbage_text"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/loader/chroma_loader.py",
+      "source_location": "L30",
+      "weight": 1.0,
+      "source": "pipeline_loader_chroma_loader_py",
+      "target": "loader_chroma_loader_get_chroma_client",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/loader/chroma_loader.py",
+      "source_location": "L42",
+      "weight": 1.0,
+      "source": "pipeline_loader_chroma_loader_py",
+      "target": "loader_chroma_loader_get_collection",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/loader/chroma_loader.py",
+      "source_location": "L59",
+      "weight": 1.0,
+      "source": "pipeline_loader_chroma_loader_py",
+      "target": "loader_chroma_loader_load_chunks_to_chroma",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/loader/chroma_loader.py",
+      "source_location": "L117",
+      "weight": 1.0,
+      "source": "pipeline_loader_chroma_loader_py",
+      "target": "loader_chroma_loader_query_collection",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/loader/chroma_loader.py",
+      "source_location": "L140",
+      "weight": 1.0,
+      "source": "pipeline_loader_chroma_loader_py",
+      "target": "loader_chroma_loader_collection_count",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/loader/chroma_loader.py",
+      "source_location": "L145",
+      "weight": 1.0,
+      "source": "pipeline_loader_chroma_loader_py",
+      "target": "loader_chroma_loader_list_symbols",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/loader/chroma_loader.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "loader_chroma_loader_rationale_1",
+      "target": "pipeline_loader_chroma_loader_py",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/loader/__init__.py",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "pipeline_loader_init_py",
+      "target": "pipeline_loader_chroma_loader_py",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/loader/chroma_loader.py",
+      "source_location": "L44",
+      "weight": 1.0,
+      "source": "loader_chroma_loader_get_collection",
+      "target": "loader_chroma_loader_get_chroma_client",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/loader/chroma_loader.py",
+      "source_location": "L72",
+      "weight": 1.0,
+      "source": "loader_chroma_loader_load_chunks_to_chroma",
+      "target": "loader_chroma_loader_get_collection",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/loader/chroma_loader.py",
+      "source_location": "L127",
+      "weight": 1.0,
+      "source": "loader_chroma_loader_query_collection",
+      "target": "loader_chroma_loader_get_collection",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/loader/chroma_loader.py",
+      "source_location": "L141",
+      "weight": 1.0,
+      "source": "loader_chroma_loader_collection_count",
+      "target": "loader_chroma_loader_get_collection",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/loader/chroma_loader.py",
+      "source_location": "L147",
+      "weight": 1.0,
+      "source": "loader_chroma_loader_list_symbols",
+      "target": "loader_chroma_loader_get_collection",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/loader/chroma_loader.py",
+      "source_location": "L43",
+      "weight": 1.0,
+      "source": "loader_chroma_loader_rationale_43",
+      "target": "loader_chroma_loader_get_collection",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/loader/chroma_loader.py",
+      "source_location": "L64",
+      "weight": 1.0,
+      "source": "loader_chroma_loader_rationale_64",
+      "target": "loader_chroma_loader_load_chunks_to_chroma",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "pipeline/loader/chroma_loader.py",
+      "source_location": "L100",
+      "weight": 1.0,
+      "source": "loader_chroma_loader_load_chunks_to_chroma",
+      "target": "loader_embedder_embed_texts"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/loader/chroma_loader.py",
+      "source_location": "L123",
+      "weight": 1.0,
+      "source": "loader_chroma_loader_rationale_123",
+      "target": "loader_chroma_loader_query_collection",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L388",
+      "weight": 1.0,
+      "source": "retrieval_retriever_run_annual_query",
+      "target": "loader_chroma_loader_query_collection"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L474",
+      "weight": 1.0,
+      "source": "retrieval_retriever_retrieve_concall",
+      "target": "loader_chroma_loader_query_collection"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/loader/chroma_loader.py",
+      "source_location": "L146",
+      "weight": 1.0,
+      "source": "loader_chroma_loader_rationale_146",
+      "target": "loader_chroma_loader_list_symbols",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/loader/chunker.py",
+      "source_location": "L28",
+      "weight": 1.0,
+      "source": "pipeline_loader_chunker_py",
+      "target": "loader_chunker_chunk",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/loader/chunker.py",
+      "source_location": "L46",
+      "weight": 1.0,
+      "source": "pipeline_loader_chunker_py",
+      "target": "loader_chunker_make_id",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/loader/chunker.py",
+      "source_location": "L54",
+      "weight": 1.0,
+      "source": "pipeline_loader_chunker_py",
+      "target": "loader_chunker_approx_tokens",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/loader/chunker.py",
+      "source_location": "L58",
+      "weight": 1.0,
+      "source": "pipeline_loader_chunker_py",
+      "target": "loader_chunker_split_by_tokens",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/loader/chunker.py",
+      "source_location": "L83",
+      "weight": 1.0,
+      "source": "pipeline_loader_chunker_py",
+      "target": "loader_chunker_chunk_annual_report",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/loader/chunker.py",
+      "source_location": "L201",
+      "weight": 1.0,
+      "source": "pipeline_loader_chunker_py",
+      "target": "loader_chunker_chunk_concall",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/loader/chunker.py",
+      "source_location": "L292",
+      "weight": 1.0,
+      "source": "pipeline_loader_chunker_py",
+      "target": "loader_chunker_chunk_document",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/loader/chunker.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "loader_chunker_rationale_1",
+      "target": "pipeline_loader_chunker_py",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/loader/__init__.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "pipeline_loader_init_py",
+      "target": "pipeline_loader_chunker_py",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/loader/chunker.py",
+      "source_location": "L166",
+      "weight": 1.0,
+      "source": "loader_chunker_chunk_annual_report",
+      "target": "loader_chunker_chunk",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/loader/chunker.py",
+      "source_location": "L167",
+      "weight": 1.0,
+      "source": "loader_chunker_chunk_annual_report",
+      "target": "loader_chunker_make_id",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/loader/chunker.py",
+      "source_location": "L189",
+      "weight": 1.0,
+      "source": "loader_chunker_chunk_annual_report",
+      "target": "loader_chunker_approx_tokens",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/loader/chunker.py",
+      "source_location": "L262",
+      "weight": 1.0,
+      "source": "loader_chunker_chunk_concall",
+      "target": "loader_chunker_approx_tokens",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/loader/chunker.py",
+      "source_location": "L59",
+      "weight": 1.0,
+      "source": "loader_chunker_rationale_59",
+      "target": "loader_chunker_split_by_tokens",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/loader/chunker.py",
+      "source_location": "L299",
+      "weight": 1.0,
+      "source": "loader_chunker_chunk_document",
+      "target": "loader_chunker_chunk_annual_report",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/loader/chunker.py",
+      "source_location": "L301",
+      "weight": 1.0,
+      "source": "loader_chunker_chunk_document",
+      "target": "loader_chunker_chunk_concall",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/loader/embedder.py",
+      "source_location": "L22",
+      "weight": 1.0,
+      "source": "pipeline_loader_embedder_py",
+      "target": "loader_embedder_get_model",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/loader/embedder.py",
+      "source_location": "L37",
+      "weight": 1.0,
+      "source": "pipeline_loader_embedder_py",
+      "target": "loader_embedder_embed_texts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/loader/embedder.py",
+      "source_location": "L59",
+      "weight": 1.0,
+      "source": "pipeline_loader_embedder_py",
+      "target": "loader_embedder_embed_query",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/loader/embedder.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "loader_embedder_rationale_1",
+      "target": "pipeline_loader_embedder_py",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/loader/__init__.py",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "pipeline_loader_init_py",
+      "target": "pipeline_loader_embedder_py",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/loader/embedder.py",
+      "source_location": "L41",
+      "weight": 1.0,
+      "source": "loader_embedder_embed_texts",
+      "target": "loader_embedder_get_model",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/loader/embedder.py",
+      "source_location": "L61",
+      "weight": 1.0,
+      "source": "loader_embedder_embed_query",
+      "target": "loader_embedder_embed_texts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/loader/embedder.py",
+      "source_location": "L60",
+      "weight": 1.0,
+      "source": "loader_embedder_rationale_60",
+      "target": "loader_embedder_embed_query",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L385",
+      "weight": 1.0,
+      "source": "retrieval_retriever_run_annual_query",
+      "target": "loader_embedder_embed_query"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L455",
+      "weight": 1.0,
+      "source": "retrieval_retriever_retrieve_concall",
+      "target": "loader_embedder_embed_query"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/reranker.py",
+      "source_location": "L84",
+      "weight": 1.0,
+      "source": "pipeline_retrieval_reranker_py",
+      "target": "retrieval_reranker_forward_boost",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/reranker.py",
+      "source_location": "L113",
+      "weight": 1.0,
+      "source": "pipeline_retrieval_reranker_py",
+      "target": "retrieval_reranker_get_voyage_client",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/reranker.py",
+      "source_location": "L143",
+      "weight": 1.0,
+      "source": "pipeline_retrieval_reranker_py",
+      "target": "retrieval_reranker_get_bge_reranker",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/reranker.py",
+      "source_location": "L176",
+      "weight": 1.0,
+      "source": "pipeline_retrieval_reranker_py",
+      "target": "retrieval_reranker_bge_score_batch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/reranker.py",
+      "source_location": "L202",
+      "weight": 1.0,
+      "source": "pipeline_retrieval_reranker_py",
+      "target": "retrieval_reranker_rerank",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/reranker.py",
+      "source_location": "L311",
+      "weight": 1.0,
+      "source": "pipeline_retrieval_reranker_py",
+      "target": "retrieval_reranker_rerank_separate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/reranker.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "retrieval_reranker_rationale_1",
+      "target": "pipeline_retrieval_reranker_py",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/__init__.py",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "pipeline_retrieval_init_py",
+      "target": "pipeline_retrieval_reranker_py",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/reranker.py",
+      "source_location": "L234",
+      "weight": 1.0,
+      "source": "retrieval_reranker_rerank",
+      "target": "retrieval_reranker_forward_boost",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/reranker.py",
+      "source_location": "L85",
+      "weight": 1.0,
+      "source": "retrieval_reranker_rationale_85",
+      "target": "retrieval_reranker_forward_boost",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/reranker.py",
+      "source_location": "L243",
+      "weight": 1.0,
+      "source": "retrieval_reranker_rerank",
+      "target": "retrieval_reranker_get_voyage_client",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/reranker.py",
+      "source_location": "L114",
+      "weight": 1.0,
+      "source": "retrieval_reranker_rationale_114",
+      "target": "retrieval_reranker_get_voyage_client",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/reranker.py",
+      "source_location": "L188",
+      "weight": 1.0,
+      "source": "retrieval_reranker_bge_score_batch",
+      "target": "retrieval_reranker_get_bge_reranker",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/reranker.py",
+      "source_location": "L144",
+      "weight": 1.0,
+      "source": "retrieval_reranker_rationale_144",
+      "target": "retrieval_reranker_get_bge_reranker",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/reranker.py",
+      "source_location": "L265",
+      "weight": 1.0,
+      "source": "retrieval_reranker_rerank",
+      "target": "retrieval_reranker_bge_score_batch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/reranker.py",
+      "source_location": "L177",
+      "weight": 1.0,
+      "source": "retrieval_reranker_rationale_177",
+      "target": "retrieval_reranker_bge_score_batch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/reranker.py",
+      "source_location": "L323",
+      "weight": 1.0,
+      "source": "retrieval_reranker_rerank_separate",
+      "target": "retrieval_reranker_rerank",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/reranker.py",
+      "source_location": "L208",
+      "weight": 1.0,
+      "source": "retrieval_reranker_rationale_208",
+      "target": "retrieval_reranker_rerank",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "pipeline/retrieval/reranker.py",
+      "source_location": "L234",
+      "weight": 1.0,
+      "source": "retrieval_reranker_rerank",
+      "target": "retrieval_retriever_recency_boost"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/reranker.py",
+      "source_location": "L318",
+      "weight": 1.0,
+      "source": "retrieval_reranker_rationale_318",
+      "target": "retrieval_reranker_rerank_separate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L166",
+      "weight": 1.0,
+      "source": "pipeline_retrieval_retriever_py",
+      "target": "retrieval_retriever_expand_query",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L202",
+      "weight": 1.0,
+      "source": "pipeline_retrieval_retriever_py",
+      "target": "retrieval_retriever_retrievedchunk",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L214",
+      "weight": 1.0,
+      "source": "pipeline_retrieval_retriever_py",
+      "target": "retrieval_retriever_normalise_fy",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L220",
+      "weight": 1.0,
+      "source": "pipeline_retrieval_retriever_py",
+      "target": "retrieval_retriever_parse_year_intent",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L307",
+      "weight": 1.0,
+      "source": "pipeline_retrieval_retriever_py",
+      "target": "retrieval_retriever_recency_boost",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L319",
+      "weight": 1.0,
+      "source": "pipeline_retrieval_retriever_py",
+      "target": "retrieval_retriever_bm25",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L355",
+      "weight": 1.0,
+      "source": "pipeline_retrieval_retriever_py",
+      "target": "retrieval_retriever_minmax",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L365",
+      "weight": 1.0,
+      "source": "pipeline_retrieval_retriever_py",
+      "target": "retrieval_retriever_build_where",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L382",
+      "weight": 1.0,
+      "source": "pipeline_retrieval_retriever_py",
+      "target": "retrieval_retriever_run_annual_query",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L423",
+      "weight": 1.0,
+      "source": "pipeline_retrieval_retriever_py",
+      "target": "retrieval_retriever_retrieve_annual",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L447",
+      "weight": 1.0,
+      "source": "pipeline_retrieval_retriever_py",
+      "target": "retrieval_retriever_retrieve_concall",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L530",
+      "weight": 1.0,
+      "source": "pipeline_retrieval_retriever_py",
+      "target": "retrieval_retriever_retrieve",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L553",
+      "weight": 1.0,
+      "source": "pipeline_retrieval_retriever_py",
+      "target": "retrieval_retriever_retrieve_with_years",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "retrieval_retriever_rationale_1",
+      "target": "pipeline_retrieval_retriever_py",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L412",
+      "weight": 1.0,
+      "source": "retrieval_retriever_rationale_412",
+      "target": "pipeline_retrieval_retriever_py",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/__init__.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "pipeline_retrieval_init_py",
+      "target": "pipeline_retrieval_retriever_py",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L384",
+      "weight": 1.0,
+      "source": "retrieval_retriever_run_annual_query",
+      "target": "retrieval_retriever_expand_query",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L454",
+      "weight": 1.0,
+      "source": "retrieval_retriever_retrieve_concall",
+      "target": "retrieval_retriever_expand_query",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L167",
+      "weight": 1.0,
+      "source": "retrieval_retriever_rationale_167",
+      "target": "retrieval_retriever_expand_query",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L414",
+      "weight": 1.0,
+      "source": "retrieval_retriever_run_annual_query",
+      "target": "retrieval_retriever_retrievedchunk",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L516",
+      "weight": 1.0,
+      "source": "retrieval_retriever_retrieve_concall",
+      "target": "retrieval_retriever_retrievedchunk",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L55",
+      "weight": 0.8,
+      "source": "rag_rag_engine_providerentry",
+      "target": "retrieval_retriever_retrievedchunk",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L55",
+      "weight": 0.8,
+      "source": "rag_rag_engine_ragresponse",
+      "target": "retrieval_retriever_retrievedchunk",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L256",
+      "weight": 1.0,
+      "source": "retrieval_retriever_parse_year_intent",
+      "target": "retrieval_retriever_normalise_fy",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L215",
+      "weight": 1.0,
+      "source": "retrieval_retriever_rationale_215",
+      "target": "retrieval_retriever_normalise_fy",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L575",
+      "weight": 1.0,
+      "source": "retrieval_retriever_retrieve_with_years",
+      "target": "retrieval_retriever_parse_year_intent",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L221",
+      "weight": 1.0,
+      "source": "retrieval_retriever_rationale_221",
+      "target": "retrieval_retriever_parse_year_intent",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L308",
+      "weight": 1.0,
+      "source": "retrieval_retriever_rationale_308",
+      "target": "retrieval_retriever_recency_boost",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L320",
+      "weight": 1.0,
+      "source": "retrieval_retriever_bm25",
+      "target": "retrieval_retriever_bm25_init",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L327",
+      "weight": 1.0,
+      "source": "retrieval_retriever_bm25",
+      "target": "retrieval_retriever_bm25_tok",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L330",
+      "weight": 1.0,
+      "source": "retrieval_retriever_bm25",
+      "target": "retrieval_retriever_bm25_build_idf",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L338",
+      "weight": 1.0,
+      "source": "retrieval_retriever_bm25",
+      "target": "retrieval_retriever_bm25_get_scores",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L403",
+      "weight": 1.0,
+      "source": "retrieval_retriever_run_annual_query",
+      "target": "retrieval_retriever_bm25",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L500",
+      "weight": 1.0,
+      "source": "retrieval_retriever_retrieve_concall",
+      "target": "retrieval_retriever_bm25",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L322",
+      "weight": 1.0,
+      "source": "retrieval_retriever_bm25_init",
+      "target": "retrieval_retriever_bm25_tok",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L325",
+      "weight": 1.0,
+      "source": "retrieval_retriever_bm25_init",
+      "target": "retrieval_retriever_bm25_build_idf",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L340",
+      "weight": 1.0,
+      "source": "retrieval_retriever_bm25_get_scores",
+      "target": "retrieval_retriever_bm25_tok",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L404",
+      "weight": 1.0,
+      "source": "retrieval_retriever_run_annual_query",
+      "target": "retrieval_retriever_bm25_get_scores",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L501",
+      "weight": 1.0,
+      "source": "retrieval_retriever_retrieve_concall",
+      "target": "retrieval_retriever_bm25_get_scores",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L406",
+      "weight": 1.0,
+      "source": "retrieval_retriever_run_annual_query",
+      "target": "retrieval_retriever_minmax",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L503",
+      "weight": 1.0,
+      "source": "retrieval_retriever_retrieve_concall",
+      "target": "retrieval_retriever_minmax",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L386",
+      "weight": 1.0,
+      "source": "retrieval_retriever_run_annual_query",
+      "target": "retrieval_retriever_build_where",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L430",
+      "weight": 1.0,
+      "source": "retrieval_retriever_retrieve_annual",
+      "target": "retrieval_retriever_run_annual_query",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L580",
+      "weight": 1.0,
+      "source": "retrieval_retriever_retrieve_with_years",
+      "target": "retrieval_retriever_retrieve_annual",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L583",
+      "weight": 1.0,
+      "source": "retrieval_retriever_retrieve_with_years",
+      "target": "retrieval_retriever_retrieve_concall",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L547",
+      "weight": 1.0,
+      "source": "retrieval_retriever_retrieve",
+      "target": "retrieval_retriever_retrieve_with_years",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L538",
+      "weight": 1.0,
+      "source": "retrieval_retriever_rationale_538",
+      "target": "retrieval_retriever_retrieve",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "pipeline/retrieval/retriever.py",
+      "source_location": "L561",
+      "weight": 1.0,
+      "source": "retrieval_retriever_rationale_561",
+      "target": "retrieval_retriever_retrieve_with_years",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L108",
+      "weight": 1.0,
+      "source": "rag_rag_engine_py",
+      "target": "rag_rag_engine_providerentry",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L121",
+      "weight": 1.0,
+      "source": "rag_rag_engine_py",
+      "target": "rag_rag_engine_discover_ollama",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L148",
+      "weight": 1.0,
+      "source": "rag_rag_engine_py",
+      "target": "rag_rag_engine_build_provider_catalogue",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L225",
+      "weight": 1.0,
+      "source": "rag_rag_engine_py",
+      "target": "rag_rag_engine_pick_provider_interactive",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L255",
+      "weight": 1.0,
+      "source": "rag_rag_engine_py",
+      "target": "rag_rag_engine_get_provider",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L426",
+      "weight": 1.0,
+      "source": "rag_rag_engine_py",
+      "target": "rag_rag_engine_estimate_tokens",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L433",
+      "weight": 1.0,
+      "source": "rag_rag_engine_py",
+      "target": "rag_rag_engine_build_context",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L453",
+      "weight": 1.0,
+      "source": "rag_rag_engine_py",
+      "target": "rag_rag_engine_build_user_prompt",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L537",
+      "weight": 1.0,
+      "source": "rag_rag_engine_py",
+      "target": "rag_rag_engine_trim_chunks_to_budget",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L613",
+      "weight": 1.0,
+      "source": "rag_rag_engine_py",
+      "target": "rag_rag_engine_call_gemini",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L650",
+      "weight": 1.0,
+      "source": "rag_rag_engine_py",
+      "target": "rag_rag_engine_call_openai_compat",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L684",
+      "weight": 1.0,
+      "source": "rag_rag_engine_py",
+      "target": "rag_rag_engine_call_with_retry",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L713",
+      "weight": 1.0,
+      "source": "rag_rag_engine_py",
+      "target": "rag_rag_engine_ragresponse",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L725",
+      "weight": 1.0,
+      "source": "rag_rag_engine_py",
+      "target": "rag_rag_engine_generate_answer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "rag_rag_engine_rationale_1",
+      "target": "rag_rag_engine_py",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "rag/__init__.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "rag_init_py",
+      "target": "rag_rag_engine_py",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L131",
+      "weight": 1.0,
+      "source": "rag_rag_engine_discover_ollama",
+      "target": "rag_rag_engine_providerentry",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L158",
+      "weight": 1.0,
+      "source": "rag_rag_engine_build_provider_catalogue",
+      "target": "rag_rag_engine_providerentry",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L209",
+      "weight": 1.0,
+      "source": "rag_rag_engine_build_provider_catalogue",
+      "target": "rag_rag_engine_discover_ollama",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L122",
+      "weight": 1.0,
+      "source": "rag_rag_engine_rationale_122",
+      "target": "rag_rag_engine_discover_ollama",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L767",
+      "weight": 1.0,
+      "source": "rag_rag_engine_generate_answer",
+      "target": "rag_rag_engine_build_provider_catalogue",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L287",
+      "weight": 1.0,
+      "source": "rag_rag_engine_get_provider",
+      "target": "rag_rag_engine_pick_provider_interactive",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L768",
+      "weight": 1.0,
+      "source": "rag_rag_engine_generate_answer",
+      "target": "rag_rag_engine_get_provider",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L573",
+      "weight": 1.0,
+      "source": "rag_rag_engine_trim_chunks_to_budget",
+      "target": "rag_rag_engine_estimate_tokens",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L779",
+      "weight": 1.0,
+      "source": "rag_rag_engine_generate_answer",
+      "target": "rag_rag_engine_build_context",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L574",
+      "weight": 1.0,
+      "source": "rag_rag_engine_trim_chunks_to_budget",
+      "target": "rag_rag_engine_build_user_prompt",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L780",
+      "weight": 1.0,
+      "source": "rag_rag_engine_generate_answer",
+      "target": "rag_rag_engine_build_user_prompt",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L460",
+      "weight": 1.0,
+      "source": "rag_rag_engine_rationale_460",
+      "target": "rag_rag_engine_build_user_prompt",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L776",
+      "weight": 1.0,
+      "source": "rag_rag_engine_generate_answer",
+      "target": "rag_rag_engine_trim_chunks_to_budget",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L546",
+      "weight": 1.0,
+      "source": "rag_rag_engine_rationale_546",
+      "target": "rag_rag_engine_trim_chunks_to_budget",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L692",
+      "weight": 1.0,
+      "source": "rag_rag_engine_call_with_retry",
+      "target": "rag_rag_engine_call_gemini",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L694",
+      "weight": 1.0,
+      "source": "rag_rag_engine_call_with_retry",
+      "target": "rag_rag_engine_call_openai_compat",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L785",
+      "weight": 1.0,
+      "source": "rag_rag_engine_generate_answer",
+      "target": "rag_rag_engine_call_with_retry",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L752",
+      "weight": 1.0,
+      "source": "rag_rag_engine_generate_answer",
+      "target": "rag_rag_engine_ragresponse",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "rag/rag_engine.py",
+      "source_location": "L736",
+      "weight": 1.0,
+      "source": "rag_rag_engine_rationale_736",
+      "target": "rag_rag_engine_generate_answer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/logger.py",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "utils_logger_py",
+      "target": "utils_logger_get_logger",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/logger.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "utils_logger_rationale_1",
+      "target": "utils_logger_py",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/__init__.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "utils_init_py",
+      "target": "utils_logger_py",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Readme.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "readme_md",
+      "target": "finrag_readme_financial_rag_equity_research_system",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Readme.md",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "finrag_readme_financial_rag_equity_research_system",
+      "target": "finrag_readme_stack",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Readme.md",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "finrag_readme_financial_rag_equity_research_system",
+      "target": "finrag_readme_architecture",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Readme.md",
+      "source_location": "L27",
+      "weight": 1.0,
+      "source": "finrag_readme_financial_rag_equity_research_system",
+      "target": "finrag_readme_directory_structure",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Readme.md",
+      "source_location": "L55",
+      "weight": 1.0,
+      "source": "finrag_readme_financial_rag_equity_research_system",
+      "target": "finrag_readme_setup",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Readme.md",
+      "source_location": "L81",
+      "weight": 1.0,
+      "source": "finrag_readme_financial_rag_equity_research_system",
+      "target": "finrag_readme_groq_free_tier",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Readme.md",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "finrag_readme_architecture",
+      "target": "finrag_readme_high_level_architecture",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Readme.md",
+      "source_location": "L20",
+      "weight": 1.0,
+      "source": "finrag_readme_architecture",
+      "target": "finrag_readme_low_level_pipeline_design",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Readme.md",
+      "source_location": "L22",
+      "weight": 1.0,
+      "source": "finrag_readme_architecture",
+      "target": "finrag_readme_structured_semantic_fusion_rag",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Readme.md",
+      "source_location": "L28",
+      "weight": 1.0,
+      "source": "finrag_readme_directory_structure",
+      "target": "finrag_readme_codeblock_1",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Readme.md",
+      "source_location": "L57",
+      "weight": 1.0,
+      "source": "finrag_readme_setup",
+      "target": "finrag_readme_codeblock_2",
+      "confidence_score": 1.0
+    }
+  ],
+  "hyperedges": [],
+  "built_at_commit": "c90edd8c9cb7f280a5e8f75143512dc2de0b99fa"
+}
