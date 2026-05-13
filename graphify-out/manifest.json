@@ -27,6 +27,18 @@
     "mtime": 1777274071.784293,
     "hash": "a4293a401df6568f4e9060de273785ac"
   },
+  "C:\\Users\\hp\\Downloads\\FinRag\\decomposer\\atomic_decomposer.py": {
+    "mtime": 1778662331.7254837,
+    "hash": "1a712de03579b37ea8c309502bd642ef"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\decomposer\\test_decomposer.py": {
+    "mtime": 1778662371.2295952,
+    "hash": "5d2cfc32242593e8605a8667085d5a67"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\decomposer\\__init__.py": {
+    "mtime": 1778662483.2067008,
+    "hash": "be720f7ae4fd33467833f0f2e85235a3"
+  },
   "C:\\Users\\hp\\Downloads\\FinRag\\pipeline\\extract\\pdf_extractor.py": {
     "mtime": 1777315435.2239764,
     "hash": "510fe6f1a2eb167423091181403e7bdc"
@@ -308,7 +320,7 @@
     "hash": "26240213b7d75c9b1c6fd8d9bd894bdd"
   },
   "C:\\Users\\hp\\Downloads\\FinRag\\images\\quant_copilot_intent_architecture.svg": {
-    "mtime": 1778321151.4141233,
-    "hash": "92b93eb3d04b1f6168d227d3d5c2b71f"
+    "mtime": 1778663567.160607,
+    "hash": "f22ff54a007dfe74cf037c9518f53914"
   }
 }
