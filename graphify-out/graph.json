@@ -9,7 +9,7 @@
       "source_file": "Ingest.py",
       "source_location": "L1",
       "id": "ingest_py",
-      "community": 1,
+      "community": 4,
       "norm_label": "ingest.py"
     },
     {
@@ -18,7 +18,7 @@
       "source_file": "Ingest.py",
       "source_location": "L40",
       "id": "finrag_ingest_resolve_doc_type",
-      "community": 1,
+      "community": 4,
       "norm_label": "resolve_doc_type()"
     },
     {
@@ -27,7 +27,7 @@
       "source_file": "Ingest.py",
       "source_location": "L49",
       "id": "finrag_ingest_extract_year_from_path",
-      "community": 1,
+      "community": 4,
       "norm_label": "extract_year_from_path()"
     },
     {
@@ -36,7 +36,7 @@
       "source_file": "Ingest.py",
       "source_location": "L58",
       "id": "finrag_ingest_find_pdfs",
-      "community": 1,
+      "community": 4,
       "norm_label": "find_pdfs()"
     },
     {
@@ -45,7 +45,7 @@
       "source_file": "Ingest.py",
       "source_location": "L96",
       "id": "finrag_ingest_ingest_pdf",
-      "community": 1,
+      "community": 4,
       "norm_label": "ingest_pdf()"
     },
     {
@@ -54,7 +54,7 @@
       "source_file": "Ingest.py",
       "source_location": "L194",
       "id": "finrag_ingest_main",
-      "community": 1,
+      "community": 4,
       "norm_label": "main()"
     },
     {
@@ -63,7 +63,7 @@
       "source_file": "Ingest.py",
       "source_location": "L41",
       "id": "finrag_ingest_rationale_41",
-      "community": 1,
+      "community": 4,
       "norm_label": "map screener_downloader output folder name to doc_type."
     },
     {
@@ -72,7 +72,7 @@
       "source_file": "Ingest.py",
       "source_location": "L50",
       "id": "finrag_ingest_rationale_50",
-      "community": 1,
+      "community": 4,
       "norm_label": "screener_downloader saves to symbol/doc_type/year/filename.pdf"
     },
     {
@@ -81,7 +81,7 @@
       "source_file": "Ingest.py",
       "source_location": "L59",
       "id": "finrag_ingest_rationale_59",
-      "community": 1,
+      "community": 4,
       "norm_label": "find all pdf files for a symbol under screener_docs/."
     },
     {
@@ -90,7 +90,7 @@
       "source_file": "query.py",
       "source_location": "L1",
       "id": "query_py",
-      "community": 3,
+      "community": 5,
       "norm_label": "query.py"
     },
     {
@@ -99,7 +99,7 @@
       "source_file": "query.py",
       "source_location": "L33",
       "id": "finrag_query_print_answer",
-      "community": 3,
+      "community": 5,
       "norm_label": "print_answer()"
     },
     {
@@ -108,7 +108,7 @@
       "source_file": "query.py",
       "source_location": "L53",
       "id": "finrag_query_run_query",
-      "community": 3,
+      "community": 5,
       "norm_label": "run_query()"
     },
     {
@@ -117,7 +117,7 @@
       "source_file": "query.py",
       "source_location": "L135",
       "id": "finrag_query_interactive_mode",
-      "community": 3,
+      "community": 5,
       "norm_label": "interactive_mode()"
     },
     {
@@ -126,7 +126,7 @@
       "source_file": "query.py",
       "source_location": "L174",
       "id": "finrag_query_main",
-      "community": 3,
+      "community": 5,
       "norm_label": "main()"
     },
     {
@@ -135,7 +135,7 @@
       "source_file": "screener_downloader.py",
       "source_location": "L1",
       "id": "screener_downloader_py",
-      "community": 9,
+      "community": 10,
       "norm_label": "screener_downloader.py"
     },
     {
@@ -144,7 +144,7 @@
       "source_file": "screener_downloader.py",
       "source_location": "L41",
       "id": "finrag_screener_downloader_fetch_page",
-      "community": 9,
+      "community": 10,
       "norm_label": "fetch_page()"
     },
     {
@@ -153,7 +153,7 @@
       "source_file": "screener_downloader.py",
       "source_location": "L54",
       "id": "finrag_screener_downloader_extract_year",
-      "community": 9,
+      "community": 10,
       "norm_label": "extract_year()"
     },
     {
@@ -162,7 +162,7 @@
       "source_file": "screener_downloader.py",
       "source_location": "L81",
       "id": "finrag_screener_downloader_classify_doc",
-      "community": 9,
+      "community": 10,
       "norm_label": "classify_doc()"
     },
     {
@@ -171,7 +171,7 @@
       "source_file": "screener_downloader.py",
       "source_location": "L101",
       "id": "finrag_screener_downloader_extract_documents",
-      "community": 9,
+      "community": 10,
       "norm_label": "extract_documents()"
     },
     {
@@ -180,7 +180,7 @@
       "source_file": "screener_downloader.py",
       "source_location": "L144",
       "id": "finrag_screener_downloader_safe_name",
-      "community": 9,
+      "community": 10,
       "norm_label": "safe_name()"
     },
     {
@@ -189,7 +189,7 @@
       "source_file": "screener_downloader.py",
       "source_location": "L148",
       "id": "finrag_screener_downloader_download_pdf",
-      "community": 9,
+      "community": 10,
       "norm_label": "download_pdf()"
     },
     {
@@ -198,7 +198,7 @@
       "source_file": "screener_downloader.py",
       "source_location": "L201",
       "id": "finrag_screener_downloader_main",
-      "community": 9,
+      "community": 10,
       "norm_label": "main()"
     },
     {
@@ -207,7 +207,7 @@
       "source_file": "config/settings.py",
       "source_location": "L1",
       "id": "config_settings_py",
-      "community": 10,
+      "community": 11,
       "norm_label": "settings.py"
     },
     {
@@ -216,7 +216,7 @@
       "source_file": "config/settings.py",
       "source_location": "L66",
       "id": "config_settings_load_dotenv",
-      "community": 10,
+      "community": 11,
       "norm_label": "_load_dotenv()"
     },
     {
@@ -225,7 +225,7 @@
       "source_file": "config/settings.py",
       "source_location": "L1",
       "id": "config_settings_rationale_1",
-      "community": 10,
+      "community": 11,
       "norm_label": "config/settings.py central configuration for the financial rag system.  fixes"
     },
     {
@@ -234,7 +234,7 @@
       "source_file": "config/__init__.py",
       "source_location": "L1",
       "id": "config_init_py",
-      "community": 10,
+      "community": 11,
       "norm_label": "__init__.py"
     },
     {
@@ -243,7 +243,7 @@
       "source_file": "db/database.py",
       "source_location": "L1",
       "id": "db_database_py",
-      "community": 1,
+      "community": 4,
       "norm_label": "database.py"
     },
     {
@@ -252,7 +252,7 @@
       "source_file": "db/database.py",
       "source_location": "L92",
       "id": "db_database_get_conn",
-      "community": 1,
+      "community": 4,
       "norm_label": "get_conn()"
     },
     {
@@ -261,7 +261,7 @@
       "source_file": "db/database.py",
       "source_location": "L105",
       "id": "db_database_init_db",
-      "community": 1,
+      "community": 4,
       "norm_label": "init_db()"
     },
     {
@@ -270,7 +270,7 @@
       "source_file": "db/database.py",
       "source_location": "L116",
       "id": "db_database_upsert_company",
-      "community": 1,
+      "community": 4,
       "norm_label": "upsert_company()"
     },
     {
@@ -279,7 +279,7 @@
       "source_file": "db/database.py",
       "source_location": "L131",
       "id": "db_database_upsert_document",
-      "community": 1,
+      "community": 4,
       "norm_label": "upsert_document()"
     },
     {
@@ -288,7 +288,7 @@
       "source_file": "db/database.py",
       "source_location": "L157",
       "id": "db_database_mark_document_ingested",
-      "community": 1,
+      "community": 4,
       "norm_label": "mark_document_ingested()"
     },
     {
@@ -297,7 +297,7 @@
       "source_file": "db/database.py",
       "source_location": "L167",
       "id": "db_database_mark_document_failed",
-      "community": 1,
+      "community": 4,
       "norm_label": "mark_document_failed()"
     },
     {
@@ -306,7 +306,7 @@
       "source_file": "db/database.py",
       "source_location": "L174",
       "id": "db_database_get_pending_documents",
-      "community": 1,
+      "community": 4,
       "norm_label": "get_pending_documents()"
     },
     {
@@ -315,7 +315,7 @@
       "source_file": "db/database.py",
       "source_location": "L188",
       "id": "db_database_is_already_ingested",
-      "community": 1,
+      "community": 4,
       "norm_label": "is_already_ingested()"
     },
     {
@@ -324,7 +324,7 @@
       "source_file": "db/database.py",
       "source_location": "L199",
       "id": "db_database_insert_chunk",
-      "community": 1,
+      "community": 4,
       "norm_label": "insert_chunk()"
     },
     {
@@ -333,7 +333,7 @@
       "source_file": "db/database.py",
       "source_location": "L222",
       "id": "db_database_get_chunks_for_doc",
-      "community": 1,
+      "community": 4,
       "norm_label": "get_chunks_for_doc()"
     },
     {
@@ -342,7 +342,7 @@
       "source_file": "db/database.py",
       "source_location": "L233",
       "id": "db_database_log_ingestion",
-      "community": 1,
+      "community": 4,
       "norm_label": "log_ingestion()"
     },
     {
@@ -351,7 +351,7 @@
       "source_file": "db/database.py",
       "source_location": "L254",
       "id": "db_database_get_stats",
-      "community": 1,
+      "community": 4,
       "norm_label": "get_stats()"
     },
     {
@@ -360,7 +360,7 @@
       "source_file": "db/database.py",
       "source_location": "L1",
       "id": "db_database_rationale_1",
-      "community": 1,
+      "community": 4,
       "norm_label": "db/database.py sqlite metadata store \u2014 shared across both rag pipelines.  tab"
     },
     {
@@ -369,7 +369,7 @@
       "source_file": "db/database.py",
       "source_location": "L106",
       "id": "db_database_rationale_106",
-      "community": 1,
+      "community": 4,
       "norm_label": "create tables if they don't exist."
     },
     {
@@ -378,7 +378,7 @@
       "source_file": "db/__init__.py",
       "source_location": "L1",
       "id": "db_init_py",
-      "community": 1,
+      "community": 4,
       "norm_label": "__init__.py"
     },
     {
@@ -405,7 +405,7 @@
       "source_file": "",
       "source_location": "",
       "id": "str",
-      "community": 6,
+      "community": 1,
       "norm_label": "str"
     },
     {
@@ -657,7 +657,7 @@
       "source_file": "decomposer/test_decomposer.py",
       "source_location": "L1",
       "id": "decomposer_test_decomposer_py",
-      "community": 12,
+      "community": 13,
       "norm_label": "test_decomposer.py"
     },
     {
@@ -666,7 +666,7 @@
       "source_file": "decomposer/test_decomposer.py",
       "source_location": "L167",
       "id": "decomposer_test_decomposer_run_tests",
-      "community": 12,
+      "community": 13,
       "norm_label": "run_tests()"
     },
     {
@@ -675,7 +675,7 @@
       "source_file": "decomposer/test_decomposer.py",
       "source_location": "L1",
       "id": "decomposer_test_decomposer_rationale_1",
-      "community": 12,
+      "community": 13,
       "norm_label": "decomposer/test_decomposer.py  run:  python -m decomposer.test_decomposer"
     },
     {
@@ -693,7 +693,7 @@
       "source_file": "pipeline/extract/pdf_extractor.py",
       "source_location": "L1",
       "id": "pipeline_extract_pdf_extractor_py",
-      "community": 6,
+      "community": 1,
       "norm_label": "pdf_extractor.py"
     },
     {
@@ -702,7 +702,7 @@
       "source_file": "pipeline/extract/pdf_extractor.py",
       "source_location": "L32",
       "id": "extract_pdf_extractor_pageblock",
-      "community": 6,
+      "community": 1,
       "norm_label": "pageblock"
     },
     {
@@ -711,7 +711,7 @@
       "source_file": "pipeline/extract/pdf_extractor.py",
       "source_location": "L44",
       "id": "extract_pdf_extractor_extracteddocument",
-      "community": 6,
+      "community": 1,
       "norm_label": "extracteddocument"
     },
     {
@@ -720,7 +720,7 @@
       "source_file": "pipeline/extract/pdf_extractor.py",
       "source_location": "L65",
       "id": "extract_pdf_extractor_is_section_header",
-      "community": 6,
+      "community": 1,
       "norm_label": "_is_section_header()"
     },
     {
@@ -729,7 +729,7 @@
       "source_file": "pipeline/extract/pdf_extractor.py",
       "source_location": "L91",
       "id": "extract_pdf_extractor_detect_speaker_role",
-      "community": 6,
+      "community": 1,
       "norm_label": "_detect_speaker_role()"
     },
     {
@@ -738,7 +738,7 @@
       "source_file": "pipeline/extract/pdf_extractor.py",
       "source_location": "L102",
       "id": "extract_pdf_extractor_extract_speaker_turns",
-      "community": 6,
+      "community": 1,
       "norm_label": "_extract_speaker_turns()"
     },
     {
@@ -747,7 +747,7 @@
       "source_file": "pipeline/extract/pdf_extractor.py",
       "source_location": "L141",
       "id": "extract_pdf_extractor_table_to_text",
-      "community": 6,
+      "community": 1,
       "norm_label": "_table_to_text()"
     },
     {
@@ -756,7 +756,7 @@
       "source_file": "pipeline/extract/pdf_extractor.py",
       "source_location": "L152",
       "id": "extract_pdf_extractor_get_table_bboxes",
-      "community": 6,
+      "community": 1,
       "norm_label": "_get_table_bboxes()"
     },
     {
@@ -765,7 +765,7 @@
       "source_file": "pipeline/extract/pdf_extractor.py",
       "source_location": "L167",
       "id": "extract_pdf_extractor_extract_prose_excluding_tables",
-      "community": 6,
+      "community": 1,
       "norm_label": "_extract_prose_excluding_tables()"
     },
     {
@@ -774,7 +774,7 @@
       "source_file": "pipeline/extract/pdf_extractor.py",
       "source_location": "L213",
       "id": "extract_pdf_extractor_extract_annual_report",
-      "community": 6,
+      "community": 1,
       "norm_label": "extract_annual_report()"
     },
     {
@@ -783,7 +783,7 @@
       "source_file": "pipeline/extract/pdf_extractor.py",
       "source_location": "L296",
       "id": "extract_pdf_extractor_extract_concall",
-      "community": 6,
+      "community": 1,
       "norm_label": "extract_concall()"
     },
     {
@@ -792,7 +792,7 @@
       "source_file": "pipeline/extract/pdf_extractor.py",
       "source_location": "L323",
       "id": "extract_pdf_extractor_extract_pdf",
-      "community": 6,
+      "community": 1,
       "norm_label": "extract_pdf()"
     },
     {
@@ -801,7 +801,7 @@
       "source_file": "pipeline/extract/pdf_extractor.py",
       "source_location": "L1",
       "id": "extract_pdf_extractor_rationale_1",
-      "community": 6,
+      "community": 1,
       "norm_label": "pipeline/extract/pdf_extractor.py  fixes applied in this version:   [fix 4] e"
     },
     {
@@ -810,7 +810,7 @@
       "source_file": "pipeline/extract/pdf_extractor.py",
       "source_location": "L33",
       "id": "extract_pdf_extractor_rationale_33",
-      "community": 6,
+      "community": 1,
       "norm_label": "atomic block of content from one pdf page."
     },
     {
@@ -819,7 +819,7 @@
       "source_file": "pipeline/extract/pdf_extractor.py",
       "source_location": "L103",
       "id": "extract_pdf_extractor_rationale_103",
-      "community": 6,
+      "community": 1,
       "norm_label": "split concall page text into individual speaker turn blocks."
     },
     {
@@ -828,7 +828,7 @@
       "source_file": "pipeline/extract/pdf_extractor.py",
       "source_location": "L142",
       "id": "extract_pdf_extractor_rationale_142",
-      "community": 6,
+      "community": 1,
       "norm_label": "convert pdfplumber table rows to readable text."
     },
     {
@@ -837,7 +837,7 @@
       "source_file": "pipeline/extract/pdf_extractor.py",
       "source_location": "L153",
       "id": "extract_pdf_extractor_rationale_153",
-      "community": 6,
+      "community": 1,
       "norm_label": "return bounding boxes (x0, top, x1, bottom) for all tables on a page.     used"
     },
     {
@@ -846,7 +846,7 @@
       "source_file": "pipeline/extract/pdf_extractor.py",
       "source_location": "L168",
       "id": "extract_pdf_extractor_rationale_168",
-      "community": 6,
+      "community": 1,
       "norm_label": "extract text from a page while cropping out table regions.     falls back to fu"
     },
     {
@@ -855,7 +855,7 @@
       "source_file": "pipeline/extract/pdf_extractor.py",
       "source_location": "L324",
       "id": "extract_pdf_extractor_rationale_324",
-      "community": 6,
+      "community": 1,
       "norm_label": "extract content from a pdf.     doc_type: 'annual_report' or 'concall'     ret"
     },
     {
@@ -864,7 +864,7 @@
       "source_file": "pipeline/extract/text_cleaner.py",
       "source_location": "L1",
       "id": "pipeline_extract_text_cleaner_py",
-      "community": 4,
+      "community": 9,
       "norm_label": "text_cleaner.py"
     },
     {
@@ -873,7 +873,7 @@
       "source_file": "pipeline/extract/text_cleaner.py",
       "source_location": "L27",
       "id": "extract_text_cleaner_fix_ligatures",
-      "community": 4,
+      "community": 9,
       "norm_label": "fix_ligatures()"
     },
     {
@@ -882,7 +882,7 @@
       "source_file": "pipeline/extract/text_cleaner.py",
       "source_location": "L46",
       "id": "extract_text_cleaner_remove_noise",
-      "community": 4,
+      "community": 9,
       "norm_label": "remove_noise()"
     },
     {
@@ -891,7 +891,7 @@
       "source_file": "pipeline/extract/text_cleaner.py",
       "source_location": "L55",
       "id": "extract_text_cleaner_normalize_whitespace",
-      "community": 4,
+      "community": 9,
       "norm_label": "normalize_whitespace()"
     },
     {
@@ -900,7 +900,7 @@
       "source_file": "pipeline/extract/text_cleaner.py",
       "source_location": "L68",
       "id": "extract_text_cleaner_normalize_numbers",
-      "community": 4,
+      "community": 9,
       "norm_label": "normalize_numbers()"
     },
     {
@@ -909,7 +909,7 @@
       "source_file": "pipeline/extract/text_cleaner.py",
       "source_location": "L81",
       "id": "extract_text_cleaner_clean_text",
-      "community": 4,
+      "community": 9,
       "norm_label": "clean_text()"
     },
     {
@@ -918,7 +918,7 @@
       "source_file": "pipeline/extract/text_cleaner.py",
       "source_location": "L101",
       "id": "extract_text_cleaner_is_garbage_text",
-      "community": 4,
+      "community": 9,
       "norm_label": "is_garbage_text()"
     },
     {
@@ -927,7 +927,7 @@
       "source_file": "pipeline/extract/text_cleaner.py",
       "source_location": "L1",
       "id": "extract_text_cleaner_rationale_1",
-      "community": 4,
+      "community": 9,
       "norm_label": "pipeline/extract/text_cleaner.py normalize and clean text extracted from financ"
     },
     {
@@ -936,7 +936,7 @@
       "source_file": "pipeline/extract/text_cleaner.py",
       "source_location": "L82",
       "id": "extract_text_cleaner_rationale_82",
-      "community": 4,
+      "community": 9,
       "norm_label": "clean extracted pdf text.     aggressive=true removes more noise (good for pros"
     },
     {
@@ -945,7 +945,7 @@
       "source_file": "pipeline/extract/text_cleaner.py",
       "source_location": "L102",
       "id": "extract_text_cleaner_rationale_102",
-      "community": 4,
+      "community": 9,
       "norm_label": "return true if text is too short or too noisy to be useful."
     },
     {
@@ -954,7 +954,7 @@
       "source_file": "pipeline/extract/__init__.py",
       "source_location": "L1",
       "id": "pipeline_extract_init_py",
-      "community": 4,
+      "community": 9,
       "norm_label": "__init__.py"
     },
     {
@@ -1071,7 +1071,7 @@
       "source_file": "pipeline/loader/chunker.py",
       "source_location": "L1",
       "id": "pipeline_loader_chunker_py",
-      "community": 4,
+      "community": 1,
       "norm_label": "chunker.py"
     },
     {
@@ -1080,7 +1080,7 @@
       "source_file": "pipeline/loader/chunker.py",
       "source_location": "L28",
       "id": "loader_chunker_chunk",
-      "community": 4,
+      "community": 1,
       "norm_label": "chunk"
     },
     {
@@ -1089,7 +1089,7 @@
       "source_file": "pipeline/loader/chunker.py",
       "source_location": "L46",
       "id": "loader_chunker_make_id",
-      "community": 4,
+      "community": 1,
       "norm_label": "_make_id()"
     },
     {
@@ -1098,7 +1098,7 @@
       "source_file": "pipeline/loader/chunker.py",
       "source_location": "L54",
       "id": "loader_chunker_approx_tokens",
-      "community": 4,
+      "community": 1,
       "norm_label": "_approx_tokens()"
     },
     {
@@ -1107,7 +1107,7 @@
       "source_file": "pipeline/loader/chunker.py",
       "source_location": "L58",
       "id": "loader_chunker_split_by_tokens",
-      "community": 4,
+      "community": 1,
       "norm_label": "_split_by_tokens()"
     },
     {
@@ -1116,7 +1116,7 @@
       "source_file": "pipeline/loader/chunker.py",
       "source_location": "L83",
       "id": "loader_chunker_chunk_annual_report",
-      "community": 4,
+      "community": 1,
       "norm_label": "chunk_annual_report()"
     },
     {
@@ -1125,7 +1125,7 @@
       "source_file": "pipeline/loader/chunker.py",
       "source_location": "L201",
       "id": "loader_chunker_chunk_concall",
-      "community": 4,
+      "community": 1,
       "norm_label": "chunk_concall()"
     },
     {
@@ -1134,7 +1134,7 @@
       "source_file": "pipeline/loader/chunker.py",
       "source_location": "L292",
       "id": "loader_chunker_chunk_document",
-      "community": 4,
+      "community": 1,
       "norm_label": "chunk_document()"
     },
     {
@@ -1143,7 +1143,7 @@
       "source_file": "pipeline/loader/chunker.py",
       "source_location": "L1",
       "id": "loader_chunker_rationale_1",
-      "community": 4,
+      "community": 1,
       "norm_label": "pipeline/loader/chunker.py  chunking strategies:   annual reports \u2192 512-token"
     },
     {
@@ -1152,7 +1152,7 @@
       "source_file": "pipeline/loader/chunker.py",
       "source_location": "L59",
       "id": "loader_chunker_rationale_59",
-      "community": 4,
+      "community": 1,
       "norm_label": "split text into overlapping windows by approximate token count."
     },
     {
@@ -1188,7 +1188,7 @@
       "source_file": "pipeline/loader/embedder.py",
       "source_location": "L59",
       "id": "loader_embedder_embed_query",
-      "community": 7,
+      "community": 3,
       "norm_label": "embed_query()"
     },
     {
@@ -1206,7 +1206,7 @@
       "source_file": "pipeline/loader/embedder.py",
       "source_location": "L60",
       "id": "loader_embedder_rationale_60",
-      "community": 7,
+      "community": 3,
       "norm_label": "embed a single query \u2014 same model, no reload."
     },
     {
@@ -1224,7 +1224,7 @@
       "source_file": "pipeline/retrieval/reranker.py",
       "source_location": "L1",
       "id": "pipeline_retrieval_reranker_py",
-      "community": 3,
+      "community": 5,
       "norm_label": "reranker.py"
     },
     {
@@ -1233,7 +1233,7 @@
       "source_file": "pipeline/retrieval/reranker.py",
       "source_location": "L84",
       "id": "retrieval_reranker_forward_boost",
-      "community": 3,
+      "community": 5,
       "norm_label": "_forward_boost()"
     },
     {
@@ -1242,7 +1242,7 @@
       "source_file": "pipeline/retrieval/reranker.py",
       "source_location": "L113",
       "id": "retrieval_reranker_get_voyage_client",
-      "community": 3,
+      "community": 5,
       "norm_label": "_get_voyage_client()"
     },
     {
@@ -1251,7 +1251,7 @@
       "source_file": "pipeline/retrieval/reranker.py",
       "source_location": "L143",
       "id": "retrieval_reranker_get_bge_reranker",
-      "community": 3,
+      "community": 5,
       "norm_label": "_get_bge_reranker()"
     },
     {
@@ -1260,7 +1260,7 @@
       "source_file": "pipeline/retrieval/reranker.py",
       "source_location": "L176",
       "id": "retrieval_reranker_bge_score_batch",
-      "community": 3,
+      "community": 5,
       "norm_label": "_bge_score_batch()"
     },
     {
@@ -1269,7 +1269,7 @@
       "source_file": "pipeline/retrieval/reranker.py",
       "source_location": "L202",
       "id": "retrieval_reranker_rerank",
-      "community": 3,
+      "community": 5,
       "norm_label": "rerank()"
     },
     {
@@ -1278,7 +1278,7 @@
       "source_file": "pipeline/retrieval/reranker.py",
       "source_location": "L311",
       "id": "retrieval_reranker_rerank_separate",
-      "community": 3,
+      "community": 5,
       "norm_label": "rerank_separate()"
     },
     {
@@ -1287,7 +1287,7 @@
       "source_file": "pipeline/retrieval/reranker.py",
       "source_location": "L1",
       "id": "retrieval_reranker_rationale_1",
-      "community": 3,
+      "community": 5,
       "norm_label": "pipeline/retrieval/reranker.py  primary  re-ranker : voyage rerank-2.5 (financ"
     },
     {
@@ -1296,7 +1296,7 @@
       "source_file": "pipeline/retrieval/reranker.py",
       "source_location": "L85",
       "id": "retrieval_reranker_rationale_85",
-      "community": 3,
+      "community": 5,
       "norm_label": "additive score adjustment:       + bonus  when query is forward-looking and chu"
     },
     {
@@ -1305,7 +1305,7 @@
       "source_file": "pipeline/retrieval/reranker.py",
       "source_location": "L114",
       "id": "retrieval_reranker_rationale_114",
-      "community": 3,
+      "community": 5,
       "norm_label": "returns a voyage client if voyage_api_key is set, else none."
     },
     {
@@ -1314,7 +1314,7 @@
       "source_file": "pipeline/retrieval/reranker.py",
       "source_location": "L144",
       "id": "retrieval_reranker_rationale_144",
-      "community": 3,
+      "community": 5,
       "norm_label": "lazy-load baai/bge-reranker-v2-m3 via sentence-transformers.      memory footp"
     },
     {
@@ -1323,7 +1323,7 @@
       "source_file": "pipeline/retrieval/reranker.py",
       "source_location": "L177",
       "id": "retrieval_reranker_rationale_177",
-      "community": 3,
+      "community": 5,
       "norm_label": "score each document against the query using bge-reranker-v2-m3.      crossenco"
     },
     {
@@ -1332,7 +1332,7 @@
       "source_file": "pipeline/retrieval/reranker.py",
       "source_location": "L208",
       "id": "retrieval_reranker_rationale_208",
-      "community": 3,
+      "community": 5,
       "norm_label": "re-rank retrieved chunks.       primary  : voyage rerank-2.5  (api, finance/sec"
     },
     {
@@ -1341,7 +1341,7 @@
       "source_file": "pipeline/retrieval/reranker.py",
       "source_location": "L318",
       "id": "retrieval_reranker_rationale_318",
-      "community": 3,
+      "community": 5,
       "norm_label": "rerank each collection independently so concall prose cannot displace     annua"
     },
     {
@@ -1350,7 +1350,7 @@
       "source_file": "pipeline/retrieval/retriever.py",
       "source_location": "L1",
       "id": "pipeline_retrieval_retriever_py",
-      "community": 2,
+      "community": 3,
       "norm_label": "retriever.py"
     },
     {
@@ -1359,7 +1359,7 @@
       "source_file": "pipeline/retrieval/retriever.py",
       "source_location": "L166",
       "id": "retrieval_retriever_expand_query",
-      "community": 2,
+      "community": 3,
       "norm_label": "_expand_query()"
     },
     {
@@ -1368,7 +1368,7 @@
       "source_file": "pipeline/retrieval/retriever.py",
       "source_location": "L202",
       "id": "retrieval_retriever_retrievedchunk",
-      "community": 2,
+      "community": 3,
       "norm_label": "retrievedchunk"
     },
     {
@@ -1377,7 +1377,7 @@
       "source_file": "pipeline/retrieval/retriever.py",
       "source_location": "L214",
       "id": "retrieval_retriever_normalise_fy",
-      "community": 2,
+      "community": 3,
       "norm_label": "_normalise_fy()"
     },
     {
@@ -1386,7 +1386,7 @@
       "source_file": "pipeline/retrieval/retriever.py",
       "source_location": "L220",
       "id": "retrieval_retriever_parse_year_intent",
-      "community": 2,
+      "community": 3,
       "norm_label": "parse_year_intent()"
     },
     {
@@ -1395,7 +1395,7 @@
       "source_file": "pipeline/retrieval/retriever.py",
       "source_location": "L307",
       "id": "retrieval_retriever_recency_boost",
-      "community": 3,
+      "community": 5,
       "norm_label": "recency_boost()"
     },
     {
@@ -1404,7 +1404,7 @@
       "source_file": "pipeline/retrieval/retriever.py",
       "source_location": "L319",
       "id": "retrieval_retriever_bm25",
-      "community": 2,
+      "community": 3,
       "norm_label": "bm25"
     },
     {
@@ -1413,7 +1413,7 @@
       "source_file": "pipeline/retrieval/retriever.py",
       "source_location": "L320",
       "id": "retrieval_retriever_bm25_init",
-      "community": 2,
+      "community": 3,
       "norm_label": ".__init__()"
     },
     {
@@ -1422,7 +1422,7 @@
       "source_file": "pipeline/retrieval/retriever.py",
       "source_location": "L327",
       "id": "retrieval_retriever_bm25_tok",
-      "community": 2,
+      "community": 3,
       "norm_label": "._tok()"
     },
     {
@@ -1431,7 +1431,7 @@
       "source_file": "pipeline/retrieval/retriever.py",
       "source_location": "L330",
       "id": "retrieval_retriever_bm25_build_idf",
-      "community": 2,
+      "community": 3,
       "norm_label": "._build_idf()"
     },
     {
@@ -1440,7 +1440,7 @@
       "source_file": "pipeline/retrieval/retriever.py",
       "source_location": "L338",
       "id": "retrieval_retriever_bm25_get_scores",
-      "community": 2,
+      "community": 3,
       "norm_label": ".get_scores()"
     },
     {
@@ -1449,7 +1449,7 @@
       "source_file": "pipeline/retrieval/retriever.py",
       "source_location": "L355",
       "id": "retrieval_retriever_minmax",
-      "community": 2,
+      "community": 3,
       "norm_label": "_minmax()"
     },
     {
@@ -1458,7 +1458,7 @@
       "source_file": "pipeline/retrieval/retriever.py",
       "source_location": "L365",
       "id": "retrieval_retriever_build_where",
-      "community": 2,
+      "community": 3,
       "norm_label": "_build_where()"
     },
     {
@@ -1467,7 +1467,7 @@
       "source_file": "pipeline/retrieval/retriever.py",
       "source_location": "L382",
       "id": "retrieval_retriever_run_annual_query",
-      "community": 2,
+      "community": 3,
       "norm_label": "_run_annual_query()"
     },
     {
@@ -1476,7 +1476,7 @@
       "source_file": "pipeline/retrieval/retriever.py",
       "source_location": "L423",
       "id": "retrieval_retriever_retrieve_annual",
-      "community": 2,
+      "community": 3,
       "norm_label": "retrieve_annual()"
     },
     {
@@ -1485,7 +1485,7 @@
       "source_file": "pipeline/retrieval/retriever.py",
       "source_location": "L447",
       "id": "retrieval_retriever_retrieve_concall",
-      "community": 2,
+      "community": 3,
       "norm_label": "retrieve_concall()"
     },
     {
@@ -1494,7 +1494,7 @@
       "source_file": "pipeline/retrieval/retriever.py",
       "source_location": "L530",
       "id": "retrieval_retriever_retrieve",
-      "community": 2,
+      "community": 3,
       "norm_label": "retrieve()"
     },
     {
@@ -1503,7 +1503,7 @@
       "source_file": "pipeline/retrieval/retriever.py",
       "source_location": "L553",
       "id": "retrieval_retriever_retrieve_with_years",
-      "community": 2,
+      "community": 3,
       "norm_label": "retrieve_with_years()"
     },
     {
@@ -1512,7 +1512,7 @@
       "source_file": "pipeline/retrieval/retriever.py",
       "source_location": "L1",
       "id": "retrieval_retriever_rationale_1",
-      "community": 2,
+      "community": 3,
       "norm_label": "pipeline/retrieval/retriever.py  fixes applied in this version:   [fix 1] par"
     },
     {
@@ -1521,7 +1521,7 @@
       "source_file": "pipeline/retrieval/retriever.py",
       "source_location": "L167",
       "id": "retrieval_retriever_rationale_167",
-      "community": 2,
+      "community": 3,
       "norm_label": "enrich the query string with domain-specific expansion phrases so the     embed"
     },
     {
@@ -1530,7 +1530,7 @@
       "source_file": "pipeline/retrieval/retriever.py",
       "source_location": "L215",
       "id": "retrieval_retriever_rationale_215",
-      "community": 2,
+      "community": 3,
       "norm_label": "convert 2-digit or 4-digit fy string to full 4-digit year."
     },
     {
@@ -1539,7 +1539,7 @@
       "source_file": "pipeline/retrieval/retriever.py",
       "source_location": "L221",
       "id": "retrieval_retriever_rationale_221",
-      "community": 2,
+      "community": 3,
       "norm_label": "returns (resolved_years, explicit_years).        resolved_years  \u2014 full year l"
     },
     {
@@ -1548,7 +1548,7 @@
       "source_file": "pipeline/retrieval/retriever.py",
       "source_location": "L308",
       "id": "retrieval_retriever_rationale_308",
-      "community": 3,
+      "community": 5,
       "norm_label": "additive boost so fy2025 ranks above fy2015 at equal semantic similarity.     s"
     },
     {
@@ -1557,7 +1557,7 @@
       "source_file": "pipeline/retrieval/retriever.py",
       "source_location": "L538",
       "id": "retrieval_retriever_rationale_538",
-      "community": 2,
+      "community": 3,
       "norm_label": "returns:       - list[retrievedchunk]                   for doc_type in (annual"
     },
     {
@@ -1566,7 +1566,7 @@
       "source_file": "pipeline/retrieval/retriever.py",
       "source_location": "L561",
       "id": "retrieval_retriever_rationale_561",
-      "community": 2,
+      "community": 3,
       "norm_label": "returns (chunks_or_tuple, resolved_years, explicit_years).      explicit_years"
     },
     {
@@ -1575,7 +1575,7 @@
       "source_file": "pipeline/retrieval/retriever.py",
       "source_location": "L412",
       "id": "retrieval_retriever_rationale_412",
-      "community": 2,
+      "community": 3,
       "norm_label": "# note: recency_boost is intentionally not applied here."
     },
     {
@@ -1584,7 +1584,7 @@
       "source_file": "pipeline/retrieval/__init__.py",
       "source_location": "L1",
       "id": "pipeline_retrieval_init_py",
-      "community": 3,
+      "community": 5,
       "norm_label": "__init__.py"
     },
     {
@@ -1593,7 +1593,7 @@
       "source_file": "rag/rag_engine.py",
       "source_location": "L1",
       "id": "rag_rag_engine_py",
-      "community": 5,
+      "community": 6,
       "norm_label": "rag_engine.py"
     },
     {
@@ -1602,7 +1602,7 @@
       "source_file": "rag/rag_engine.py",
       "source_location": "L108",
       "id": "rag_rag_engine_providerentry",
-      "community": 5,
+      "community": 6,
       "norm_label": "providerentry"
     },
     {
@@ -1611,7 +1611,7 @@
       "source_file": "rag/rag_engine.py",
       "source_location": "L121",
       "id": "rag_rag_engine_discover_ollama",
-      "community": 5,
+      "community": 6,
       "norm_label": "_discover_ollama()"
     },
     {
@@ -1620,7 +1620,7 @@
       "source_file": "rag/rag_engine.py",
       "source_location": "L148",
       "id": "rag_rag_engine_build_provider_catalogue",
-      "community": 5,
+      "community": 6,
       "norm_label": "build_provider_catalogue()"
     },
     {
@@ -1629,7 +1629,7 @@
       "source_file": "rag/rag_engine.py",
       "source_location": "L225",
       "id": "rag_rag_engine_pick_provider_interactive",
-      "community": 5,
+      "community": 6,
       "norm_label": "pick_provider_interactive()"
     },
     {
@@ -1638,7 +1638,7 @@
       "source_file": "rag/rag_engine.py",
       "source_location": "L255",
       "id": "rag_rag_engine_get_provider",
-      "community": 5,
+      "community": 6,
       "norm_label": "get_provider()"
     },
     {
@@ -1647,7 +1647,7 @@
       "source_file": "rag/rag_engine.py",
       "source_location": "L426",
       "id": "rag_rag_engine_estimate_tokens",
-      "community": 5,
+      "community": 6,
       "norm_label": "_estimate_tokens()"
     },
     {
@@ -1656,7 +1656,7 @@
       "source_file": "rag/rag_engine.py",
       "source_location": "L433",
       "id": "rag_rag_engine_build_context",
-      "community": 5,
+      "community": 6,
       "norm_label": "_build_context()"
     },
     {
@@ -1665,7 +1665,7 @@
       "source_file": "rag/rag_engine.py",
       "source_location": "L453",
       "id": "rag_rag_engine_build_user_prompt",
-      "community": 5,
+      "community": 6,
       "norm_label": "_build_user_prompt()"
     },
     {
@@ -1674,7 +1674,7 @@
       "source_file": "rag/rag_engine.py",
       "source_location": "L537",
       "id": "rag_rag_engine_trim_chunks_to_budget",
-      "community": 5,
+      "community": 6,
       "norm_label": "_trim_chunks_to_budget()"
     },
     {
@@ -1683,7 +1683,7 @@
       "source_file": "rag/rag_engine.py",
       "source_location": "L613",
       "id": "rag_rag_engine_call_gemini",
-      "community": 5,
+      "community": 6,
       "norm_label": "_call_gemini()"
     },
     {
@@ -1692,7 +1692,7 @@
       "source_file": "rag/rag_engine.py",
       "source_location": "L650",
       "id": "rag_rag_engine_call_openai_compat",
-      "community": 5,
+      "community": 6,
       "norm_label": "_call_openai_compat()"
     },
     {
@@ -1701,7 +1701,7 @@
       "source_file": "rag/rag_engine.py",
       "source_location": "L684",
       "id": "rag_rag_engine_call_with_retry",
-      "community": 5,
+      "community": 6,
       "norm_label": "_call_with_retry()"
     },
     {
@@ -1710,7 +1710,7 @@
       "source_file": "rag/rag_engine.py",
       "source_location": "L713",
       "id": "rag_rag_engine_ragresponse",
-      "community": 5,
+      "community": 6,
       "norm_label": "ragresponse"
     },
     {
@@ -1719,7 +1719,7 @@
       "source_file": "rag/rag_engine.py",
       "source_location": "L725",
       "id": "rag_rag_engine_generate_answer",
-      "community": 5,
+      "community": 6,
       "norm_label": "generate_answer()"
     },
     {
@@ -1728,7 +1728,7 @@
       "source_file": "rag/rag_engine.py",
       "source_location": "L1",
       "id": "rag_rag_engine_rationale_1",
-      "community": 5,
+      "community": 6,
       "norm_label": "rag/rag_engine.py  fixes applied in this version:    [fix context-trim] cont"
     },
     {
@@ -1737,7 +1737,7 @@
       "source_file": "rag/rag_engine.py",
       "source_location": "L122",
       "id": "rag_rag_engine_rationale_122",
-      "community": 5,
+      "community": 6,
       "norm_label": "query /api/tags; return one entry per installed model. never raises."
     },
     {
@@ -1746,7 +1746,7 @@
       "source_file": "rag/rag_engine.py",
       "source_location": "L460",
       "id": "rag_rag_engine_rationale_460",
-      "community": 5,
+      "community": 6,
       "norm_label": "build the user-turn prompt.      resolved_years \u2014 used for the year-filter not"
     },
     {
@@ -1755,7 +1755,7 @@
       "source_file": "rag/rag_engine.py",
       "source_location": "L546",
       "id": "rag_rag_engine_rationale_546",
-      "community": 5,
+      "community": 6,
       "norm_label": "drop lowest-ranked chunks until the full prompt fits within:       (a) the mode"
     },
     {
@@ -1764,7 +1764,7 @@
       "source_file": "rag/rag_engine.py",
       "source_location": "L736",
       "id": "rag_rag_engine_rationale_736",
-      "community": 5,
+      "community": 6,
       "norm_label": "resolved_years \u2014 years used for chromadb retrieval filter.     explicit_years \u2014"
     },
     {
@@ -1773,7 +1773,457 @@
       "source_file": "rag/__init__.py",
       "source_location": "L1",
       "id": "rag_init_py",
-      "community": 5,
+      "community": 6,
+      "norm_label": "__init__.py"
+    },
+    {
+      "label": "schema_bridge.py",
+      "file_type": "code",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L1",
+      "id": "schema_bridge_schema_bridge_py",
+      "community": 0,
+      "norm_label": "schema_bridge.py"
+    },
+    {
+      "label": "_fy_date_range()",
+      "file_type": "code",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L129",
+      "id": "schema_bridge_schema_bridge_fy_date_range",
+      "community": 2,
+      "norm_label": "_fy_date_range()"
+    },
+    {
+      "label": "SqlAtomResult",
+      "file_type": "code",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L143",
+      "id": "schema_bridge_schema_bridge_sqlatomresult",
+      "community": 0,
+      "norm_label": "sqlatomresult"
+    },
+    {
+      "label": "VectorAtomResult",
+      "file_type": "code",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L152",
+      "id": "schema_bridge_schema_bridge_vectoratomresult",
+      "community": 0,
+      "norm_label": "vectoratomresult"
+    },
+    {
+      "label": "BridgeResult",
+      "file_type": "code",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L159",
+      "id": "schema_bridge_schema_bridge_bridgeresult",
+      "community": 0,
+      "norm_label": "bridgeresult"
+    },
+    {
+      "label": ".all_sql_rows()",
+      "file_type": "code",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L165",
+      "id": "schema_bridge_schema_bridge_bridgeresult_all_sql_rows",
+      "community": 0,
+      "norm_label": ".all_sql_rows()"
+    },
+    {
+      "label": ".all_chunks()",
+      "file_type": "code",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L173",
+      "id": "schema_bridge_schema_bridge_bridgeresult_all_chunks",
+      "community": 0,
+      "norm_label": ".all_chunks()"
+    },
+    {
+      "label": "_build_sql()",
+      "file_type": "code",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L181",
+      "id": "schema_bridge_schema_bridge_build_sql",
+      "community": 2,
+      "norm_label": "_build_sql()"
+    },
+    {
+      "label": "_execute_sql_atom()",
+      "file_type": "code",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L286",
+      "id": "schema_bridge_schema_bridge_execute_sql_atom",
+      "community": 0,
+      "norm_label": "_execute_sql_atom()"
+    },
+    {
+      "label": "_execute_vector_atom()",
+      "file_type": "code",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L317",
+      "id": "schema_bridge_schema_bridge_execute_vector_atom",
+      "community": 0,
+      "norm_label": "_execute_vector_atom()"
+    },
+    {
+      "label": "_expand_comparative()",
+      "file_type": "code",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L347",
+      "id": "schema_bridge_schema_bridge_expand_comparative",
+      "community": 0,
+      "norm_label": "_expand_comparative()"
+    },
+    {
+      "label": "_classify()",
+      "file_type": "code",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L392",
+      "id": "schema_bridge_schema_bridge_classify",
+      "community": 2,
+      "norm_label": "_classify()"
+    },
+    {
+      "label": "SchemaBridge",
+      "file_type": "code",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L409",
+      "id": "schema_bridge_schema_bridge_schemabridge",
+      "community": 0,
+      "norm_label": "schemabridge"
+    },
+    {
+      "label": ".__init__()",
+      "file_type": "code",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L429",
+      "id": "schema_bridge_schema_bridge_schemabridge_init",
+      "community": 0,
+      "norm_label": ".__init__()"
+    },
+    {
+      "label": ".fetch()",
+      "file_type": "code",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L439",
+      "id": "schema_bridge_schema_bridge_schemabridge_fetch",
+      "community": 0,
+      "norm_label": ".fetch()"
+    },
+    {
+      "label": "._safe_sql()",
+      "file_type": "code",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L514",
+      "id": "schema_bridge_schema_bridge_schemabridge_safe_sql",
+      "community": 0,
+      "norm_label": "._safe_sql()"
+    },
+    {
+      "label": "._safe_vector()",
+      "file_type": "code",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L517",
+      "id": "schema_bridge_schema_bridge_schemabridge_safe_vector",
+      "community": 0,
+      "norm_label": "._safe_vector()"
+    },
+    {
+      "label": ".fetch_symbol()",
+      "file_type": "code",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L522",
+      "id": "schema_bridge_schema_bridge_schemabridge_fetch_symbol",
+      "community": 0,
+      "norm_label": ".fetch_symbol()"
+    },
+    {
+      "label": "schema_bridge/schema_bridge.py  Layer 2 of the Quant CoPilot Intent Decomposit",
+      "file_type": "rationale",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L1",
+      "id": "schema_bridge_schema_bridge_rationale_1",
+      "community": 0,
+      "norm_label": "schema_bridge/schema_bridge.py  layer 2 of the quant copilot intent decomposit"
+    },
+    {
+      "label": "Indian FY: April of (fy_year-1) \u2192 March of fy_year.     e.g. FY2024 = 2023-04-0",
+      "file_type": "rationale",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L130",
+      "id": "schema_bridge_schema_bridge_rationale_130",
+      "community": 2,
+      "norm_label": "indian fy: april of (fy_year-1) \u2192 march of fy_year.     e.g. fy2024 = 2023-04-0"
+    },
+    {
+      "label": "Build a parameterized SELECT for one SQL-backed AtomicNeed.      Returns (sql_",
+      "file_type": "rationale",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L182",
+      "id": "schema_bridge_schema_bridge_rationale_182",
+      "community": 2,
+      "norm_label": "build a parameterized select for one sql-backed atomicneed.      returns (sql_"
+    },
+    {
+      "label": "Run the SQL for one atom, return SqlAtomResult (never raises).",
+      "file_type": "rationale",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L287",
+      "id": "schema_bridge_schema_bridge_rationale_287",
+      "community": 0,
+      "norm_label": "run the sql for one atom, return sqlatomresult (never raises)."
+    },
+    {
+      "label": "Run a ChromaDB vector query for one atom, return VectorAtomResult.",
+      "file_type": "rationale",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L318",
+      "id": "schema_bridge_schema_bridge_rationale_318",
+      "community": 0,
+      "norm_label": "run a chromadb vector query for one atom, return vectoratomresult."
+    },
+    {
+      "label": "A COMPARATIVE atom targets multiple symbols.     Expand it into one atom per sy",
+      "file_type": "rationale",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L348",
+      "id": "schema_bridge_schema_bridge_rationale_348",
+      "community": 0,
+      "norm_label": "a comparative atom targets multiple symbols.     expand it into one atom per sy"
+    },
+    {
+      "label": "Return 'sql', 'vector', or 'both'.",
+      "file_type": "rationale",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L393",
+      "id": "schema_bridge_schema_bridge_rationale_393",
+      "community": 2,
+      "norm_label": "return 'sql', 'vector', or 'both'."
+    },
+    {
+      "label": "Translates a list of AtomicNeed objects into concrete data-fetch results.",
+      "file_type": "rationale",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L410",
+      "id": "schema_bridge_schema_bridge_rationale_410",
+      "community": 0,
+      "norm_label": "translates a list of atomicneed objects into concrete data-fetch results."
+    },
+    {
+      "label": "Dispatch all atoms to the appropriate channel(s), running them in         paral",
+      "file_type": "rationale",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L440",
+      "id": "schema_bridge_schema_bridge_rationale_440",
+      "community": 0,
+      "norm_label": "dispatch all atoms to the appropriate channel(s), running them in         paral"
+    },
+    {
+      "label": "Helper for the common case: fetch several metrics for one company.          Ex",
+      "file_type": "rationale",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L528",
+      "id": "schema_bridge_schema_bridge_rationale_528",
+      "community": 0,
+      "norm_label": "helper for the common case: fetch several metrics for one company.          ex"
+    },
+    {
+      "label": "test_schema_bridge.py",
+      "file_type": "code",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L1",
+      "id": "schema_bridge_test_schema_bridge_py",
+      "community": 2,
+      "norm_label": "test_schema_bridge.py"
+    },
+    {
+      "label": "_atom()",
+      "file_type": "code",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L45",
+      "id": "schema_bridge_test_schema_bridge_atom",
+      "community": 2,
+      "norm_label": "_atom()"
+    },
+    {
+      "label": "_pass()",
+      "file_type": "code",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L61",
+      "id": "schema_bridge_test_schema_bridge_pass",
+      "community": 2,
+      "norm_label": "_pass()"
+    },
+    {
+      "label": "_fail()",
+      "file_type": "code",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L62",
+      "id": "schema_bridge_test_schema_bridge_fail",
+      "community": 2,
+      "norm_label": "_fail()"
+    },
+    {
+      "label": "test_fy_date_range()",
+      "file_type": "code",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L69",
+      "id": "schema_bridge_test_schema_bridge_test_fy_date_range",
+      "community": 2,
+      "norm_label": "test_fy_date_range()"
+    },
+    {
+      "label": "test_sql_revenue()",
+      "file_type": "code",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L76",
+      "id": "schema_bridge_test_schema_bridge_test_sql_revenue",
+      "community": 2,
+      "norm_label": "test_sql_revenue()"
+    },
+    {
+      "label": "test_sql_revenue_multiyear()",
+      "file_type": "code",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L89",
+      "id": "schema_bridge_test_schema_bridge_test_sql_revenue_multiyear",
+      "community": 2,
+      "norm_label": "test_sql_revenue_multiyear()"
+    },
+    {
+      "label": "test_sql_no_symbol_macro()",
+      "file_type": "code",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L98",
+      "id": "schema_bridge_test_schema_bridge_test_sql_no_symbol_macro",
+      "community": 2,
+      "norm_label": "test_sql_no_symbol_macro()"
+    },
+    {
+      "label": "test_sql_balance_sheet_period_type()",
+      "file_type": "code",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L107",
+      "id": "schema_bridge_test_schema_bridge_test_sql_balance_sheet_period_type",
+      "community": 2,
+      "norm_label": "test_sql_balance_sheet_period_type()"
+    },
+    {
+      "label": "test_sql_quarterly()",
+      "file_type": "code",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L115",
+      "id": "schema_bridge_test_schema_bridge_test_sql_quarterly",
+      "community": 2,
+      "norm_label": "test_sql_quarterly()"
+    },
+    {
+      "label": "test_sql_corporate_action_type()",
+      "file_type": "code",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L122",
+      "id": "schema_bridge_test_schema_bridge_test_sql_corporate_action_type",
+      "community": 2,
+      "norm_label": "test_sql_corporate_action_type()"
+    },
+    {
+      "label": "test_sql_current_limit()",
+      "file_type": "code",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L131",
+      "id": "schema_bridge_test_schema_bridge_test_sql_current_limit",
+      "community": 2,
+      "norm_label": "test_sql_current_limit()"
+    },
+    {
+      "label": "test_channel_routing()",
+      "file_type": "code",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L140",
+      "id": "schema_bridge_test_schema_bridge_test_channel_routing",
+      "community": 2,
+      "norm_label": "test_channel_routing()"
+    },
+    {
+      "label": "test_comparative_expansion()",
+      "file_type": "code",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L156",
+      "id": "schema_bridge_test_schema_bridge_test_comparative_expansion",
+      "community": 2,
+      "norm_label": "test_comparative_expansion()"
+    },
+    {
+      "label": "test_vector_backed_sub_type()",
+      "file_type": "code",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L166",
+      "id": "schema_bridge_test_schema_bridge_test_vector_backed_sub_type",
+      "community": 2,
+      "norm_label": "test_vector_backed_sub_type()"
+    },
+    {
+      "label": "test_sql_ownership()",
+      "file_type": "code",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L174",
+      "id": "schema_bridge_test_schema_bridge_test_sql_ownership",
+      "community": 2,
+      "norm_label": "test_sql_ownership()"
+    },
+    {
+      "label": "test_integration_fetch()",
+      "file_type": "code",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L186",
+      "id": "schema_bridge_test_schema_bridge_test_integration_fetch",
+      "community": 2,
+      "norm_label": "test_integration_fetch()"
+    },
+    {
+      "label": "run_all()",
+      "file_type": "code",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L244",
+      "id": "schema_bridge_test_schema_bridge_run_all",
+      "community": 2,
+      "norm_label": "run_all()"
+    },
+    {
+      "label": "schema_bridge/test_schema_bridge.py  Tests for the SchemaBridge.  Two test m",
+      "file_type": "rationale",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L1",
+      "id": "schema_bridge_test_schema_bridge_rationale_1",
+      "community": 2,
+      "norm_label": "schema_bridge/test_schema_bridge.py  tests for the schemabridge.  two test m"
+    },
+    {
+      "label": "No years \u2192 ORDER BY date DESC LIMIT used.",
+      "file_type": "rationale",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L132",
+      "id": "schema_bridge_test_schema_bridge_rationale_132",
+      "community": 2,
+      "norm_label": "no years \u2192 order by date desc limit used."
+    },
+    {
+      "label": "Atoms whose sql_table starts with 'chromadb:' must route to vector.",
+      "file_type": "rationale",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L167",
+      "id": "schema_bridge_test_schema_bridge_rationale_167",
+      "community": 2,
+      "norm_label": "atoms whose sql_table starts with 'chromadb:' must route to vector."
+    },
+    {
+      "label": "__init__.py",
+      "file_type": "code",
+      "source_file": "schema_bridge/__init__.py",
+      "source_location": "L1",
+      "id": "schema_bridge_init_py",
+      "community": 0,
       "norm_label": "__init__.py"
     },
     {
@@ -1782,7 +2232,7 @@
       "source_file": "utils/logger.py",
       "source_location": "L1",
       "id": "utils_logger_py",
-      "community": 11,
+      "community": 12,
       "norm_label": "logger.py"
     },
     {
@@ -1791,7 +2241,7 @@
       "source_file": "utils/logger.py",
       "source_location": "L12",
       "id": "utils_logger_get_logger",
-      "community": 11,
+      "community": 12,
       "norm_label": "get_logger()"
     },
     {
@@ -1800,7 +2250,7 @@
       "source_file": "utils/logger.py",
       "source_location": "L1",
       "id": "utils_logger_rationale_1",
-      "community": 11,
+      "community": 12,
       "norm_label": "utils/logger.py structured logging with file + console output."
     },
     {
@@ -1809,7 +2259,7 @@
       "source_file": "utils/__init__.py",
       "source_location": "L1",
       "id": "utils_init_py",
-      "community": 11,
+      "community": 12,
       "norm_label": "__init__.py"
     },
     {
@@ -2807,9 +3257,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L45",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_py",
-      "target": "enum",
-      "confidence_score": 1.0
+      "target": "enum"
     },
     {
       "relation": "contains",
@@ -2817,9 +3267,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L54",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_py",
-      "target": "decomposer_atomic_decomposer_needtype",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_needtype"
     },
     {
       "relation": "contains",
@@ -2827,9 +3277,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L64",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_py",
-      "target": "decomposer_atomic_decomposer_timehorizon",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_timehorizon"
     },
     {
       "relation": "contains",
@@ -2837,9 +3287,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L211",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_py",
-      "target": "decomposer_atomic_decomposer_atomicneed",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_atomicneed"
     },
     {
       "relation": "contains",
@@ -2847,9 +3297,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L498",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_py",
-      "target": "decomposer_atomic_decomposer_extract_years",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_extract_years"
     },
     {
       "relation": "contains",
@@ -2857,9 +3307,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L541",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_py",
-      "target": "decomposer_atomic_decomposer_extract_symbols",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_extract_symbols"
     },
     {
       "relation": "contains",
@@ -2867,9 +3317,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L574",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_py",
-      "target": "decomposer_atomic_decomposer_infer_time_horizon",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_infer_time_horizon"
     },
     {
       "relation": "contains",
@@ -2877,9 +3327,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L588",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_py",
-      "target": "decomposer_atomic_decomposer_infer_period",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_infer_period"
     },
     {
       "relation": "contains",
@@ -2887,9 +3337,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L601",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_py",
-      "target": "decomposer_atomic_decomposer_rule_based_decompose",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_rule_based_decompose"
     },
     {
       "relation": "contains",
@@ -2897,9 +3347,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L649",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_py",
-      "target": "decomposer_atomic_decomposer_upgrade_forward_atoms",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_upgrade_forward_atoms"
     },
     {
       "relation": "contains",
@@ -2907,9 +3357,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L729",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_py",
-      "target": "decomposer_atomic_decomposer_llm_decompose",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_llm_decompose"
     },
     {
       "relation": "contains",
@@ -2917,9 +3367,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L786",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_py",
-      "target": "decomposer_atomic_decomposer_atomicdecomposer",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_atomicdecomposer"
     },
     {
       "relation": "rationale_for",
@@ -2927,9 +3377,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_rationale_1",
-      "target": "decomposer_atomic_decomposer_py",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_py"
     },
     {
       "relation": "imports_from",
@@ -2938,9 +3388,9 @@
       "source_file": "decomposer/__init__.py",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_init_py",
-      "target": "decomposer_atomic_decomposer_py",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_py"
     },
     {
       "relation": "inherits",
@@ -2948,9 +3398,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L54",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_needtype",
-      "target": "str",
-      "confidence_score": 1.0
+      "target": "str"
     },
     {
       "relation": "inherits",
@@ -2958,9 +3408,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L54",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_needtype",
-      "target": "enum",
-      "confidence_score": 1.0
+      "target": "enum"
     },
     {
       "relation": "calls",
@@ -2969,9 +3419,49 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L762",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_llm_decompose",
+      "target": "decomposer_atomic_decomposer_needtype"
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L66",
+      "weight": 0.8,
+      "source": "schema_bridge_schema_bridge_sqlatomresult",
       "target": "decomposer_atomic_decomposer_needtype",
-      "confidence_score": 1.0
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L66",
+      "weight": 0.8,
+      "source": "schema_bridge_schema_bridge_vectoratomresult",
+      "target": "decomposer_atomic_decomposer_needtype",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L66",
+      "weight": 0.8,
+      "source": "schema_bridge_schema_bridge_bridgeresult",
+      "target": "decomposer_atomic_decomposer_needtype",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L66",
+      "weight": 0.8,
+      "source": "schema_bridge_schema_bridge_schemabridge",
+      "target": "decomposer_atomic_decomposer_needtype",
+      "confidence_score": 0.5
     },
     {
       "relation": "inherits",
@@ -2979,9 +3469,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L64",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_timehorizon",
-      "target": "str",
-      "confidence_score": 1.0
+      "target": "str"
     },
     {
       "relation": "calls",
@@ -3072,14 +3562,25 @@
       "target": "str"
     },
     {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L292",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_execute_sql_atom",
+      "target": "str"
+    },
+    {
       "relation": "inherits",
       "confidence": "EXTRACTED",
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L64",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_timehorizon",
-      "target": "enum",
-      "confidence_score": 1.0
+      "target": "enum"
     },
     {
       "relation": "calls",
@@ -3088,9 +3589,49 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L768",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_llm_decompose",
+      "target": "decomposer_atomic_decomposer_timehorizon"
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L66",
+      "weight": 0.8,
+      "source": "schema_bridge_schema_bridge_sqlatomresult",
       "target": "decomposer_atomic_decomposer_timehorizon",
-      "confidence_score": 1.0
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L66",
+      "weight": 0.8,
+      "source": "schema_bridge_schema_bridge_vectoratomresult",
+      "target": "decomposer_atomic_decomposer_timehorizon",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L66",
+      "weight": 0.8,
+      "source": "schema_bridge_schema_bridge_bridgeresult",
+      "target": "decomposer_atomic_decomposer_timehorizon",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L66",
+      "weight": 0.8,
+      "source": "schema_bridge_schema_bridge_schemabridge",
+      "target": "decomposer_atomic_decomposer_timehorizon",
+      "confidence_score": 0.5
     },
     {
       "relation": "method",
@@ -3098,9 +3639,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L230",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_atomicneed",
-      "target": "decomposer_atomic_decomposer_atomicneed_resolve_schema",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_atomicneed_resolve_schema"
     },
     {
       "relation": "method",
@@ -3108,9 +3649,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L236",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_atomicneed",
-      "target": "decomposer_atomic_decomposer_atomicneed_to_dict",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_atomicneed_to_dict"
     },
     {
       "relation": "calls",
@@ -3119,9 +3660,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L629",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_rule_based_decompose",
-      "target": "decomposer_atomic_decomposer_atomicneed",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_atomicneed"
     },
     {
       "relation": "calls",
@@ -3130,9 +3671,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L667",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_upgrade_forward_atoms",
-      "target": "decomposer_atomic_decomposer_atomicneed",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_atomicneed"
     },
     {
       "relation": "calls",
@@ -3141,9 +3682,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L761",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_llm_decompose",
-      "target": "decomposer_atomic_decomposer_atomicneed",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_atomicneed"
     },
     {
       "relation": "rationale_for",
@@ -3151,9 +3692,82 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L212",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_rationale_212",
+      "target": "decomposer_atomic_decomposer_atomicneed"
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L66",
+      "weight": 0.8,
+      "source": "schema_bridge_schema_bridge_sqlatomresult",
       "target": "decomposer_atomic_decomposer_atomicneed",
-      "confidence_score": 1.0
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L66",
+      "weight": 0.8,
+      "source": "schema_bridge_schema_bridge_vectoratomresult",
+      "target": "decomposer_atomic_decomposer_atomicneed",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L66",
+      "weight": 0.8,
+      "source": "schema_bridge_schema_bridge_bridgeresult",
+      "target": "decomposer_atomic_decomposer_atomicneed",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L66",
+      "weight": 0.8,
+      "source": "schema_bridge_schema_bridge_schemabridge",
+      "target": "decomposer_atomic_decomposer_atomicneed",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L359",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_expand_comparative",
+      "target": "decomposer_atomic_decomposer_atomicneed"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L540",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_schemabridge_fetch_symbol",
+      "target": "decomposer_atomic_decomposer_atomicneed"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L47",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_atom",
+      "target": "decomposer_atomic_decomposer_atomicneed"
     },
     {
       "relation": "calls",
@@ -3162,9 +3776,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L642",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_rule_based_decompose",
-      "target": "decomposer_atomic_decomposer_atomicneed_resolve_schema",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_atomicneed_resolve_schema"
     },
     {
       "relation": "calls",
@@ -3173,9 +3787,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L674",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_upgrade_forward_atoms",
-      "target": "decomposer_atomic_decomposer_atomicneed_resolve_schema",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_atomicneed_resolve_schema"
     },
     {
       "relation": "calls",
@@ -3184,9 +3798,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L774",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_llm_decompose",
-      "target": "decomposer_atomic_decomposer_atomicneed_resolve_schema",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_atomicneed_resolve_schema"
     },
     {
       "relation": "rationale_for",
@@ -3194,9 +3808,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L231",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_rationale_231",
-      "target": "decomposer_atomic_decomposer_atomicneed_resolve_schema",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_atomicneed_resolve_schema"
     },
     {
       "relation": "calls",
@@ -3205,9 +3819,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L892",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_atomicdecomposer_decompose_verbose",
-      "target": "decomposer_atomic_decomposer_atomicneed_to_dict",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_atomicneed_to_dict"
     },
     {
       "relation": "calls",
@@ -3216,9 +3830,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L603",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_rule_based_decompose",
-      "target": "decomposer_atomic_decomposer_extract_years",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_extract_years"
     },
     {
       "relation": "rationale_for",
@@ -3226,9 +3840,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L499",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_rationale_499",
-      "target": "decomposer_atomic_decomposer_extract_years",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_extract_years"
     },
     {
       "relation": "calls",
@@ -3237,9 +3851,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L604",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_rule_based_decompose",
-      "target": "decomposer_atomic_decomposer_extract_symbols",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_extract_symbols"
     },
     {
       "relation": "rationale_for",
@@ -3247,9 +3861,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L542",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_rationale_542",
-      "target": "decomposer_atomic_decomposer_extract_symbols",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_extract_symbols"
     },
     {
       "relation": "calls",
@@ -3258,9 +3872,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L624",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_rule_based_decompose",
-      "target": "decomposer_atomic_decomposer_infer_time_horizon",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_infer_time_horizon"
     },
     {
       "relation": "calls",
@@ -3269,9 +3883,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L605",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_rule_based_decompose",
-      "target": "decomposer_atomic_decomposer_infer_period",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_infer_period"
     },
     {
       "relation": "calls",
@@ -3280,9 +3894,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L645",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_rule_based_decompose",
-      "target": "decomposer_atomic_decomposer_upgrade_forward_atoms",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_upgrade_forward_atoms"
     },
     {
       "relation": "calls",
@@ -3291,9 +3905,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L832",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_atomicdecomposer_decompose",
-      "target": "decomposer_atomic_decomposer_rule_based_decompose",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_rule_based_decompose"
     },
     {
       "relation": "rationale_for",
@@ -3301,9 +3915,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L602",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_rationale_602",
-      "target": "decomposer_atomic_decomposer_rule_based_decompose",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_rule_based_decompose"
     },
     {
       "relation": "rationale_for",
@@ -3311,9 +3925,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L650",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_rationale_650",
-      "target": "decomposer_atomic_decomposer_upgrade_forward_atoms",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_upgrade_forward_atoms"
     },
     {
       "relation": "calls",
@@ -3322,9 +3936,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L839",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_atomicdecomposer_decompose",
-      "target": "decomposer_atomic_decomposer_llm_decompose",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_llm_decompose"
     },
     {
       "relation": "rationale_for",
@@ -3332,9 +3946,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L730",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_rationale_730",
-      "target": "decomposer_atomic_decomposer_llm_decompose",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_llm_decompose"
     },
     {
       "relation": "method",
@@ -3342,9 +3956,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L798",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_atomicdecomposer",
-      "target": "decomposer_atomic_decomposer_atomicdecomposer_init",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_atomicdecomposer_init"
     },
     {
       "relation": "method",
@@ -3352,9 +3966,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L822",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_atomicdecomposer",
-      "target": "decomposer_atomic_decomposer_atomicdecomposer_decompose",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_atomicdecomposer_decompose"
     },
     {
       "relation": "method",
@@ -3362,9 +3976,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L850",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_atomicdecomposer",
-      "target": "decomposer_atomic_decomposer_atomicdecomposer_decompose_verbose",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_atomicdecomposer_decompose_verbose"
     },
     {
       "relation": "rationale_for",
@@ -3372,9 +3986,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L787",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_rationale_787",
-      "target": "decomposer_atomic_decomposer_atomicdecomposer",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_atomicdecomposer"
     },
     {
       "relation": "calls",
@@ -3383,9 +3997,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L864",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_atomicdecomposer_decompose_verbose",
-      "target": "decomposer_atomic_decomposer_atomicdecomposer_decompose",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_atomicdecomposer_decompose"
     },
     {
       "relation": "rationale_for",
@@ -3393,9 +4007,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L823",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_rationale_823",
-      "target": "decomposer_atomic_decomposer_atomicdecomposer_decompose",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_atomicdecomposer_decompose"
     },
     {
       "relation": "rationale_for",
@@ -3403,9 +4017,9 @@
       "source_file": "decomposer/atomic_decomposer.py",
       "source_location": "L851",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_atomic_decomposer_rationale_851",
-      "target": "decomposer_atomic_decomposer_atomicdecomposer_decompose_verbose",
-      "confidence_score": 1.0
+      "target": "decomposer_atomic_decomposer_atomicdecomposer_decompose_verbose"
     },
     {
       "relation": "contains",
@@ -3413,9 +4027,9 @@
       "source_file": "decomposer/test_decomposer.py",
       "source_location": "L167",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_test_decomposer_py",
-      "target": "decomposer_test_decomposer_run_tests",
-      "confidence_score": 1.0
+      "target": "decomposer_test_decomposer_run_tests"
     },
     {
       "relation": "rationale_for",
@@ -3423,9 +4037,9 @@
       "source_file": "decomposer/test_decomposer.py",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "decomposer_test_decomposer_rationale_1",
-      "target": "decomposer_test_decomposer_py",
-      "confidence_score": 1.0
+      "target": "decomposer_test_decomposer_py"
     },
     {
       "relation": "contains",
@@ -4861,6 +5475,46 @@
       "target": "retrieval_retriever_retrievedchunk"
     },
     {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L72",
+      "weight": 0.8,
+      "source": "schema_bridge_schema_bridge_sqlatomresult",
+      "target": "retrieval_retriever_retrievedchunk",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L72",
+      "weight": 0.8,
+      "source": "schema_bridge_schema_bridge_vectoratomresult",
+      "target": "retrieval_retriever_retrievedchunk",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L72",
+      "weight": 0.8,
+      "source": "schema_bridge_schema_bridge_bridgeresult",
+      "target": "retrieval_retriever_retrievedchunk",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L72",
+      "weight": 0.8,
+      "source": "schema_bridge_schema_bridge_schemabridge",
+      "target": "retrieval_retriever_retrievedchunk",
+      "confidence_score": 0.5
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -5087,12 +5741,34 @@
     {
       "relation": "calls",
       "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L333",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_execute_vector_atom",
+      "target": "retrieval_retriever_retrieve_annual"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "pipeline/retrieval/retriever.py",
       "source_location": "L583",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "retrieval_retriever_retrieve_with_years",
+      "target": "retrieval_retriever_retrieve_concall"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L330",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_execute_vector_atom",
       "target": "retrieval_retriever_retrieve_concall"
     },
     {
@@ -5495,6 +6171,1037 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L129",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_py",
+      "target": "schema_bridge_schema_bridge_fy_date_range",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L143",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_py",
+      "target": "schema_bridge_schema_bridge_sqlatomresult",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L152",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_py",
+      "target": "schema_bridge_schema_bridge_vectoratomresult",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L159",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_py",
+      "target": "schema_bridge_schema_bridge_bridgeresult",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L181",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_py",
+      "target": "schema_bridge_schema_bridge_build_sql",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L286",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_py",
+      "target": "schema_bridge_schema_bridge_execute_sql_atom",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L317",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_py",
+      "target": "schema_bridge_schema_bridge_execute_vector_atom",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L347",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_py",
+      "target": "schema_bridge_schema_bridge_expand_comparative",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L392",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_py",
+      "target": "schema_bridge_schema_bridge_classify",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L409",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_py",
+      "target": "schema_bridge_schema_bridge_schemabridge",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_rationale_1",
+      "target": "schema_bridge_schema_bridge_py",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/__init__.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "schema_bridge_init_py",
+      "target": "schema_bridge_schema_bridge_py",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L237",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_build_sql",
+      "target": "schema_bridge_schema_bridge_fy_date_range",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L130",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_rationale_130",
+      "target": "schema_bridge_schema_bridge_fy_date_range",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L70",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_test_fy_date_range",
+      "target": "schema_bridge_schema_bridge_fy_date_range"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L292",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_execute_sql_atom",
+      "target": "schema_bridge_schema_bridge_sqlatomresult",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L336",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_execute_vector_atom",
+      "target": "schema_bridge_schema_bridge_vectoratomresult",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L165",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_bridgeresult",
+      "target": "schema_bridge_schema_bridge_bridgeresult_all_sql_rows",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L173",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_bridgeresult",
+      "target": "schema_bridge_schema_bridge_bridgeresult_all_chunks",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L445",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_schemabridge_fetch",
+      "target": "schema_bridge_schema_bridge_bridgeresult",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L289",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_execute_sql_atom",
+      "target": "schema_bridge_schema_bridge_build_sql",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L182",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_rationale_182",
+      "target": "schema_bridge_schema_bridge_build_sql",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L78",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_test_sql_revenue",
+      "target": "schema_bridge_schema_bridge_build_sql"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L91",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_test_sql_revenue_multiyear",
+      "target": "schema_bridge_schema_bridge_build_sql"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L100",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_test_sql_no_symbol_macro",
+      "target": "schema_bridge_schema_bridge_build_sql"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L109",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_test_sql_balance_sheet_period_type",
+      "target": "schema_bridge_schema_bridge_build_sql"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L117",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_test_sql_quarterly",
+      "target": "schema_bridge_schema_bridge_build_sql"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L124",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_test_sql_corporate_action_type",
+      "target": "schema_bridge_schema_bridge_build_sql"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L134",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_test_sql_current_limit",
+      "target": "schema_bridge_schema_bridge_build_sql"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L176",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_test_sql_ownership",
+      "target": "schema_bridge_schema_bridge_build_sql"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L515",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_schemabridge_safe_sql",
+      "target": "schema_bridge_schema_bridge_execute_sql_atom",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L287",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_rationale_287",
+      "target": "schema_bridge_schema_bridge_execute_sql_atom",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L518",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_schemabridge_safe_vector",
+      "target": "schema_bridge_schema_bridge_execute_vector_atom",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L318",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_rationale_318",
+      "target": "schema_bridge_schema_bridge_execute_vector_atom",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L451",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_schemabridge_fetch",
+      "target": "schema_bridge_schema_bridge_expand_comparative",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L348",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_rationale_348",
+      "target": "schema_bridge_schema_bridge_expand_comparative",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L159",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_test_comparative_expansion",
+      "target": "schema_bridge_schema_bridge_expand_comparative"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L459",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_schemabridge_fetch",
+      "target": "schema_bridge_schema_bridge_classify",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L393",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_rationale_393",
+      "target": "schema_bridge_schema_bridge_classify",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L151",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_test_channel_routing",
+      "target": "schema_bridge_schema_bridge_classify"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L169",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_test_vector_backed_sub_type",
+      "target": "schema_bridge_schema_bridge_classify"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L429",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_schemabridge",
+      "target": "schema_bridge_schema_bridge_schemabridge_init",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L439",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_schemabridge",
+      "target": "schema_bridge_schema_bridge_schemabridge_fetch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L514",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_schemabridge",
+      "target": "schema_bridge_schema_bridge_schemabridge_safe_sql",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L517",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_schemabridge",
+      "target": "schema_bridge_schema_bridge_schemabridge_safe_vector",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L522",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_schemabridge",
+      "target": "schema_bridge_schema_bridge_schemabridge_fetch_symbol",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L410",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_rationale_410",
+      "target": "schema_bridge_schema_bridge_schemabridge",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L193",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_test_integration_fetch",
+      "target": "schema_bridge_schema_bridge_schemabridge"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L551",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_schemabridge_fetch_symbol",
+      "target": "schema_bridge_schema_bridge_schemabridge_fetch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L440",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_rationale_440",
+      "target": "schema_bridge_schema_bridge_schemabridge_fetch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/schema_bridge.py",
+      "source_location": "L528",
+      "weight": 1.0,
+      "source": "schema_bridge_schema_bridge_rationale_528",
+      "target": "schema_bridge_schema_bridge_schemabridge_fetch_symbol",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L45",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_py",
+      "target": "schema_bridge_test_schema_bridge_atom",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L61",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_py",
+      "target": "schema_bridge_test_schema_bridge_pass",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L62",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_py",
+      "target": "schema_bridge_test_schema_bridge_fail",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L69",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_py",
+      "target": "schema_bridge_test_schema_bridge_test_fy_date_range",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L76",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_py",
+      "target": "schema_bridge_test_schema_bridge_test_sql_revenue",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L89",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_py",
+      "target": "schema_bridge_test_schema_bridge_test_sql_revenue_multiyear",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L98",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_py",
+      "target": "schema_bridge_test_schema_bridge_test_sql_no_symbol_macro",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L107",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_py",
+      "target": "schema_bridge_test_schema_bridge_test_sql_balance_sheet_period_type",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L115",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_py",
+      "target": "schema_bridge_test_schema_bridge_test_sql_quarterly",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L122",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_py",
+      "target": "schema_bridge_test_schema_bridge_test_sql_corporate_action_type",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L131",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_py",
+      "target": "schema_bridge_test_schema_bridge_test_sql_current_limit",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L140",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_py",
+      "target": "schema_bridge_test_schema_bridge_test_channel_routing",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L156",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_py",
+      "target": "schema_bridge_test_schema_bridge_test_comparative_expansion",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L166",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_py",
+      "target": "schema_bridge_test_schema_bridge_test_vector_backed_sub_type",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L174",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_py",
+      "target": "schema_bridge_test_schema_bridge_test_sql_ownership",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L186",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_py",
+      "target": "schema_bridge_test_schema_bridge_test_integration_fetch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L244",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_py",
+      "target": "schema_bridge_test_schema_bridge_run_all",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_rationale_1",
+      "target": "schema_bridge_test_schema_bridge_py",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L77",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_test_sql_revenue",
+      "target": "schema_bridge_test_schema_bridge_atom",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L90",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_test_sql_revenue_multiyear",
+      "target": "schema_bridge_test_schema_bridge_atom",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L99",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_test_sql_no_symbol_macro",
+      "target": "schema_bridge_test_schema_bridge_atom",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L108",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_test_sql_balance_sheet_period_type",
+      "target": "schema_bridge_test_schema_bridge_atom",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L116",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_test_sql_quarterly",
+      "target": "schema_bridge_test_schema_bridge_atom",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L123",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_test_sql_corporate_action_type",
+      "target": "schema_bridge_test_schema_bridge_atom",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L133",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_test_sql_current_limit",
+      "target": "schema_bridge_test_schema_bridge_atom",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L150",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_test_channel_routing",
+      "target": "schema_bridge_test_schema_bridge_atom",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L157",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_test_comparative_expansion",
+      "target": "schema_bridge_test_schema_bridge_atom",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L168",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_test_vector_backed_sub_type",
+      "target": "schema_bridge_test_schema_bridge_atom",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L175",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_test_sql_ownership",
+      "target": "schema_bridge_test_schema_bridge_atom",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L197",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_test_integration_fetch",
+      "target": "schema_bridge_test_schema_bridge_atom",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L73",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_test_fy_date_range",
+      "target": "schema_bridge_test_schema_bridge_pass",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L86",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_test_sql_revenue",
+      "target": "schema_bridge_test_schema_bridge_pass",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L95",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_test_sql_revenue_multiyear",
+      "target": "schema_bridge_test_schema_bridge_pass",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L104",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_test_sql_no_symbol_macro",
+      "target": "schema_bridge_test_schema_bridge_pass",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L112",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_test_sql_balance_sheet_period_type",
+      "target": "schema_bridge_test_schema_bridge_pass",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L119",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_test_sql_quarterly",
+      "target": "schema_bridge_test_schema_bridge_pass",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L128",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_test_sql_corporate_action_type",
+      "target": "schema_bridge_test_schema_bridge_pass",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L137",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_test_sql_current_limit",
+      "target": "schema_bridge_test_schema_bridge_pass",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L153",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_test_channel_routing",
+      "target": "schema_bridge_test_schema_bridge_pass",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L163",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_test_comparative_expansion",
+      "target": "schema_bridge_test_schema_bridge_pass",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L171",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_test_vector_backed_sub_type",
+      "target": "schema_bridge_test_schema_bridge_pass",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L179",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_test_sql_ownership",
+      "target": "schema_bridge_test_schema_bridge_pass",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L220",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_test_integration_fetch",
+      "target": "schema_bridge_test_schema_bridge_pass",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L255",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_run_all",
+      "target": "schema_bridge_test_schema_bridge_fail",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L132",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_rationale_132",
+      "target": "schema_bridge_test_schema_bridge_test_sql_current_limit",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L167",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_rationale_167",
+      "target": "schema_bridge_test_schema_bridge_test_vector_backed_sub_type",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "schema_bridge/test_schema_bridge.py",
+      "source_location": "L264",
+      "weight": 1.0,
+      "source": "schema_bridge_test_schema_bridge_run_all",
+      "target": "schema_bridge_test_schema_bridge_test_integration_fetch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "utils/logger.py",
       "source_location": "L12",
       "weight": 1.0,
@@ -5635,5 +7342,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "4bc056e6c3b8da6592b48fd1ad87e4f098d44734"
+  "built_at_commit": "aef68b04d84596429b02cb3627ce54baf650ce9b"
 }
