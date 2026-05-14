@@ -79,9 +79,21 @@ from utils.logger import get_logger
 log = get_logger(__name__)
 
 # ─────────────────────────────────────────────────────────────────────────────
-# DB path (reuse the same DB as the rest of the system)
+# DB paths — two separate SQLite databases
+#
+#   FINANCE_DB_PATH  (Ai_Hedge_Fund.db)
+#     → all structured financial tables: annual_results, fundamentals,
+#       balance_sheet, cash_flow, growth_metrics, technical_indicators, etc.
+#     → this is what SQL atoms query against
+#
+#   DB_PATH  (financial_rag.db)
+#     → RAG metadata only: chunks, documents, companies, ingestion_log
+#     → NOT queried by the bridge; used by the rest of the RAG pipeline
+#
+# Set FINANCE_DB_PATH in config/settings.py:
+#   FINANCE_DB_PATH = Path("C:/Users/hp/Downloads/Fund/database/Ai_Hedge_Fund.db")
 # ─────────────────────────────────────────────────────────────────────────────
-from config.settings import DB_PATH   # noqa: E402  (import after path setup)
+from config.settings import DB_PATH, FINANCE_DB_PATH   # noqa: E402
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Table metadata: which column holds the date/period, and which holds symbol
@@ -428,11 +440,13 @@ class SchemaBridge:
 
     def __init__(
         self,
-        db_path:    Optional[Path] = None,
-        max_workers: int = 8,
+        finance_db_path: Optional[Path] = None,
+        max_workers:     int = 8,
     ):
-        self.db_path    = db_path or DB_PATH
-        self.max_workers = max_workers
+        # SQL atoms query Ai_Hedge_Fund.db (structured financial tables).
+        # Pass finance_db_path explicitly to override the settings default.
+        self.finance_db_path = finance_db_path or FINANCE_DB_PATH
+        self.max_workers     = max_workers
 
     # ── Main entry point ──────────────────────────────────────────────────────
 
@@ -512,7 +526,7 @@ class SchemaBridge:
     # ── Internal helpers ──────────────────────────────────────────────────────
 
     def _safe_sql(self, atom: AtomicNeed) -> SqlAtomResult:
-        return _execute_sql_atom(atom, self.db_path)
+        return _execute_sql_atom(atom, self.finance_db_path)
 
     def _safe_vector(self, atom: AtomicNeed) -> VectorAtomResult:
         return _execute_vector_atom(atom)

@@ -184,19 +184,40 @@ def test_sql_ownership():
 # ─────────────────────────────────────────────────────────────────────────────
 
 def test_integration_fetch(db_path: str):
+    """
+    db_path should point at Ai_Hedge_Fund.db (the structured financial DB),
+    NOT financial_rag.db (which only holds RAG metadata).
+
+    Example:
+        python -m schema_bridge.test_schema_bridge \
+            --db "C:/Users/hp/Downloads/Fund/database/Ai_Hedge_Fund.db"
+    """
     from pathlib import Path
     p = Path(db_path)
     if not p.exists():
         print(f"  ⚠  DB not found at {db_path} — skipping integration test")
+        print(f"      Pass Ai_Hedge_Fund.db, not financial_rag.db")
         return True
 
-    bridge = SchemaBridge(db_path=p)
+    # Quick schema check — warn clearly if wrong DB passed
+    import sqlite3
+    conn = sqlite3.connect(str(p))
+    tables = {r[0] for r in conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()}
+    conn.close()
+    if "annual_results" not in tables:
+        print(f"  ⚠  {p.name} has no 'annual_results' table.")
+        print(f"      Tables found: {sorted(tables)}")
+        print(f"      You likely passed financial_rag.db — use Ai_Hedge_Fund.db instead.")
+        return True
 
-    # Build a mixed set of atoms: revenue (SQL) + mda (vector)
+    bridge = SchemaBridge(finance_db_path=p)
+
+    # SQL-only atoms (vector atoms need the embedding model online)
     atoms = [
-        _atom("revenue",  symbol="RELIANCE", years=[2024]),
+        _atom("revenue",    symbol="RELIANCE", years=[2024]),
         _atom("net_profit", symbol="RELIANCE", years=[2024]),
-        _atom("mda", need_type=NeedType.QUALITATIVE, symbol="RELIANCE"),
+        _atom("net_debt",   symbol="RELIANCE", years=[2024]),
+        _atom("roce",       symbol="RELIANCE"),
     ]
 
     result: BridgeResult = bridge.fetch(atoms)

@@ -192,3 +192,15 @@ COMBINED_CONCALL_CHUNKS =  6    # was 3
 # ─────────────────────────────────────────────
 MIN_CHUNK_WORDS = 20
 MAX_PDF_SIZE_MB = 100
+# ─── ADD THIS LINE to your existing config/settings.py ───────────────────────
+#
+# Structured financial database (Ai_Hedge_Fund.db).
+# This is what the schema bridge queries for SQL atoms.
+# financial_rag.db is RAG metadata only — NOT the same database.
+#
+FINANCE_DB_PATH = Path("C:/Users/hp/Downloads/Fund/database/Ai_Hedge_Fund.db")
+#
+# If you want to make it portable (relative to project root), use:
+#   FINANCE_DB_PATH = BASE_DIR.parent / "Fund" / "database" / "Ai_Hedge_Fund.db"
+# ─────────────────────────────────────────────────────────────────────────────
+ 
