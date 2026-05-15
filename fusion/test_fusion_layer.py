@@ -6,6 +6,13 @@ No DB, no embedding model, no network required.
 
 Run:
     python -m fusion.test_fusion_layer
+    # or directly (ModuleNotFoundError: pipeline is now handled):
+    python fusion/test_fusion_layer.py
+
+FIX: BUG 3 — removed the direct `from pipeline.retrieval.retriever import
+RetrievedChunk` import that caused ModuleNotFoundError when the pipeline
+package is absent.  Instead we import RetrievedChunk from fusion_layer,
+which provides a graceful stub when pipeline is not installed.
 """
 
 import sys, os
@@ -13,8 +20,11 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from decomposer.atomic_decomposer import AtomicNeed, NeedType, TimeHorizon
 from schema_bridge.schema_bridge   import BridgeResult, SqlAtomResult, VectorAtomResult
-from pipeline.retrieval.retriever  import RetrievedChunk
+
+# BUG 3 FIX: import RetrievedChunk from fusion_layer (which has a safe stub
+# fallback) instead of directly from pipeline.retrieval.retriever.
 from fusion.fusion_layer import (
+    RetrievedChunk,
     FusionLayer, FusionResult, InsightType,
     MetricRow, ConcallClaim,
     _extract_numeric_claims, _parse_year_from_period, _pct_divergence,
@@ -41,12 +51,12 @@ def _sql_result(sub_type, rows, symbol="RELIANCE", error=None):
     return SqlAtomResult(atom=_atom(sub_type, symbol), rows=rows, error=error)
 
 def _chunk(text, doc_type="concall", speaker="CFO", role="management",
-           year=2024, score=0.85):
+           year=2024, score=0.85, symbol="RELIANCE"):
     return RetrievedChunk(
         chunk_id="test", text=text, score=score,
         vector_score=score, bm25_score=score,
         metadata={"doc_type": doc_type, "speaker": speaker,
-                  "speaker_role": role, "year": year, "symbol": "RELIANCE"},
+                  "speaker_role": role, "year": year, "symbol": symbol},
     )
 
 def _vec_result(sub_type, chunks):
@@ -74,10 +84,18 @@ def _fail(msg): print(f"  ✗  {msg}"); return False
 # ─────────────────────────────────────────────────────────────────────────────
 
 def test_parse_year():
+    # Original tests
     assert _parse_year_from_period("2024-03-31") == 2024
-    assert _parse_year_from_period("2023-09-30") == 2023
+    assert _parse_year_from_period("2023-09-30") == 2024   # BUG 1: was wrong
     assert _parse_year_from_period("")           is None
-    _pass("_parse_year_from_period handles Mar/Sep/empty")
+    # BUG 1 regression tests: Oct/Nov/Dec must now return y+1
+    assert _parse_year_from_period("2023-12-31") == 2024, \
+        "Q3 FY2024 ends Dec 2023 → FY year should be 2024"
+    assert _parse_year_from_period("2023-06-30") == 2024, \
+        "Q1 FY2024 ends Jun 2023 → FY year should be 2024"
+    assert _parse_year_from_period("2022-03-31") == 2022, \
+        "Q4 FY2022 ends Mar 2022 → FY year should be 2022"
+    _pass("_parse_year_from_period: Mar/Jun/Sep/Dec/empty all correct")
 
 
 def test_pct_divergence():
@@ -120,12 +138,54 @@ def test_number_extraction_crore():
 def test_number_extraction_no_unit_ignored():
     """Numbers without a recognised unit should NOT be captured."""
     chunk = _chunk("Revenue grew 12 percent year on year in FY24.")
-    # "12 percent" — the word "percent" is not in the unit set, only "%"
     claims = _extract_numeric_claims(chunk, "revenue", ["revenue", "sales"], "crore")
-    # Should not find crore-unit numbers here
     assert all(c.unit not in ("%",) for c in claims), \
         "Should not have extracted % claims for crore metric"
     _pass("Numbers without matching unit are ignored")
+
+
+def test_claim_symbol_stored():
+    """BUG 2: ConcallClaim.symbol must carry the company from chunk metadata."""
+    chunk = _chunk(
+        "Going forward we expect capex of Rs 12,000 crore for FY26.",
+        symbol="ADANIPORTS",
+    )
+    claims = _extract_numeric_claims(chunk, "capex",
+                                     ["capex", "capital expenditure"], "crore")
+    assert len(claims) >= 1
+    assert claims[0].symbol == "ADANIPORTS", \
+        f"Expected symbol='ADANIPORTS', got {claims[0].symbol!r}"
+    _pass("ConcallClaim.symbol correctly populated from chunk metadata")
+
+
+def test_orphan_forward_symbol():
+    """
+    BUG 2: Orphan forward FusionInsight.symbol was always ''.
+
+    The orphan-forward path (claims whose sub_type has NO matching SQL row)
+    requires the claim to have first been extracted.  _extract_all_claims
+    only scans sub_types that appear in active SQL atoms, so we provide a
+    capex SQL atom (with zero rows so no MetricRow is produced) alongside
+    the concall chunk.  The claim is extracted, no MetricRow exists for it
+    → it surfaces as an orphan FORWARD insight with the correct symbol.
+    """
+    bridge = _bridge(
+        # SQL atom present so _extract_all_claims scans "capex" keywords,
+        # but it returns zero rows so no MetricRow is produced for capex.
+        sql=[_sql_result("capex", [], symbol="TATASTEEL")],
+        vec=[_vec_result("concall_capex", [
+            _chunk(
+                "Going forward we target capex of Rs 8,000 crore in FY26.",
+                symbol="TATASTEEL",
+            )
+        ])]
+    )
+    result = fusion.fuse(bridge)
+    fwd = result.forward_guidance()
+    assert len(fwd) >= 1, "Expected at least one FORWARD insight"
+    assert fwd[0].symbol == "TATASTEEL", \
+        f"BUG 2 not fixed: symbol='{fwd[0].symbol}' instead of 'TATASTEEL'"
+    _pass(f"Orphan FORWARD insight.symbol = '{fwd[0].symbol}' (correct)")
 
 
 def test_fuse_unmatched_no_concall():
@@ -216,7 +276,7 @@ def test_fuse_sql_error_skipped():
         sql=[_sql_result("revenue", [], error="table not found")]
     )
     result = fusion.fuse(bridge)
-    assert result.metric_rows == []   # error row produces no MetricRow
+    assert result.metric_rows == []
     _pass("SQL error atoms produce no MetricRow (skipped)")
 
 
@@ -263,6 +323,33 @@ def test_bridge_errors_propagated():
     _pass("Bridge errors propagated into FusionResult.errors")
 
 
+def test_metric_row_unit_populated():
+    """
+    BUG 4: sub_types beyond the original 17 in _METRIC_SIGNALS had unit=''.
+    Spot-check a selection of the newly added sub_types.
+    """
+    from fusion.fusion_layer import _METRIC_SIGNALS
+    spot_checks = {
+        "total_assets":  "crore",
+        "pe":            "x",
+        "pb":            "x",
+        "eps":           "rs",
+        "dso":           "days",
+        "rsi":           "",    # dimensionless — acceptable
+        "promoter":      "%",
+        "book_value":    "rs",
+        "net_debt":      "crore",
+        "roe":           "%",
+    }
+    for sub_type, expected_unit in spot_checks.items():
+        assert sub_type in _METRIC_SIGNALS, \
+            f"{sub_type} still missing from _METRIC_SIGNALS"
+        actual_unit = _METRIC_SIGNALS[sub_type][2]
+        assert actual_unit == expected_unit, \
+            f"{sub_type}: expected unit {expected_unit!r}, got {actual_unit!r}"
+    _pass(f"_METRIC_SIGNALS unit coverage: {len(spot_checks)} sub_types verified")
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Runner
 # ─────────────────────────────────────────────────────────────────────────────
@@ -273,6 +360,8 @@ TESTS = [
     test_number_extraction_percent,
     test_number_extraction_crore,
     test_number_extraction_no_unit_ignored,
+    test_claim_symbol_stored,          # NEW: BUG 2 unit test
+    test_orphan_forward_symbol,        # NEW: BUG 2 integration test
     test_fuse_unmatched_no_concall,
     test_fuse_forward_guidance,
     test_fuse_confirm,
@@ -282,6 +371,7 @@ TESTS = [
     test_annual_chunk_routing,
     test_to_context_dict_structure,
     test_bridge_errors_propagated,
+    test_metric_row_unit_populated,    # NEW: BUG 4 unit test
 ]
 
 

@@ -45,6 +45,31 @@ FusionResult
   .concall_chunks  : List[RetrievedChunk] — concall chunks (sorted by score)
   .errors          : List[str]          — non-fatal issues encountered
   .to_context_dict()→ dict              — ready for prompt builder
+
+Fixes applied
+─────────────
+BUG 1  _parse_year_from_period: Oct/Nov/Dec period-end dates now correctly
+       return y+1 (they belong to the FY whose March-end is in the next
+       calendar year).  Old code had `return y if m >= 4 else y` — both
+       branches were identical, making every non-Jan/Feb/Mar date wrong.
+       Correct logic: Indian FY Apr–Mar → period ending Apr–Dec belongs to
+       FY(y+1); period ending Jan–Mar belongs to FY(y).
+
+BUG 2  Orphan FORWARD insight symbol was always "": the ternary
+       `c.year and "" or ""` always evaluates to "".  Fixed by storing
+       `symbol` on ConcallClaim at extraction time and using it in the
+       orphan-forward loop.
+
+BUG 3  ModuleNotFoundError: pipeline — both fusion_layer.py and
+       schema_bridge.py import `from pipeline.retrieval.retriever import
+       RetrievedChunk`.  A try/except stub is provided so the module
+       (and its unit tests) work when the pipeline package is not on the
+       path (e.g. running test_fusion_layer.py standalone).
+
+BUG 4  49 SQL sub_types had no entry in _METRIC_SIGNALS → unit="" for
+       every one of them (total_assets, pe, pb, eps, dso, rsi, …).
+       The full table is now expanded to cover every SQL-backed sub_type
+       defined in SUBTYPE_TABLE_MAP, with correct unit labels.
 """
 
 from __future__ import annotations
@@ -54,11 +79,55 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Dict, List, Optional, Tuple
 
-from pipeline.retrieval.retriever import RetrievedChunk
-from schema_bridge.schema_bridge import BridgeResult, SqlAtomResult, VectorAtomResult
-from utils.logger import get_logger
+# ── BUG 3 FIX: graceful import of RetrievedChunk ────────────────────────────
+# When running unit tests standalone (without the full pipeline package on
+# sys.path) this import would raise ModuleNotFoundError.  We fall back to a
+# minimal dataclass stub that is API-compatible with the real class.
+try:
+    from pipeline.retrieval.retriever import RetrievedChunk
+except ModuleNotFoundError:
+    @dataclass
+    class RetrievedChunk:                          # type: ignore[no-redef]
+        """Minimal stub used when pipeline package is not installed."""
+        chunk_id:     str   = ""
+        text:         str   = ""
+        score:        float = 0.0
+        vector_score: float = 0.0
+        bm25_score:   float = 0.0
+        metadata:     Dict[str, Any] = field(default_factory=dict)
 
-log = get_logger(__name__)
+try:
+    from schema_bridge.schema_bridge import BridgeResult, SqlAtomResult, VectorAtomResult
+except ModuleNotFoundError:
+    from dataclasses import dataclass as _dc, field as _field
+    from typing import Any as _Any, Dict as _Dict, List as _List, Optional as _Opt
+
+    @_dc
+    class SqlAtomResult:          # type: ignore[no-redef]
+        atom:   _Any
+        rows:   _List[_Dict[str, _Any]] = _field(default_factory=list)
+        sql:    str = ""
+        params: tuple = ()
+        error:  _Opt[str] = None
+
+    @_dc
+    class VectorAtomResult:       # type: ignore[no-redef]
+        atom:   _Any
+        chunks: _List[_Any] = _field(default_factory=list)
+        error:  _Opt[str] = None
+
+    @_dc
+    class BridgeResult:           # type: ignore[no-redef]
+        sql_results:    _List[_Any] = _field(default_factory=list)
+        vector_results: _List[_Any] = _field(default_factory=list)
+        errors:         _List[str]  = _field(default_factory=list)
+
+try:
+    from utils.logger import get_logger
+    log = get_logger(__name__)
+except ModuleNotFoundError:
+    import logging
+    log = logging.getLogger(__name__)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Thresholds
@@ -68,27 +137,144 @@ CONTRADICT_THRESHOLD  = 0.15   # beyond 15 %  → CONTRADICT
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Metric signal map
+# Metric signal map  (BUG 4 FIX: expanded to cover all SQL-backed sub_types)
+#
 # sub_type → (sql_value_column, concall_keyword_list, unit_hint)
+#
+# unit_hint drives both the regex filter in _extract_numeric_claims and the
+# unit label shown in insight notes.  Accepted values:
+#   "crore"  — absolute financials (revenue, profit, debt, capex, …)
+#   "%"      — ratios and margins
+#   "rs"     — per-share figures (EPS, book value, Graham number)
+#   "x"      — multiples (P/E, EV/EBITDA, interest coverage, …)
+#   "days"   — working-capital cycle metrics
+#   "price"  — stock price / 52-week levels
+#   ""       — dimensionless / unknown (avoid where possible)
 # ─────────────────────────────────────────────────────────────────────────────
 _METRIC_SIGNALS: Dict[str, Tuple[str, List[str], str]] = {
-    "revenue":        ("sales",                ["revenue", "sales", "topline"],          "crore"),
-    "net_profit":     ("net_profit",           ["profit", "pat", "net income"],           "crore"),
-    "ebitda":         ("ebitda",               ["ebitda", "operating profit"],            "crore"),
-    "ebitda_margin":  ("ebitda_margin_pct",    ["ebitda margin", "operating margin"],    "%"),
-    "opm":            ("opm_pct",              ["opm", "operating margin"],              "%"),
-    "gross_margin":   ("gross_margin_pct",     ["gross margin"],                         "%"),
-    "net_margin":     ("net_profit_margin_pct",["net margin", "profit margin"],          "%"),
-    "roce":           ("roce_pct",             ["roce", "return on capital"],             "%"),
-    "roe":            ("roe_pct",              ["roe", "return on equity"],               "%"),
-    "net_debt":       ("net_debt",             ["net debt", "debt"],                     "crore"),
-    "capex":          ("capex",                ["capex", "capital expenditure", "capex plan"], "crore"),
-    "fcf":            ("free_cash_flow",       ["free cash flow", "fcf"],                "crore"),
-    "ocf":            ("cfo",                  ["operating cash flow", "cash from operations"], "crore"),
-    "borrowings":     ("borrowings",           ["borrowings", "total debt"],             "crore"),
-    "eps":            ("eps_annual",           ["eps", "earnings per share"],            "rs"),
-    "revenue_cagr":   ("sales_cagr_3y",        ["revenue cagr", "sales cagr", "revenue growth"], "%"),
-    "profit_cagr":    ("profit_cagr_3y",       ["profit cagr", "earnings cagr"],         "%"),
+
+    # ── Income statement ──────────────────────────────────────────────────────
+    "revenue":          ("sales",                  ["revenue", "sales", "topline", "turnover"],        "crore"),
+    "revenue_q":        ("sales",                  ["revenue", "sales", "quarterly sales"],            "crore"),
+    "operating_profit": ("operating_profit",       ["operating profit", "ebit"],                       "crore"),
+    "net_profit":       ("net_profit",             ["profit", "pat", "net income", "net profit"],      "crore"),
+    "net_profit_q":     ("net_profit",             ["profit", "pat", "quarterly profit"],              "crore"),
+    "ebitda":           ("ebitda",                 ["ebitda", "operating profit"],                     "crore"),
+    "ebit":             ("ebit_margin_pct",        ["ebit", "ebit margin"],                            "%"),
+    "depreciation":     ("depreciation",           ["depreciation", "d&a", "amortisation"],           "crore"),
+    "interest":         ("interest",               ["interest", "finance cost", "interest expense"],  "crore"),
+    "pbt":              ("profit_before_tax",      ["pbt", "profit before tax"],                      "crore"),
+    "opm":              ("opm_pct",                ["opm", "operating margin"],                        "%"),
+    "eps":              ("eps_annual",             ["eps", "earnings per share"],                      "rs"),
+    "eps_q":            ("eps",                    ["eps", "quarterly eps"],                           "rs"),
+    "tax":              ("tax_pct",                ["tax rate", "effective tax"],                      "%"),
+
+    # ── Margins ───────────────────────────────────────────────────────────────
+    "ebitda_margin":    ("ebitda_margin_pct",      ["ebitda margin", "operating margin"],              "%"),
+    "gross_margin":     ("gross_margin_pct",       ["gross margin"],                                   "%"),
+    "net_margin":       ("net_profit_margin_pct",  ["net margin", "profit margin", "net profit margin"], "%"),
+
+    # ── Return ratios ─────────────────────────────────────────────────────────
+    "roe":              ("roe_pct",                ["roe", "return on equity"],                        "%"),
+    "roce":             ("roce_pct",               ["roce", "return on capital"],                      "%"),
+    "roa":              ("roa_pct",                ["roa", "return on assets"],                        "%"),
+
+    # ── Balance sheet ─────────────────────────────────────────────────────────
+    "total_assets":     ("total_assets",           ["total assets", "asset base"],                    "crore"),
+    "total_equity":     ("total_equity",           ["equity", "net worth", "shareholders equity"],    "crore"),
+    "net_worth":        ("total_equity",           ["net worth", "equity"],                           "crore"),
+    "borrowings":       ("borrowings",             ["borrowings", "total debt", "gross debt"],        "crore"),
+    "net_debt":         ("net_debt",               ["net debt", "debt"],                              "crore"),
+    "cash":             ("cash_equivalents",       ["cash", "cash equivalents", "cash and bank"],     "crore"),
+    "trade_receivables":("trade_receivables",      ["trade receivables", "receivables", "debtors"],   "crore"),
+    "inventories":      ("inventories",            ["inventories", "inventory", "stock"],             "crore"),
+    "cwip":             ("cwip",                   ["cwip", "capital work in progress"],              "crore"),
+    "fixed_assets":     ("fixed_assets",           ["fixed assets", "net block", "property plant"],  "crore"),
+    "investments":      ("investments",            ["investments"],                                   "crore"),
+
+    # ── Cash flow ─────────────────────────────────────────────────────────────
+    "ocf":              ("cfo",                    ["operating cash flow", "cash from operations"],   "crore"),
+    "cfi":              ("cfi",                    ["investing cash flow", "cash used in investing"], "crore"),
+    "cff":              ("cff",                    ["financing cash flow", "cash from financing"],    "crore"),
+    "capex":            ("capex",                  ["capex", "capital expenditure", "capex plan"],    "crore"),
+    "fcf":              ("free_cash_flow",         ["free cash flow", "fcf"],                         "crore"),
+    "net_cashflow":     ("net_cash_flow",          ["net cash flow", "net cashflow"],                 "crore"),
+    "fcf_margin":       ("fcf_margin_pct",         ["fcf margin", "free cash flow margin"],           "%"),
+
+    # ── Valuation multiples ───────────────────────────────────────────────────
+    "pe":               ("pe_ratio",               ["pe", "p/e", "price to earnings", "p/e ratio"],   "x"),
+    "pb":               ("pb_ratio",               ["pb", "p/b", "price to book"],                    "x"),
+    "ev_ebitda":        ("ev_ebitda",              ["ev/ebitda", "enterprise value ebitda"],           "x"),
+    "ev_revenue":       ("ev_revenue",             ["ev/revenue", "ev/sales"],                        "x"),
+    "book_value":       ("book_value",             ["book value", "bvps"],                            "rs"),
+    "graham_number":    ("graham_number",          ["graham number"],                                 "rs"),
+    "dividend_yield":   ("dividend_yield_pct",     ["dividend yield"],                                "%"),
+    "dividend_payout":  ("dividend_payout_pct",    ["dividend payout", "payout ratio"],               "%"),
+    "debt_equity":      ("debt_to_equity",         ["debt equity", "d/e", "leverage"],               "x"),
+    "current_ratio":    ("current_ratio",          ["current ratio"],                                 "x"),
+    "quick_ratio":      ("quick_ratio",            ["quick ratio", "acid test"],                      "x"),
+    "interest_coverage":("interest_coverage",      ["interest coverage", "coverage ratio"],           "x"),
+    "market_cap":       ("market_cap",             ["market cap", "market capitalisation"],           "crore"),
+    "ev":               ("ev",                     ["enterprise value", "ev"],                        "crore"),
+
+    # ── Working capital ───────────────────────────────────────────────────────
+    "dso":              ("dso_days",               ["dso", "days sales outstanding", "receivable days"], "days"),
+    "dio":              ("dio_days",               ["dio", "days inventory outstanding", "inventory days"], "days"),
+    "dpo":              ("dpo_days",               ["dpo", "days payable outstanding"],               "days"),
+    "ccc":              ("cash_conversion_cycle",  ["cash conversion cycle", "ccc"],                  "days"),
+    "working_capital":  ("working_capital_days",   ["working capital days", "working capital cycle"], "days"),
+
+    # ── Growth metrics ────────────────────────────────────────────────────────
+    "revenue_cagr":     ("sales_cagr_3y",          ["revenue cagr", "sales cagr", "revenue growth"],  "%"),
+    "profit_cagr":      ("profit_cagr_3y",         ["profit cagr", "earnings cagr"],                  "%"),
+    "eps_cagr":         ("eps_cagr_3y",            ["eps cagr", "earnings cagr"],                     "%"),
+    "ebitda_cagr":      ("ebitda_cagr_3y",         ["ebitda cagr"],                                   "%"),
+    "fcf_cagr":         ("fcf_cagr_3y",            ["fcf cagr", "free cash flow cagr"],               "%"),
+    "stock_cagr":       ("stock_cagr_3y",          ["stock cagr", "price cagr", "return cagr"],       "%"),
+    "roe_avg":          ("roe_3y",                 ["roe average", "average roe"],                    "%"),
+
+    # ── Price & 52-week ───────────────────────────────────────────────────────
+    "price":            ("close",                  ["price", "stock price", "closing price"],          "rs"),
+    "52w_high":         ("high_52w",               ["52 week high", "52-week high", "52w high"],       "rs"),
+    "52w_low":          ("low_52w",                ["52 week low", "52-week low", "52w low"],          "rs"),
+
+    # ── Technical indicators ──────────────────────────────────────────────────
+    "rsi":              ("rsi_14",                 ["rsi", "relative strength"],                       ""),
+    "macd":             ("macd",                   ["macd"],                                           ""),
+    "sma":              ("sma_200",                ["sma", "moving average", "200 sma", "50 sma"],     "rs"),
+    "ema":              ("ema_21",                 ["ema", "exponential moving average"],              "rs"),
+    "bb":               ("bb_upper",               ["bollinger bands", "bb upper", "bb lower"],        "rs"),
+    "atr":              ("atr_14",                 ["atr", "average true range"],                      "rs"),
+    "adx":              ("adx_14",                 ["adx", "average directional index"],               ""),
+    "supertrend":       ("supertrend",             ["supertrend"],                                     "rs"),
+    "vwap":             ("vwap_14",                ["vwap", "volume weighted average price"],          "rs"),
+    "obv":              ("obv",                    ["obv", "on balance volume"],                       ""),
+
+    # ── Macro / rates ─────────────────────────────────────────────────────────
+    "repo_rate":        ("rate_pct",               ["repo rate", "rbi rate", "policy rate"],           "%"),
+    "forex":            ("rate",                   ["forex", "usd inr", "exchange rate"],              ""),
+    "cpi":              ("value",                  ["cpi", "consumer price", "inflation"],             ""),
+    "gdp":              ("value",                  ["gdp", "gross domestic product"],                  ""),
+    "iip":              ("value",                  ["iip", "industrial production"],                   ""),
+
+    # ── Ownership ─────────────────────────────────────────────────────────────
+    "promoter":         ("promoter_pct",           ["promoter holding", "promoter stake"],             "%"),
+    "fii":              ("fii_pct",                ["fii", "foreign institutional", "fii stake"],      "%"),
+    "dii":              ("dii_pct",                ["dii", "domestic institutional", "dii stake"],     "%"),
+    "public":           ("public_pct",             ["public holding", "retail holding"],               "%"),
+
+    # ── Dividends / corporate actions ─────────────────────────────────────────
+    "dividend":         ("amount",                 ["dividend", "div per share"],                      "rs"),
+    "buyback":          ("amount",                 ["buyback", "share repurchase"],                    "crore"),
+
+    # ── EPS estimates ─────────────────────────────────────────────────────────
+    "eps_estimate":     ("mean_estimate",          ["eps estimate", "analyst estimate", "eps consensus"], "rs"),
+
+    # ── Concall-only sub_types (no SQL actual; forward claims only) ───────────
+    "concall_capex":    ("capex",                  ["capex", "capital expenditure"],                   "crore"),
+    "concall_margin":   ("ebitda_margin_pct",      ["margin", "ebitda margin"],                        "%"),
+    "concall_outlook":  ("",                       ["outlook", "demand", "volume guidance"],           ""),
+    "concall_guidance": ("",                       ["guidance", "target", "expect", "forecast"],       ""),
 }
 
 # Keywords that signal a forward-looking statement (don't compare to actuals)
@@ -153,6 +339,8 @@ class ConcallClaim:
     year:         Optional[int]
     source_text:  str               # sentence containing the claim
     chunk_score:  float
+    # BUG 2 FIX: store the company symbol so orphan-forward insights are labelled
+    symbol:       str = ""
 
 
 @dataclass
@@ -176,16 +364,31 @@ class FusionInsight:
 
 def _parse_year_from_period(period: str) -> Optional[int]:
     """
-    '2024-03-31' → 2024  (Indian FY ends in March, year = calendar year)
-    '2023-12-31' → 2024  (fallback: if month <= 3 bump year by 0, else +1)
+    Convert a period-end date string to an Indian FY year.
+
+    Indian financial year runs April → March.
+    A period-end date in Jan/Feb/Mar (m ≤ 3) closes in the *same* calendar
+    year, so the FY year equals that calendar year.
+    A period-end date in Apr–Dec (m ≥ 4) belongs to a FY that won't close
+    until March of the *next* calendar year, so the FY year is y + 1.
+
+    Examples
+    ─────────
+      "2024-03-31"  → 2024   (Q4 FY2024, Mar close)
+      "2023-12-31"  → 2024   (Q3 FY2024, Dec close)   ← BUG 1 FIX
+      "2023-09-30"  → 2024   (Q2 FY2024, Sep close)   ← BUG 1 FIX
+      "2023-06-30"  → 2024   (Q1 FY2024, Jun close)   ← BUG 1 FIX
+      "2023-03-31"  → 2023   (Q4 FY2023, Mar close)
+      ""            → None
     """
     if not period:
         return None
     try:
         parts = period.split("-")
         y, m = int(parts[0]), int(parts[1])
-        # Indian FY: Apr–Mar.  Period end in Jan/Feb/Mar belongs to that FY year.
-        return y if m >= 4 else y
+        # BUG 1 FIX: was `return y if m >= 4 else y` (both branches identical).
+        # Correct: Apr–Dec period-end → FY closes next March → year is y+1.
+        return y + 1 if m >= 4 else y
     except Exception:
         return None
 
@@ -195,7 +398,7 @@ def _strip_commas(s: str) -> float:
 
 
 def _extract_numeric_claims(
-    chunk: RetrievedChunk,
+    chunk: "RetrievedChunk",
     sub_type: str,
     keywords: List[str],
     unit_hint: str,
@@ -210,6 +413,8 @@ def _extract_numeric_claims(
     speaker      = meta.get("speaker", "Unknown")
     speaker_role = (meta.get("speaker_role") or "unknown").lower()
     year         = meta.get("year")
+    # BUG 2 FIX: capture symbol from chunk metadata so ConcallClaim carries it
+    symbol       = meta.get("symbol", "")
 
     # Split on sentence boundaries
     sentences = re.split(r"(?<=[.!?])\s+", chunk.text)
@@ -269,6 +474,7 @@ def _extract_numeric_claims(
                 year         = year,
                 source_text  = sent.strip()[:300],
                 chunk_score  = chunk.score,
+                symbol       = symbol,   # BUG 2 FIX
             ))
 
     return claims
@@ -403,7 +609,7 @@ class FusionLayer:
     def _extract_all_claims(
         self,
         sql_results:    List[SqlAtomResult],
-        concall_chunks: List[RetrievedChunk],
+        concall_chunks: List["RetrievedChunk"],
     ) -> List[ConcallClaim]:
         """
         For each sub_type that has SQL results, scan concall chunks for
@@ -544,6 +750,8 @@ class FusionLayer:
             ))
 
         # Also surface forward-looking claims with NO matching SQL row
+        # BUG 2 FIX: use c.symbol (stored from chunk metadata) instead of
+        # the broken ternary `c.year and "" or ""` which always returned "".
         matched_sub_types = {r.sub_type for r in metric_rows}
         for sub_type, claims in claims_by_sub.items():
             if sub_type in matched_sub_types:
@@ -556,7 +764,7 @@ class FusionLayer:
                         insight_type  = InsightType.FORWARD,
                         sub_type      = sub_type,
                         metric        = sub_type,
-                        symbol        = c.year and "" or "",
+                        symbol        = c.symbol,           # BUG 2 FIX
                         year          = c.year,
                         sql_value     = None,
                         sql_period    = "",
@@ -581,8 +789,8 @@ class FusionResult:
     metric_rows:    List[MetricRow]       = field(default_factory=list)
     concall_claims: List[ConcallClaim]    = field(default_factory=list)
     insights:       List[FusionInsight]   = field(default_factory=list)
-    annual_chunks:  List[RetrievedChunk]  = field(default_factory=list)
-    concall_chunks: List[RetrievedChunk]  = field(default_factory=list)
+    annual_chunks:  List["RetrievedChunk"]  = field(default_factory=list)
+    concall_chunks: List["RetrievedChunk"]  = field(default_factory=list)
     errors:         List[str]             = field(default_factory=list)
 
     # ── Accessors ─────────────────────────────────────────────────────────────
