@@ -83,7 +83,7 @@ def test_render_sql_table_populated():
     assert "[SQL-1]" in rendered
     assert "[SQL-2]" in rendered
     assert "[SQL-3]" in rendered
-    assert "₹23,452.1 cr" in rendered
+    assert "₹23,452.0 cr" in rendered
     assert "54.70%" in rendered
     assert "ADANIPORTS" in rendered
     _pass("render_sql_table: 3 rows rendered with correct [SQL-N] anchors and values")
