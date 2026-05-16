@@ -38,6 +38,20 @@ USAGE (unchanged from caller's perspective):
     from pipeline.retrieval.reranker import rerank, rerank_separate
     top = rerank(query, candidates, doc_type)
     top = rerank_separate(query, annual_cands, concall_cands)
+
+[CACHE INTEGRATION]  The reranker itself is NOT cached — it runs every time
+    because cache hits are intercepted in rag_engine BEFORE the reranker fires.
+    See pipeline/retrieval/semantic_cache.py for the SemanticCache class.
+
+[INT8 FIX]  If you see "export=True" slow on first run (it traces the model),
+    pre-export once and set RERANKER_MODEL to the local ONNX path:
+        python -c "
+        from optimum.onnxruntime import ORTModelForSequenceClassification
+        m = ORTModelForSequenceClassification.from_pretrained(
+            'BAAI/bge-reranker-v2-m3', export=True)
+        m.save_pretrained('./models/bge-reranker-v2-m3-onnx')
+        "
+    Then: RERANKER_MODEL=./models/bge-reranker-v2-m3-onnx
 """
 
 from __future__ import annotations

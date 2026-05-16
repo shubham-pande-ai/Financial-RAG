@@ -2,7 +2,7 @@
 requests>=2.31.0
 beautifulsoup4>=4.12.0
 lxml>=5.0.0
-
+diskcache
 # ── PDF extraction ──────────────────────────────
 pdfplumber>=0.10.0
 
