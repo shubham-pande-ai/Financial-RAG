@@ -311,21 +311,103 @@ def _build_intent_note(query: str) -> str:
         )
     return ""
 
+"""
+synthesis/prompt_builder.py  — EBITDA proxy patch
 
+Bug fixed
+──────────
+[BUG-EBITDA-CALC]
+  When the user asks for "EBITDA CAGR FY23-25", the bridge now fetches
+  ebitda_proxy rows (operating_profit + depreciation from annual_results).
+  But the prompt_builder didn't know to tell the LLM to compute
+  EBITDA = operating_profit + depreciation and then compute the CAGR.
+
+  Without this instruction, the LLM just sees the raw numbers and either
+  guesses incorrectly or says "EBITDA not available".
+
+  FIX: In _build_metric_note() (called from both fusion and vector-only paths),
+  detect when the query mentions "ebitda" + multi-year indicators and inject
+  an explicit calculation instruction into the prompt.
+
+HOW TO APPLY:
+In your synthesis/prompt_builder.py, find the function _build_metric_note()
+(around line 350-380).  Add the EBITDA block shown below to its return value.
+
+Also update _render_sql_table() to show a "CALCULATION NOTE" row when
+ebitda_proxy sub_type is present in the rows.
+"""
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PATCH: Replace _build_metric_note() in prompt_builder.py with this version
+# ─────────────────────────────────────────────────────────────────────────────
 def _build_metric_note(query: str) -> str:
+    """
+    Return model-specific calculation instructions based on detected metrics.
+    Injected at the bottom of the user prompt.
+    """
+    notes = []
     q = query.lower()
-    if "ebit" in q and "ebitda" not in q:
-        return (
-            "\nMETRIC NOTE: User asked for EBIT. If only EBITDA is available, "
-            "state: 'EBIT not found; EBITDA shown. EBIT = EBITDA − D&A (₹X cr if available).'"
-        )
-    if "ebitda" in q and "ebit" not in q:
-        return (
-            "\nMETRIC NOTE: User asked for EBITDA. Do not report EBIT as EBITDA "
-            "without disclosing the difference."
-        )
-    return ""
 
+    # EBITDA multi-year / CAGR note  [BUG-EBITDA-CALC]
+    import re
+    if re.search(r'\bebitda\b', q) and re.search(
+        r'\b(cagr|yoy|year[\s\-]on[\s\-]year|trend|growth|fy2[0-9]\d?\s*[-–to])', q
+    ):
+        notes.append(
+            "EBITDA CALCULATION NOTE: If [SQL] rows show 'operating_profit' and "
+            "'depreciation' columns (ebitda_proxy), compute:\n"
+            "  EBITDA = operating_profit + depreciation  (for each year)\n"
+            "Then compute CAGR:\n"
+            "  CAGR = (EBITDA_end / EBITDA_start)^(1/n_years) - 1\n"
+            "Show this calculation step explicitly before presenting the result."
+        )
+
+    # FCF calculation note
+    if re.search(r'\bfcf\b|\bfree\s+cash\s+flow\b', q):
+        notes.append(
+            "FCF NOTE: Free Cash Flow = Operating Cash Flow (CFO) − Capex. "
+            "If only OCF and Capex are provided, compute FCF explicitly."
+        )
+
+    # CAGR general note
+    if re.search(r'\bcagr\b', q):
+        notes.append(
+            "CAGR FORMULA: CAGR = (End_Value / Start_Value)^(1 / N_years) − 1. "
+            "Write formula + numbers inline before stating the result."
+        )
+
+    # YoY note
+    if re.search(r'\byoy\b|\byear[\s\-]on[\s\-]year\b|\bgrowth\b', q):
+        notes.append(
+            "YoY GROWTH: (Current_Year − Prior_Year) / Prior_Year × 100. "
+            "Show formula + numbers for every year."
+        )
+
+    return ("\n\n" + "\n".join(notes)) if notes else ""
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# INSTRUCTION: In your existing prompt_builder.py, find the current
+# _build_metric_note() function and replace its entire body with the
+# function above (keep the same function signature).
+#
+# If the function doesn't exist yet in your file, add it and call it
+# from both _build_fusion_prompt() and _build_vector_only_prompt() like:
+#
+#   notes = (
+#       _build_gap_flag_note(resolved_years, explicit_years)
+#       + _build_intent_note(query)
+#       + _build_metric_note(query)   ← add this line
+#   )
+# ─────────────────────────────────────────────────────────────────────────────
+
+PATCH_DESCRIPTION = {
+    "file":     "synthesis/prompt_builder.py",
+    "function": "_build_metric_note",
+    "reason":   "Adds EBITDA = operating_profit + depreciation calculation instruction "
+                "when ebitda_proxy SQL rows are fetched, so LLM can compute CAGR/YoY "
+                "from annual_results instead of failing on the fundamentals snapshot.",
+}
 
 # ─────────────────────────────────────────────────────────────────────────────
 # PromptBuilder

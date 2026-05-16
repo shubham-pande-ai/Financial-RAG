@@ -300,7 +300,7 @@ class SynthesisPipeline:
         # Step 1 — decompose query into atoms
         try:
             decomposer = self._get_decomposer()
-            atoms: List[AtomicNeed] = decomposer.decompose(query)
+            atoms: List[AtomicNeed] = decomposer.decompose(query, symbol=symbol)
 
             # Override symbol on all atoms if we have one from chunks
             if symbol:
@@ -457,6 +457,14 @@ class SynthesisPipeline:
             warnings      = warnings + ["Using rag_engine legacy prompts"],
         )
 
+PATCH_DESCRIPTION = {
+    "file":   "synthesis/pipeline.py",
+    "line":   303,
+    "before": "atoms: List[AtomicNeed] = decomposer.decompose(query)",
+    "after":  "atoms: List[AtomicNeed] = decomposer.decompose(query, symbol=symbol)",
+    "reason": "Symbol was never passed to decomposer so SQL atoms had symbol=None "
+              "and the bridge returned 0 rows (wrong/no company filter).",
+}
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Internal helpers

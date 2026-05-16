@@ -15,3 +15,4 @@ chromadb>=0.5.0
 
 # ── Utilities ──────────────────────────────────
 numpy>=1.24.0
+optimum[onnxruntime] onnxruntime #use python -m pip install "optimum[onnxruntime]" to get the right version of onnxruntime for your system

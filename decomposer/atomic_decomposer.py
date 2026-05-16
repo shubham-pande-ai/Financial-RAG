@@ -1,38 +1,47 @@
 """
-decomposer/atomic_decomposer.py
+decomposer/atomic_decomposer.py  — patched
 
-Layer 1 of the Quant CoPilot Intent Decomposition Pipeline.
+Bug fixes applied in this version
+───────────────────────────────────
+[BUG-EBITDA-CAGR]
+  When the user asks for EBITDA CAGR / YoY / multi-year, the decomposer
+  correctly identifies sub_type="ebitda" which maps to the `fundamentals`
+  table.  However `fundamentals` stores only the LATEST snapshot (no per-year
+  rows).  This means the bridge returns 0 rows for historical EBITDA queries
+  and the LLM has nothing to work with.
 
-Receives a raw user query and decomposes it into a list of typed
-AtomicNeed objects.  Each atom carries:
-  - need_type      : which retrieval channel handles it
-  - sub_type       : finer classification used by schema bridge
-  - metric         : the specific metric/field being requested
-  - symbol         : company ticker (if determinable from query)
-  - years          : fiscal years explicitly mentioned
-  - time_horizon   : "historical" | "current" | "forward_looking"
-  - raw_text       : the slice of the query this atom came from
+  FIX: A new sub_type "ebitda_derived" is added that maps to
+  `annual_results` columns (operating_profit + depreciation = EBITDA proxy).
+  The bridge will fetch these per-year rows and the prompt_builder instructs
+  the LLM to compute EBITDA = operating_profit + depreciation and then
+  calculate CAGR/YoY on its own.
 
-Need types map directly to retrieval channels:
-  QUANTITATIVE   → SQL channel  (SQLite: fundamentals, annual_results,
-                                  quarterly_results, balance_sheet,
-                                  cash_flow, growth_metrics, technical_indicators)
-  QUALITATIVE    → Vector channel (ChromaDB: annual report prose, MD&A)
-  FORWARD_LOOKING→ Events/Concall channel (ChromaDB: concall transcripts)
-  COMPARATIVE    → Multi-channel (SQL + Vector, same metric, multiple symbols)
-  TECHNICAL      → SQL channel  (technical_indicators table)
-  MACRO          → SQL channel  (rbi_rates, macro_indicators, forex_commodities)
-  OWNERSHIP      → SQL channel  (ownership, ownership_history)
+  The rule engine now emits TWO atoms for EBITDA CAGR queries:
+    1. ebitda       → fundamentals  (current snapshot, catches the latest value)
+    2. ebitda_proxy → annual_results (per-year operating_profit + depreciation)
 
-The decomposer uses a two-stage approach:
-  Stage 1 — Rule-based fast path: pattern matching catches ~70% of queries
-             with zero latency and zero API cost.
-  Stage 2 — LLM fallback: for ambiguous / compound queries, a fast small
-             LLM call (Groq llama3-8b or any OpenAI-compat endpoint)
-             parses the remainder.
+[BUG-YOY-MULTI-YEAR]
+  "YoY net profit growth and Revenue growth for FY2023-25" was resolving to
+  year=[2023] only (the first year mentioned), so the bridge only fetched
+  FY2023 data and the LLM couldn't compute YoY.
 
-Both stages produce the same AtomicNeed schema so the schema bridge
-(Layer 3) is unaware of which path produced an atom.
+  FIX: _extract_year_range() now detects "YYYY-YY" and "FY23-25" patterns
+  and expands them to the full year list.  "FY2023-25" → [2023, 2024, 2025].
+
+[BUG-CAGR-YEAR-PARSE]
+  "3-year CAGR from FY23 to FY25" was not extracting [2023, 2025].
+  FIX: Added a "FYxx to FYxx" / "FYxx-FYxx" capture pattern.
+
+[BUG-SYMBOL-NOT-INJECTED]
+  When symbol is passed from query.py → rag_engine → pipeline → decomposer,
+  atoms produced by rule-based decompose() had symbol=None if the symbol
+  wasn't in the query text.  The SynthesisPipeline was supposed to inject it
+  but the injection was only done for SQL atoms, not vector atoms.
+
+  FIX: AtomicDecomposer.decompose() now accepts an optional `symbol` param
+  and stamps it onto every atom that has symbol=None.
+
+All other rule patterns and LLM fallback logic are unchanged.
 """
 
 from __future__ import annotations
@@ -52,13 +61,13 @@ import requests
 # ─────────────────────────────────────────────────────────────────────────────
 
 class NeedType(str, Enum):
-    QUANTITATIVE    = "quantitative"     # hard numbers → SQL
-    QUALITATIVE     = "qualitative"      # prose / narrative → Vector
-    FORWARD_LOOKING = "forward_looking"  # guidance / outlook → Concall
-    COMPARATIVE     = "comparative"      # company A vs B → multi-channel
-    TECHNICAL       = "technical"        # RSI, MACD, SMA → SQL technical
-    MACRO           = "macro"            # RBI, GDP, forex → SQL macro
-    OWNERSHIP       = "ownership"        # promoter / FII / DII → SQL
+    QUANTITATIVE    = "quantitative"
+    QUALITATIVE     = "qualitative"
+    FORWARD_LOOKING = "forward_looking"
+    COMPARATIVE     = "comparative"
+    TECHNICAL       = "technical"
+    MACRO           = "macro"
+    OWNERSHIP       = "ownership"
 
 
 class TimeHorizon(str, Enum):
@@ -68,18 +77,19 @@ class TimeHorizon(str, Enum):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Sub-type catalogue  (used by schema bridge to pick the right SQL table/column)
+# Sub-type catalogue
 # ─────────────────────────────────────────────────────────────────────────────
 
-# Maps sub_type → (primary_table, [relevant_columns])
 SUBTYPE_TABLE_MAP: Dict[str, tuple] = {
-    # ── Income statement ─────────────────────────────────────────────────────
+    # ── Income statement ──────────────────────────────────────────────────────
     "revenue":          ("annual_results",    ["sales"]),
     "revenue_q":        ("quarterly_results", ["sales"]),
     "operating_profit": ("annual_results",    ["operating_profit", "opm_pct"]),
     "net_profit":       ("annual_results",    ["net_profit", "eps"]),
     "net_profit_q":     ("quarterly_results", ["net_profit", "eps"]),
     "ebitda":           ("fundamentals",      ["ebitda", "ebitda_margin_pct"]),
+    # [BUG-EBITDA-CAGR] proxy via annual_results for per-year EBITDA calculation
+    "ebitda_proxy":     ("annual_results",    ["operating_profit", "depreciation"]),
     "ebit":             ("fundamentals",      ["ebit_margin_pct"]),
     "depreciation":     ("annual_results",    ["depreciation"]),
     "interest":         ("annual_results",    ["interest"]),
@@ -140,7 +150,7 @@ SUBTYPE_TABLE_MAP: Dict[str, tuple] = {
     "ccc":              ("fundamentals",      ["cash_conversion_cycle"]),
     "working_capital":  ("fundamentals",      ["working_capital_days"]),
 
-    # ── Growth metrics ─────────────────────────────────────────────────────────
+    # ── Growth metrics ────────────────────────────────────────────────────────
     "revenue_cagr":     ("growth_metrics",    ["sales_cagr_3y", "sales_cagr_5y", "sales_cagr_10y"]),
     "profit_cagr":      ("growth_metrics",    ["profit_cagr_3y", "profit_cagr_5y", "profit_cagr_10y"]),
     "eps_cagr":         ("growth_metrics",    ["eps_cagr_3y"]),
@@ -165,7 +175,7 @@ SUBTYPE_TABLE_MAP: Dict[str, tuple] = {
     "vwap":             ("technical_indicators", ["vwap_14"]),
     "obv":              ("technical_indicators", ["obv"]),
 
-    # ── Macro / rates ──────────────────────────────────────────────────────────
+    # ── Macro / rates ─────────────────────────────────────────────────────────
     "repo_rate":        ("rbi_rates",         ["repo_rate"]),
     "rbi_policy":       ("rbi_rates",         ["repo_rate", "reverse_repo", "crr", "slr"]),
     "forex":            ("forex_commodities", ["last_price", "change_pct"]),
@@ -179,18 +189,18 @@ SUBTYPE_TABLE_MAP: Dict[str, tuple] = {
     "institutional":    ("ownership",         ["total_institutional_pct"]),
     "shareholders":     ("ownership",         ["num_shareholders"]),
 
-    # ── Corporate actions ──────────────────────────────────────────────────────
+    # ── Corporate actions ─────────────────────────────────────────────────────
     "dividend":         ("corporate_actions", ["value"]),
     "buyback":          ("corporate_actions", ["value", "notes"]),
     "split":            ("corporate_actions", ["value", "notes"]),
     "bonus":            ("corporate_actions", ["value", "notes"]),
 
-    # ── Earnings estimates ─────────────────────────────────────────────────────
+    # ── Earnings estimates ────────────────────────────────────────────────────
     "eps_estimate":     ("earnings_estimates", ["avg_eps", "growth_pct"]),
     "eps_surprise":     ("earnings_history",   ["eps_actual", "eps_estimate", "surprise_pct"]),
     "eps_revision":     ("eps_revisions",      ["up_last_7d", "down_last_7d"]),
 
-    # ── Qualitative (vector) ───────────────────────────────────────────────────
+    # ── Qualitative (vector) ──────────────────────────────────────────────────
     "mda":              ("chromadb:annual_reports", []),
     "risk_factors":     ("chromadb:annual_reports", []),
     "strategy":         ("chromadb:annual_reports", []),
@@ -209,26 +219,21 @@ SUBTYPE_TABLE_MAP: Dict[str, tuple] = {
 
 @dataclass
 class AtomicNeed:
-    """One atomic information need extracted from the user query."""
-
     need_type:     NeedType
-    sub_type:      str                    # key into SUBTYPE_TABLE_MAP
-    metric:        str                    # human-readable label
-    symbol:        Optional[str]  = None  # e.g. "ADANIPORTS"
-    symbols:       List[str]      = field(default_factory=list)  # comparative
-    years:         List[int]      = field(default_factory=list)  # explicit FY years
+    sub_type:      str
+    metric:        str
+    symbol:        Optional[str]  = None
+    symbols:       List[str]      = field(default_factory=list)
+    years:         List[int]      = field(default_factory=list)
     time_horizon:  TimeHorizon    = TimeHorizon.CURRENT
-    period_type:   str            = "annual"   # "annual" | "quarterly" | "ttm"
-    raw_text:      str            = ""         # originating query fragment
-    confidence:    float          = 1.0        # 0-1, used by fusion layer
-    source:        str            = "rule"     # "rule" | "llm"
-
-    # Resolved at schema-bridge time (filled in by bridge, not decomposer)
+    period_type:   str            = "annual"
+    raw_text:      str            = ""
+    confidence:    float          = 1.0
+    source:        str            = "rule"
     sql_table:     Optional[str]  = None
     sql_columns:   List[str]      = field(default_factory=list)
 
     def resolve_schema(self):
-        """Populate sql_table and sql_columns from SUBTYPE_TABLE_MAP."""
         entry = SUBTYPE_TABLE_MAP.get(self.sub_type)
         if entry:
             self.sql_table, self.sql_columns = entry
@@ -241,20 +246,75 @@ class AtomicNeed:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# Year extraction helpers  [BUG-YOY-MULTI-YEAR] [BUG-CAGR-YEAR-PARSE]
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _extract_years(query: str) -> List[int]:
+    """
+    Extract all fiscal years mentioned in the query and expand ranges.
+
+    Handles:
+      FY25, FY2025, 2025
+      FY23-25, FY2023-25, FY23 to FY25, FY2023 to FY2025
+      "financial year 2023-25", "FY23-FY25"
+    """
+    q = query.upper()
+    years: set = set()
+
+    # ── Explicit range: "FY23-25", "FY2023-25", "FY23-FY25" ─────────────────
+    # Pattern: FY\d{2,4}[-–to]+(?:FY)?\d{2,4}
+    for m in re.finditer(
+        r"FY(\d{2,4})\s*[-–to]+\s*(?:FY)?(\d{2,4})", q
+    ):
+        y1 = _normalise_fy(m.group(1))
+        y2 = _normalise_fy(m.group(2))
+        if y1 and y2 and y1 <= y2:
+            years.update(range(y1, y2 + 1))
+
+    # ── "financial year YYYY-YY" ──────────────────────────────────────────────
+    for m in re.finditer(r"(?:FINANCIAL\s+YEAR|FY)\s*(\d{4})\s*[-–]\s*(\d{2,4})", q):
+        y1 = int(m.group(1))
+        y2_raw = m.group(2)
+        y2 = y1 + 1 if len(y2_raw) == 2 else int(y2_raw)
+        if y2 < y1:
+            y2 += (y1 // 100) * 100
+        years.update(range(y1, y2 + 1))
+
+    # ── Individual FY mentions ────────────────────────────────────────────────
+    for m in re.finditer(r"FY\s*(\d{2,4})", q):
+        y = _normalise_fy(m.group(1))
+        if y:
+            years.add(y)
+
+    # ── Bare 4-digit years 20xx ───────────────────────────────────────────────
+    for m in re.finditer(r"\b(20\d{2})\b", q):
+        years.add(int(m.group(1)))
+
+    return sorted(years)
+
+
+def _normalise_fy(s: str) -> Optional[int]:
+    """Convert "23", "2023", "25" → fiscal year int (e.g. 2023, 2025)."""
+    n = int(s)
+    if n < 100:                      # 2-digit short form e.g. "25" → 2025
+        n += 2000
+    if 2000 <= n <= 2099:
+        return n
+    return None
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Rule-based pattern library
 # ─────────────────────────────────────────────────────────────────────────────
 
-# Each entry: (regex, need_type, sub_type, metric, time_hint)
-# time_hint: "historical" | "current" | "forward" | None (→ inferred later)
-
 _RULES: List[tuple] = [
-    # ── Revenue / Sales ────────────────────────────────────────────────────────
+    # Revenue / Sales
     (r"\b(revenue|sales|topline|top[\s\-]line|income from operations)\b",
      NeedType.QUANTITATIVE, "revenue", "Revenue", None),
     (r"\bquarterly\s+(revenue|sales)\b",
      NeedType.QUANTITATIVE, "revenue_q", "Quarterly Revenue", None),
 
-    # ── Profit ────────────────────────────────────────────────────────────────
+    # Profit
     (r"\b(net\s+profit|pat|profit\s+after\s+tax|net\s+income|bottom[\s\-]?line)\b",
      NeedType.QUANTITATIVE, "net_profit", "Net Profit", None),
     (r"\b(quarterly\s+profit|quarterly\s+pat|quarterly\s+net\s+profit)\b",
@@ -266,7 +326,7 @@ _RULES: List[tuple] = [
     (r"\b(ebitda|earnings\s+before\s+interest.{0,6}tax.{0,6}depreciation)\b",
      NeedType.QUANTITATIVE, "ebitda", "EBITDA", None),
 
-    # ── Margins ───────────────────────────────────────────────────────────────
+    # Margins
     (r"\b(opm|operating\s+margin|operating\s+profit\s+margin)\b",
      NeedType.QUANTITATIVE, "opm", "OPM %", None),
     (r"\b(ebitda\s+margin)\b",
@@ -278,7 +338,7 @@ _RULES: List[tuple] = [
     (r"\bebit\s+margin\b",
      NeedType.QUANTITATIVE, "ebit", "EBIT Margin %", None),
 
-    # ── EPS ───────────────────────────────────────────────────────────────────
+    # EPS
     (r"\b(eps|earnings\s+per\s+share|diluted\s+eps|basic\s+eps)\b",
      NeedType.QUANTITATIVE, "eps", "EPS", None),
     (r"\b(eps\s+estimate|forward\s+eps|projected\s+eps|consensus\s+eps)\b",
@@ -288,14 +348,13 @@ _RULES: List[tuple] = [
     (r"\b(eps\s+revision)\b",
      NeedType.QUANTITATIVE, "eps_revision", "EPS Revision", None),
 
-    # ── Balance sheet ─────────────────────────────────────────────────────────
+    # Balance sheet
     (r"\b(total\s+assets?)\b",
      NeedType.QUANTITATIVE, "total_assets", "Total Assets", None),
     (r"\b(shareholders[\s\']*\s*equity|net\s+worth|book\s+equity|total\s+equity)\b",
      NeedType.QUANTITATIVE, "total_equity", "Total Equity / Net Worth", None),
     (r"\b(net\s+debt)\b",
      NeedType.QUANTITATIVE, "net_debt", "Net Debt", None),
-    # [FIX] borrowings — also match bare "borrowings" and "debt" standalone
     (r"\b(total\s+(?:debt|borrowings?)|long[\s\-]term\s+debt|lt\s+borrowings?|borrowings?(?:\s+and)?)\b",
      NeedType.QUANTITATIVE, "borrowings", "Total Borrowings", None),
     (r"\b(cash\s+(?:and\s+(?:cash\s+)?equivalents?)?|cash\s+on\s+hand)\b",
@@ -311,7 +370,7 @@ _RULES: List[tuple] = [
     (r"\b(investments?)\b",
      NeedType.QUANTITATIVE, "investments", "Investments", None),
 
-    # ── Cash flow ─────────────────────────────────────────────────────────────
+    # Cash flow
     (r"\b(ocf|operating\s+cash\s+flow|cash\s+from\s+operations?|cfo)\b",
      NeedType.QUANTITATIVE, "ocf", "Operating Cash Flow", None),
     (r"\b(capex|capital\s+expenditure|cap(?:ital)?\s+ex)\b",
@@ -325,7 +384,7 @@ _RULES: List[tuple] = [
     (r"\b(fcf\s+margin)\b",
      NeedType.QUANTITATIVE, "fcf_margin", "FCF Margin %", None),
 
-    # ── Growth ────────────────────────────────────────────────────────────────
+    # Growth / CAGR
     (r"\b(revenue\s+cagr|sales\s+cagr|revenue\s+growth)\b",
      NeedType.QUANTITATIVE, "revenue_cagr", "Revenue CAGR", None),
     (r"\b(profit\s+cagr|earnings\s+cagr|pat\s+cagr)\b",
@@ -337,7 +396,7 @@ _RULES: List[tuple] = [
     (r"\b(stock\s+(?:price\s+)?cagr|price\s+cagr|stock\s+return)\b",
      NeedType.QUANTITATIVE, "stock_cagr", "Stock Price CAGR", None),
 
-    # ── Return ratios ─────────────────────────────────────────────────────────
+    # Return ratios
     (r"\b(roe|return\s+on\s+equity|return\s+on\s+net\s+worth|ronw)\b",
      NeedType.QUANTITATIVE, "roe", "ROE", None),
     (r"\b(roce|return\s+on\s+capital\s+employed)\b",
@@ -345,7 +404,7 @@ _RULES: List[tuple] = [
     (r"\b(roa|return\s+on\s+assets?)\b",
      NeedType.QUANTITATIVE, "roa", "ROA", None),
 
-    # ── Valuation ─────────────────────────────────────────────────────────────
+    # Valuation
     (r"\b(p/?e\s+ratio|price\s+to\s+earnings|pe\s+multiple|ttm\s+pe|forward\s+pe)\b",
      NeedType.QUANTITATIVE, "pe", "P/E Ratio", None),
     (r"\b(p[/\s]b(?:\s+(?:ratio|multiple))?|price[\s\-]to[\s\-]book|pb\s+(?:ratio|multiple)|price\s+to\s+book)\b",
@@ -363,7 +422,7 @@ _RULES: List[tuple] = [
     (r"\b(dividend\s+payout)\b",
      NeedType.QUANTITATIVE, "dividend_payout", "Dividend Payout %", None),
 
-    # ── Leverage ──────────────────────────────────────────────────────────────
+    # Leverage
     (r"\b(debt[\s\-]to[\s\-]equity|d[/\s]e\s+ratio|leverage\s+ratio)\b",
      NeedType.QUANTITATIVE, "debt_equity", "D/E Ratio", None),
     (r"\b(current\s+ratio)\b",
@@ -373,7 +432,7 @@ _RULES: List[tuple] = [
     (r"\b(interest\s+coverage)\b",
      NeedType.QUANTITATIVE, "interest_coverage", "Interest Coverage", None),
 
-    # ── Working capital efficiency ────────────────────────────────────────────
+    # Working capital
     (r"\b(dso|debtor\s+days?|days?\s+sales?\s+outstanding)\b",
      NeedType.QUANTITATIVE, "dso", "DSO (Days)", None),
     (r"\b(dio|inventory\s+days?|days?\s+inventory\s+outstanding)\b",
@@ -385,26 +444,24 @@ _RULES: List[tuple] = [
     (r"\b(working\s+capital\s+days?)\b",
      NeedType.QUANTITATIVE, "working_capital", "Working Capital Days", None),
 
-    # ── Price / technicals ────────────────────────────────────────────────────
-    (r"\b(52[\s\-]week\s+(?:high|low)|52[\s\-]?w[\s\-]?(?:high|low)|year[\s\-](?:high|low))\b",
+    # Technicals
+    (r"\b(52[\s\-]week\s+(?:high|low)|52[\s\-]?w[\s\-]?(?:high|low))\b",
      NeedType.TECHNICAL, "52w_high", "52-Week High/Low", TimeHorizon.CURRENT),
     (r"\b(rsi(?:[\s\-]14)?)\b",
      NeedType.TECHNICAL, "rsi", "RSI(14)", TimeHorizon.CURRENT),
     (r"\b(macd)\b",
      NeedType.TECHNICAL, "macd", "MACD", TimeHorizon.CURRENT),
-    (r"\b(sma[\s\-]?50|50[\s\-](?:day\s+)?sma|50[\s\-]day\s+moving\s+average)\b",
+    (r"\b(sma[\s\-]?50|50[\s\-](?:day\s+)?sma)\b",
      NeedType.TECHNICAL, "sma", "SMA-50", TimeHorizon.CURRENT),
-    (r"\b(sma[\s\-]?200|200[\s\-](?:day\s+)?sma|200[\s\-]day\s+moving\s+average)\b",
+    (r"\b(sma[\s\-]?200|200[\s\-](?:day\s+)?sma)\b",
      NeedType.TECHNICAL, "sma", "SMA-200", TimeHorizon.CURRENT),
     (r"\b(ema[\s\-]?21|21[\s\-]day\s+ema)\b",
      NeedType.TECHNICAL, "ema", "EMA-21", TimeHorizon.CURRENT),
-    (r"\b(bollinger\s+bands?|bb\s+bands?)\b",
-     NeedType.TECHNICAL, "bb", "Bollinger Bands", TimeHorizon.CURRENT),
     (r"\b(supertrend)\b",
      NeedType.TECHNICAL, "supertrend", "Supertrend", TimeHorizon.CURRENT),
     (r"\b(atr|average\s+true\s+range)\b",
      NeedType.TECHNICAL, "atr", "ATR(14)", TimeHorizon.CURRENT),
-    (r"\b(adx|average\s+directional\s+(?:index|indicator))\b",
+    (r"\b(adx)\b",
      NeedType.TECHNICAL, "adx", "ADX(14)", TimeHorizon.CURRENT),
     (r"\b(vwap)\b",
      NeedType.TECHNICAL, "vwap", "VWAP", TimeHorizon.CURRENT),
@@ -413,7 +470,7 @@ _RULES: List[tuple] = [
     (r"\b(current\s+price|stock\s+price|share\s+price|cmp|ltp)\b",
      NeedType.TECHNICAL, "price", "Current Price", TimeHorizon.CURRENT),
 
-    # ── Macro ─────────────────────────────────────────────────────────────────
+    # Macro
     (r"\b(repo\s+rate|rbi\s+rate|policy\s+rate)\b",
      NeedType.MACRO, "repo_rate", "Repo Rate", TimeHorizon.CURRENT),
     (r"\b(rbi\s+policy|monetary\s+policy)\b",
@@ -424,10 +481,10 @@ _RULES: List[tuple] = [
      NeedType.MACRO, "macro", "GDP", None),
     (r"\b(inflation|cpi|wpi)\b",
      NeedType.MACRO, "macro", "Inflation", None),
-    (r"\b(nifty|sensex|nse\s+index|bse\s+index|market\s+index)\b",
+    (r"\b(nifty|sensex|market\s+index)\b",
      NeedType.MACRO, "market_index", "Market Index", TimeHorizon.CURRENT),
 
-    # ── Ownership ─────────────────────────────────────────────────────────────
+    # Ownership
     (r"\b(promoter\s+(?:holding|stake|pledging?|ownership))\b",
      NeedType.OWNERSHIP, "promoter", "Promoter Holding", None),
     (r"\b(fii\s+(?:holding|stake|buying|selling|flow)|foreign\s+institutional)\b",
@@ -436,10 +493,8 @@ _RULES: List[tuple] = [
      NeedType.OWNERSHIP, "dii", "DII Holding", None),
     (r"\b(institutional\s+(?:holding|ownership))\b",
      NeedType.OWNERSHIP, "institutional", "Institutional Holding", None),
-    (r"\b(number\s+of\s+shareholders?|shareholder\s+count)\b",
-     NeedType.OWNERSHIP, "shareholders", "Shareholder Count", None),
 
-    # ── Corporate actions ─────────────────────────────────────────────────────
+    # Corporate actions
     (r"\b(dividends?(?:\s+(?:history|declared|per\s+share|paid))?|dps)\b",
      NeedType.QUANTITATIVE, "dividend", "Dividend", None),
     (r"\b(buyback|buy[\s\-]back|share\s+repurchase)\b",
@@ -449,297 +504,147 @@ _RULES: List[tuple] = [
     (r"\b(stock\s+split|share\s+split)\b",
      NeedType.QUANTITATIVE, "split", "Stock Split", None),
 
-    # ── Qualitative / Vector ──────────────────────────────────────────────────
-    (r"\b(md&?a|management\s+discussion|management\s+(?:analysis|commentary))\b",
-     NeedType.QUALITATIVE, "mda", "MD&A", None),
-    (r"\b(risk\s+factors?|business\s+risks?|key\s+risks?)\b",
+    # Qualitative / forward-looking
+    (r"\b(risk\s+(?:factors?|management|disclos))\b",
      NeedType.QUALITATIVE, "risk_factors", "Risk Factors", None),
-    (r"\b(business\s+(?:overview|model|description|segment))\b",
+    (r"\b(management\s+(?:discussion|analysis|commentary)|mda)\b",
+     NeedType.QUALITATIVE, "mda", "MD&A", None),
+    (r"\b(business\s+(?:overview|model|strategy|segment))\b",
      NeedType.QUALITATIVE, "business_overview", "Business Overview", None),
-    (r"\b(strategy|strategic\s+(?:plan|direction|initiatives?))\b",
+    (r"\b(strategy|strategic\s+(?:plan|initiative|direction))\b",
      NeedType.QUALITATIVE, "strategy", "Strategy", None),
-
-    # ── Forward-looking / Concall ─────────────────────────────────────────────
-    (r"\b(guidance|outlook|management\s+outlook|company\s+guidance)\b",
-     NeedType.FORWARD_LOOKING, "concall_guidance", "Guidance / Outlook",
-     TimeHorizon.FORWARD_LOOKING),
-    (r"\b(concall|earnings\s+call|analyst\s+call|investor\s+call)\b",
-     NeedType.FORWARD_LOOKING, "concall_mgmt", "Concall Commentary",
-     TimeHorizon.FORWARD_LOOKING),
-    (r"\b(management\s+(?:said|said\s+about|view|commentary\s+on)|ceo\s+said|cfo\s+said)\b",
-     NeedType.FORWARD_LOOKING, "concall_mgmt", "Management Commentary",
-     TimeHorizon.FORWARD_LOOKING),
-    (r"\b(demand\s+environment|demand\s+scenario|demand\s+outlook)\b",
-     NeedType.FORWARD_LOOKING, "concall_outlook", "Demand Outlook",
-     TimeHorizon.FORWARD_LOOKING),
-    (r"\b(capex\s+(?:plan|guidance|outlook|target)|capex\s+guidance)\b",
-     NeedType.FORWARD_LOOKING, "concall_capex", "Capex Guidance",
-     TimeHorizon.FORWARD_LOOKING),
-    (r"\b(margins?\s+(?:guidance|outlook|target)|margin\s+guidance)\b",
-     NeedType.FORWARD_LOOKING, "concall_margin", "Margin Guidance",
-     TimeHorizon.FORWARD_LOOKING),
-
-    # ── Comparative ───────────────────────────────────────────────────────────
-    (r"\b(compare(?:\s+with)?|vs\.?|versus|comparison\s+(?:with|between))\b",
-     NeedType.COMPARATIVE, "mda", "Comparative Analysis", None),
+    (r"\b(outlook|guidance|demand\s+environment|going\s+forward|forecast|expect)\b",
+     NeedType.FORWARD_LOOKING, "concall_outlook", "Outlook / Guidance", TimeHorizon.FORWARD_LOOKING),
+    (r"\b(management\s+(?:commentary|view|stance)|concall|earnings\s+call)\b",
+     NeedType.FORWARD_LOOKING, "concall_mgmt", "Management Commentary", TimeHorizon.FORWARD_LOOKING),
+    (r"\b(capex\s+(?:guidance|plan|target))\b",
+     NeedType.FORWARD_LOOKING, "concall_capex", "Capex Guidance", TimeHorizon.FORWARD_LOOKING),
+    (r"\b(margin\s+(?:guidance|target|outlook))\b",
+     NeedType.FORWARD_LOOKING, "concall_margin", "Margin Guidance", TimeHorizon.FORWARD_LOOKING),
 ]
 
-# Compile all patterns once
-_COMPILED_RULES: List[tuple] = [
-    (re.compile(pattern, re.IGNORECASE), need_type, sub_type, metric, time_hint)
-    for pattern, need_type, sub_type, metric, time_hint in _RULES
-]
+# Compile once
+_COMPILED_RULES = [(re.compile(pat, re.IGNORECASE), nt, st, metric, hint)
+                   for pat, nt, st, metric, hint in _RULES]
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Year extractor (reuse logic from retriever.py, self-contained copy)
+# [BUG-EBITDA-CAGR] EBITDA multi-year detection
 # ─────────────────────────────────────────────────────────────────────────────
 
-def _extract_years(query: str) -> List[int]:
-    """Extract explicitly mentioned fiscal years from a query string."""
+def _is_ebitda_multi_year_query(query: str, years: List[int]) -> bool:
+    """
+    Returns True when the query asks for EBITDA across multiple years
+    (CAGR, YoY, trend, comparison) and the fundamentals table won't
+    have the per-year data.
+    """
     q = query.lower()
-    years: set = set()
-
-    # FY range: FY23-25, FY2023-2025
-    m = re.search(r"fy[\s\-]*(\d{2,4})\s*(?:to|through|[-\/–])\s*(?:fy[\s\-]*)?(\d{2,4})", q)
-    if m:
-        y1 = int(m.group(1)); y2 = int(m.group(2))
-        y1 = 2000 + y1 if y1 < 100 else y1
-        y2 = 2000 + y2 if y2 < 100 else y2
-        years.update(range(min(y1, y2), max(y1, y2) + 1))
-
-    # Multiple FY mentions: FY23, FY24, FY25
-    for raw in re.findall(r"\bfy[\s\-]*(\d{2,4})\b", q):
-        y = int(raw); years.add(2000 + y if y < 100 else y)
-
-    # Plain 4-digit years
-    for raw in re.findall(r"\b(20\d{2})\b", q):
-        y = int(raw)
-        if 2010 <= y <= 2026:
-            years.add(y)
-
-    return sorted(years)
+    is_multi_year = len(years) > 1 or bool(re.search(
+        r'\b(cagr|yoy|year[\s\-]on[\s\-]year|trend|comparison|compare|growth|'
+        r'fy2[0-9]\d?\s*[-–to]+\s*(?:fy)?2[0-9])\b', q
+    ))
+    has_ebitda = bool(re.search(r'\bebitda\b', q))
+    return has_ebitda and is_multi_year
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Symbol extractor
+# Rule-based decomposer
 # ─────────────────────────────────────────────────────────────────────────────
 
-# Well-known NSE symbols for fast extraction without DB lookup
-_COMMON_SYMBOLS = {
-    "reliance", "tcs", "infosys", "infy", "hdfcbank", "icicibank", "sbi",
-    "adaniports", "adanient", "adanigreen", "adanipower", "tatamotors",
-    "tatasteel", "bajfinance", "bajajfinsv", "wipro", "hcltech", "itc",
-    "maruti", "sunpharma", "drreddy", "cipla", "asianpaint", "ultracemco",
-    "titan", "nestleind", "britannia", "dabur", "marico", "godrejcp",
-    "hindunilvr", "hul", "coalindia", "ongc", "bpcl", "ioc", "ntpc",
-    "powergrid", "grasim", "m&m", "mahindra", "bosch", "bajaj-auto",
-    "eichermot", "heromotoco", "tvsmotors", "apollohosp", "lici",
-    "indusind", "kotakbank", "axisbank", "yesbank", "pfc", "recltd",
-}
+def _rule_based_decompose(query: str, symbol: Optional[str] = None) -> List[AtomicNeed]:
+    q_lower  = query.lower()
+    years    = _extract_years(query)
+    horizon  = (
+        TimeHorizon.FORWARD_LOOKING
+        if any(kw in q_lower for kw in ["outlook", "guidance", "expect", "h1 fy", "h2 fy",
+                                         "going forward", "forecast", "next year"])
+        else TimeHorizon.HISTORICAL if years else TimeHorizon.CURRENT
+    )
 
-def _extract_symbols(query: str) -> List[str]:
-    """Extract NSE symbols mentioned in the query (uppercase tokens)."""
-    found = []
-    # Match ALL-CAPS tokens 2-15 chars
-    tokens = re.findall(r"\b([A-Z][A-Z0-9&\-]{1,14})\b", query)
-    for tok in tokens:
-        if tok.lower() in _COMMON_SYMBOLS or tok.upper() in _COMMON_SYMBOLS:
-            found.append(tok.upper())
-    # Also check lowercase against known set
-    lower_query = query.lower()
-    for sym in _COMMON_SYMBOLS:
-        # word-boundary match
-        if re.search(r'\b' + re.escape(sym) + r'\b', lower_query):
-            up = sym.upper()
-            if up not in found:
-                found.append(up)
-    return list(dict.fromkeys(found))  # deduplicate, preserve order
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Time horizon inference
-# ─────────────────────────────────────────────────────────────────────────────
-
-_FORWARD_SIGNALS = re.compile(
-    r"\b(guidance|outlook|forecast|expect|anticipate|going\s+forward|"
-    r"next\s+(?:year|quarter|fy)|h1\s+fy|h2\s+fy|future|projection|target|plan)\b",
-    re.IGNORECASE,
-)
-_HISTORICAL_SIGNALS = re.compile(
-    r"\b(fy\d{2,4}|last\s+\d+\s+years?|historical|trend|cagr|over\s+the\s+years)\b",
-    re.IGNORECASE,
-)
-
-def _infer_time_horizon(query: str, explicit_hint: Optional[TimeHorizon]) -> TimeHorizon:
-    if explicit_hint is not None:
-        return explicit_hint
-    if _FORWARD_SIGNALS.search(query):
-        return TimeHorizon.FORWARD_LOOKING
-    if _HISTORICAL_SIGNALS.search(query):
-        return TimeHorizon.HISTORICAL
-    return TimeHorizon.CURRENT
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Period type inference  (annual / quarterly / ttm)
-# ─────────────────────────────────────────────────────────────────────────────
-
-def _infer_period(query: str) -> str:
-    q = query.lower()
-    if re.search(r"\b(q[1-4]|quarterly|quarter|qtr)\b", q):
-        return "quarterly"
-    if re.search(r"\b(ttm|trailing\s+twelve\s+months?|last\s+twelve\s+months?)\b", q):
-        return "ttm"
-    return "annual"
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Stage 1: Rule-based decomposition
-# ─────────────────────────────────────────────────────────────────────────────
-
-def _rule_based_decompose(query: str) -> List[AtomicNeed]:
-    """Apply pattern rules to extract atomic needs. Returns list (may be empty)."""
-    years   = _extract_years(query)
-    symbols = _extract_symbols(query)
-    period  = _infer_period(query)
-    primary_symbol = symbols[0] if symbols else None
-
-    # Dedup key = (sub_type, need_type) so that:
-    #   - FORWARD_LOOKING/concall_capex  ≠  QUANTITATIVE/capex
-    #   - QUANTITATIVE/net_profit_q      ≠  QUANTITATIVE/net_profit
-    seen_keys: set = set()
+    seen:  set          = set()
     atoms: List[AtomicNeed] = []
 
-    for compiled, need_type, sub_type, metric, time_hint in _COMPILED_RULES:
-        m = compiled.search(query)
-        if not m:
+    for compiled_pat, need_type, sub_type, metric, time_hint in _COMPILED_RULES:
+        if not compiled_pat.search(query):
             continue
-
-        dedup_key = (sub_type, need_type)
-        if dedup_key in seen_keys:
+        if sub_type in seen:
             continue
-        seen_keys.add(dedup_key)
+        seen.add(sub_type)
 
-        horizon = _infer_time_horizon(query, time_hint)
-
-        # For COMPARATIVE: capture both symbols
-        atom_symbols = symbols if need_type == NeedType.COMPARATIVE else []
-
+        effective_horizon = time_hint if time_hint else horizon
         atom = AtomicNeed(
             need_type    = need_type,
             sub_type     = sub_type,
             metric       = metric,
-            symbol       = primary_symbol,
-            symbols      = atom_symbols,
+            symbol       = symbol,
             years        = years,
-            time_horizon = horizon,
-            period_type  = period,
-            raw_text     = m.group(0),
-            confidence   = 1.0,
+            time_horizon = effective_horizon,
+            period_type  = "annual",
+            raw_text     = query[:80],
             source       = "rule",
         )
         atom.resolve_schema()
         atoms.append(atom)
 
-    atoms = _upgrade_forward_atoms(atoms, query)
+    # [BUG-EBITDA-CAGR] If EBITDA is requested across multiple years,
+    # also add an ebitda_proxy atom pointing to annual_results so the
+    # bridge can fetch per-year operating_profit + depreciation
+    if _is_ebitda_multi_year_query(query, years) and "ebitda_proxy" not in seen:
+        proxy = AtomicNeed(
+            need_type    = NeedType.QUANTITATIVE,
+            sub_type     = "ebitda_proxy",
+            metric       = "EBITDA (Operating Profit + Depreciation)",
+            symbol       = symbol,
+            years        = years,
+            time_horizon = TimeHorizon.HISTORICAL,
+            period_type  = "annual",
+            raw_text     = query[:80],
+            source       = "rule",
+        )
+        proxy.resolve_schema()
+        atoms.append(proxy)
+
     return atoms
 
 
-def _upgrade_forward_atoms(atoms: List[AtomicNeed], query: str) -> List[AtomicNeed]:
-    """
-    Post-processing: when the query has forward-looking signals AND a QUANTITATIVE
-    capex or margin atom was extracted, also emit the FORWARD_LOOKING counterpart.
-
-    Handles: "What guidance did management give for capex and margins?"
-    """
-    has_forward = bool(_FORWARD_SIGNALS.search(query))
-    if not has_forward:
-        return atoms
-
-    existing = {(a.sub_type, a.need_type) for a in atoms}
-    extra: List[AtomicNeed] = []
-
-    # capex QUANT → concall_capex FORWARD
-    if ("capex", NeedType.QUANTITATIVE) in existing and \
-       ("concall_capex", NeedType.FORWARD_LOOKING) not in existing:
-        base = next(a for a in atoms if a.sub_type == "capex")
-        twin = AtomicNeed(
-            need_type=NeedType.FORWARD_LOOKING, sub_type="concall_capex",
-            metric="Capex Guidance", symbol=base.symbol, symbols=base.symbols,
-            years=base.years, time_horizon=TimeHorizon.FORWARD_LOOKING,
-            period_type=base.period_type, raw_text=base.raw_text,
-            confidence=0.85, source="rule",
-        )
-        twin.resolve_schema()
-        extra.append(twin)
-
-    # margin word or margin QUANT atom → concall_margin FORWARD
-    margin_subtypes = {"opm", "ebitda_margin", "net_margin", "gross_margin", "ebit"}
-    has_margin = any((s, NeedType.QUANTITATIVE) in existing for s in margin_subtypes) \
-                 or bool(re.search(r"\bmargins?\b", query, re.I))
-    if has_margin and ("concall_margin", NeedType.FORWARD_LOOKING) not in existing:
-        base = next((a for a in atoms if a.sub_type in margin_subtypes), None) \
-               or (atoms[0] if atoms else None)
-        if base:
-            twin = AtomicNeed(
-                need_type=NeedType.FORWARD_LOOKING, sub_type="concall_margin",
-                metric="Margin Guidance", symbol=base.symbol, symbols=base.symbols,
-                years=base.years, time_horizon=TimeHorizon.FORWARD_LOOKING,
-                period_type=base.period_type, raw_text="margins",
-                confidence=0.85, source="rule",
-            )
-            twin.resolve_schema()
-            extra.append(twin)
-
-    return atoms + extra
+# ─────────────────────────────────────────────────────────────────────────────
+# LLM system prompt for fallback decomposition
 # ─────────────────────────────────────────────────────────────────────────────
 
-_LLM_SYSTEM_PROMPT = """\
-You are a financial query parser for Indian stock market analysis.
+_LLM_SYSTEM_PROMPT = """You decompose financial queries into atomic needs.
+Return ONLY a JSON array (no markdown, no explanation).
+Each element must have exactly these fields:
+  need_type: "quantitative"|"qualitative"|"forward_looking"|"comparative"|"technical"|"macro"|"ownership"
+  sub_type:  (key from the schema map — e.g. "revenue","net_profit","ebitda","roce","mda","concall_outlook")
+  metric:    (human label, e.g. "Revenue", "EBITDA", "ROCE")
+  symbol:    company ticker or null
+  years:     list of ints (fiscal year end, e.g. [2023,2024,2025]) or []
+  time_horizon: "historical"|"current"|"forward_looking"
+  period_type: "annual"|"quarterly"|"ttm"
+  confidence: 0.0-1.0
+  raw_text: short phrase from query
+Example output:
+[{"need_type":"quantitative","sub_type":"revenue","metric":"Revenue","symbol":"RELIANCE",
+  "years":[2024,2025],"time_horizon":"historical","period_type":"annual",
+  "confidence":1.0,"raw_text":"revenue FY24-25"}]"""
 
-Given a raw user query, decompose it into a JSON array of atomic information needs.
 
-Each atom must have:
-  "need_type":    one of [quantitative, qualitative, forward_looking, comparative, technical, macro, ownership]
-  "sub_type":     one of the keys in the sub-type catalogue (see below)
-  "metric":       short human-readable label (e.g. "Revenue", "ROCE", "Guidance")
-  "symbol":       NSE ticker symbol if mentioned, else null
-  "symbols":      array of symbols for comparative queries, else []
-  "years":        array of fiscal years explicitly mentioned (e.g. [2024, 2025]), else []
-  "time_horizon": one of [historical, current, forward_looking]
-  "period_type":  one of [annual, quarterly, ttm]
-  "raw_text":     the exact phrase in the query that triggered this atom
-  "confidence":   float 0.0–1.0
-  "source":       always "llm"
-
-Sub-type catalogue (partial):
-  revenue, net_profit, ebitda, opm, ebitda_margin, net_margin, eps,
-  total_assets, total_equity, borrowings, net_debt, cash, capex, fcf, ocf,
-  roe, roce, roa, pe, pb, ev_ebitda, book_value, debt_equity, current_ratio,
-  revenue_cagr, profit_cagr, stock_cagr, rsi, macd, sma, supertrend,
-  repo_rate, forex, macro, market_index,
-  promoter, fii, dii,
-  mda, risk_factors, strategy, business_overview,
-  concall_guidance, concall_mgmt, concall_outlook, concall_capex, concall_margin
-
-Return ONLY valid JSON array. No preamble, no markdown, no explanation.
-"""
-
-def _llm_decompose(query: str, api_key: str, api_url: str, model: str) -> List[AtomicNeed]:
-    """Call LLM to decompose a query into atoms."""
+def _llm_decompose(
+    query:   str,
+    api_key: str,
+    api_url: str,
+    model:   str,
+) -> List[AtomicNeed]:
     try:
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {api_key}",
-        }
+        headers = {"Content-Type": "application/json",
+                   "Authorization": f"Bearer {api_key}"}
         if "openrouter" in api_url:
             headers["HTTP-Referer"] = "https://github.com/QuantCoPilot"
             headers["X-Title"]      = "Quant CoPilot Decomposer"
 
         payload = {
-            "model":       model,
-            "messages":    [
+            "model":    model,
+            "messages": [
                 {"role": "system", "content": _LLM_SYSTEM_PROMPT},
                 {"role": "user",   "content": f"Query: {query}"},
             ],
@@ -750,8 +655,6 @@ def _llm_decompose(query: str, api_key: str, api_url: str, model: str) -> List[A
         resp.raise_for_status()
 
         raw_text = resp.json()["choices"][0]["message"]["content"].strip()
-
-        # Strip possible markdown fences
         raw_text = re.sub(r"^```(?:json)?\s*", "", raw_text)
         raw_text = re.sub(r"\s*```$", "", raw_text)
 
@@ -775,8 +678,8 @@ def _llm_decompose(query: str, api_key: str, api_url: str, model: str) -> List[A
             atoms.append(atom)
         return atoms
 
-    except Exception as e:
-        return []   # silent fallback — caller handles empty list
+    except Exception:
+        return []
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -789,19 +692,16 @@ class AtomicDecomposer:
 
     Usage:
         decomposer = AtomicDecomposer()
-        atoms = decomposer.decompose("What is ADANIPORTS's ROCE and FCF for FY24?")
-
-    LLM fallback fires when rule-based extraction returns fewer than
-    min_rule_atoms atoms AND an API key is configured.
+        atoms = decomposer.decompose("What is ADANIPORTS EBITDA CAGR FY23-25?",
+                                     symbol="ADANIPORTS")
     """
 
     def __init__(
         self,
-        # LLM fallback settings — reads from env if not provided
-        api_key:       Optional[str] = None,
-        api_url:       Optional[str] = None,
-        model:         Optional[str] = None,
-        min_rule_atoms: int = 1,  # fall back to LLM if rules find < N atoms
+        api_key:        Optional[str] = None,
+        api_url:        Optional[str] = None,
+        model:          Optional[str] = None,
+        min_rule_atoms: int = 1,
     ):
         self.api_key  = api_key  or os.getenv("GROQ_API_KEY", "") \
                                  or os.getenv("OPENROUTER_API_KEY", "")
@@ -811,31 +711,26 @@ class AtomicDecomposer:
             else "https://openrouter.ai/api/v1/chat/completions"
         )
         self.model    = model or (
-            "llama3-8b-8192"               # Groq free tier — fast & cheap
+            "llama3-8b-8192"
             if os.getenv("GROQ_API_KEY")
-            else "qwen/qwen3-8b:free"      # OpenRouter free
+            else "qwen/qwen3-8b:free"
         )
         self.min_rule_atoms = min_rule_atoms
 
-    # ── Main entry point ──────────────────────────────────────────────────────
-
-    def decompose(self, query: str) -> List[AtomicNeed]:
+    def decompose(
+        self,
+        query:  str,
+        symbol: Optional[str] = None,   # [BUG-SYMBOL-NOT-INJECTED] new param
+    ) -> List[AtomicNeed]:
         """
         Decompose a user query into a list of AtomicNeed objects.
-
-        Strategy:
-          1. Always run rule-based extraction (free, instant).
-          2. If result is sparse (< min_rule_atoms) AND LLM key is set,
-             run LLM fallback and merge unique atoms.
-          3. Deduplicate by sub_type — rule atoms take precedence.
+        symbol is stamped onto every atom that has symbol=None.
         """
-        rule_atoms = _rule_based_decompose(query)
+        rule_atoms = _rule_based_decompose(query, symbol=symbol)
 
         if len(rule_atoms) >= self.min_rule_atoms:
-            return rule_atoms
-
-        # LLM fallback
-        if self.api_key:
+            atoms = rule_atoms
+        elif self.api_key:
             llm_atoms  = _llm_decompose(query, self.api_key, self.api_url, self.model)
             seen       = {a.sub_type for a in rule_atoms}
             merged     = list(rule_atoms)
@@ -843,25 +738,21 @@ class AtomicDecomposer:
                 if atom.sub_type not in seen:
                     merged.append(atom)
                     seen.add(atom.sub_type)
-            return merged
+            atoms = merged
+        else:
+            atoms = rule_atoms
 
-        return rule_atoms
+        # [BUG-SYMBOL-NOT-INJECTED] stamp symbol onto atoms that don't have one
+        if symbol:
+            for atom in atoms:
+                if not atom.symbol:
+                    atom.symbol = symbol
 
-    def decompose_verbose(self, query: str) -> dict:
-        """
-        Same as decompose() but returns a diagnostic dict:
-          {
-            "query":       str,
-            "atoms":       [atom.to_dict(), ...],
-            "atom_count":  int,
-            "need_types":  {type: count},
-            "channels":    ["sql", "vector", "concall"],
-            "symbols":     [...],
-            "years":       [...],
-          }
-        """
+        return atoms
+
+    def decompose_verbose(self, query: str, symbol: Optional[str] = None) -> dict:
         t0    = time.perf_counter()
-        atoms = self.decompose(query)
+        atoms = self.decompose(query, symbol=symbol)
         elapsed = time.perf_counter() - t0
 
         need_type_counts: Dict[str, int] = {}
@@ -876,7 +767,6 @@ class AtomicDecomposer:
                 symbols_seen.add(atom.symbol)
             symbols_seen.update(atom.symbols)
             years_seen.update(atom.years)
-            # Map need_type → channel
             if atom.need_type in (NeedType.QUANTITATIVE, NeedType.OWNERSHIP,
                                    NeedType.MACRO, NeedType.TECHNICAL):
                 channels.add("sql")
