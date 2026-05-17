@@ -59,10 +59,13 @@ _MODEL_CTX: Dict[str, int] = {
     "gemini-2.0-flash":                200_000,
     "gemini-1.5-flash":                200_000,
     "gemini-1.5-pro":                  200_000,
-    "qwen/qwen3-30b-a3b:free":          30_000,
+    "qwen/qwen3-30b-a3b":               30_000,   # OR free tier (no :free suffix needed)
+    "qwen/qwen3-30b-a3b:free":          30_000,   # keep old key for compat
+    "qwen/qwen3-8b":                    30_000,
     "qwen/qwen3-8b:free":               30_000,
     "qwen/qwen2.5-72b-instruct:free":   30_000,
     "google/gemini-2.0-flash-001":     200_000,
+    "google/gemini-2.0-flash-exp:free":200_000,
     "anthropic/claude-3-haiku":         50_000,
     "meta/llama-3.3-70b-instruct":      50_000,
     "_ollama_default":                 100_000,
@@ -134,8 +137,8 @@ def build_provider_catalogue() -> List[ProviderEntry]:
     if or_key:
         cat.extend([
             ProviderEntry(
-                id="or-qwen30b", label="OpenRouter — Qwen3 30B MoE [FREE]",
-                provider="openrouter", model="qwen/qwen3-30b-a3b:free",
+                id="or-qwen30b", label="OpenRouter — Qwen3 30B A3B [FREE]",
+                provider="openrouter", model="qwen/qwen3-30b-a3b",
                 api_key=or_key, api_url=OPENROUTER_API_URL,
                 context_note="131k ctx, FREE",
             ),
@@ -147,13 +150,13 @@ def build_provider_catalogue() -> List[ProviderEntry]:
             ),
             ProviderEntry(
                 id="or-qwen8b", label="OpenRouter — Qwen3 8B [FREE]",
-                provider="openrouter", model="qwen/qwen3-8b:free",
+                provider="openrouter", model="qwen/qwen3-8b",
                 api_key=or_key, api_url=OPENROUTER_API_URL,
                 context_note="131k ctx, FREE",
             ),
             ProviderEntry(
                 id="or-gemini", label="OpenRouter — Gemini 2.0 Flash",
-                provider="openrouter", model="google/gemini-2.0-flash-001",
+                provider="openrouter", model="google/gemini-2.0-flash-exp:free",
                 api_key=or_key, api_url=OPENROUTER_API_URL,
                 context_note="1M ctx",
             ),
@@ -324,7 +327,7 @@ def _call_gemini(system_prompt: str, user_prompt: str,
         },
         headers={"Content-Type": "application/json"},
         params={"key": api_key},
-        timeout=90,
+        timeout=110,   # Gemini can be slow on first call after idle
     )
     resp.raise_for_status()
     data = resp.json()
@@ -353,25 +356,48 @@ def _call_openai_compat(system_prompt: str, user_prompt: str,
     if entry.api_key:
         headers["Authorization"] = f"Bearer {entry.api_key}"
     if "openrouter" in entry.api_url:
-        headers["HTTP-Referer"] = "https://github.com/Import-Saurabh/Financial-Rag"
-        headers["X-Title"]      = "Financial RAG"
+        # These headers are required by OpenRouter — missing them causes 403/429
+        headers["HTTP-Referer"] = "https://github.com/Import-Saurabh/FinancialRag"
+        headers["X-Title"]      = "FinancialRAG"
     messages = (
         [{"role": "user", "content": f"{system_prompt}\n\n---\n\n{user_prompt}"}]
         if merge else
         [{"role": "system", "content": system_prompt},
          {"role": "user",   "content": user_prompt}]
     )
+
+    # Per-provider timeouts so a single stall doesn't eat the whole 180s budget
+    if entry.provider == "groq":
+        call_timeout = 55          # Groq is fast; 55s is generous
+    elif entry.provider in ("openrouter", "nvidia"):
+        call_timeout = 90          # Free-tier models can be slow
+    else:
+        call_timeout = 75
+
+    payload = {
+        "model":       entry.model,
+        "messages":    messages,
+        "max_tokens":  GROQ_MAX_TOKENS,
+        "temperature": GROQ_TEMPERATURE,
+        "stream":      False,      # never stream — we need the full JSON response
+    }
+    # Qwen3 thinking/reasoning mode is ON by default; it adds 10-40s and extra
+    # tokens that blow the context budget — disable it for RAG queries.
+    if "qwen3" in entry.model.lower():
+        payload["thinking"] = {"type": "disabled"}
+
     resp = requests.post(
         entry.api_url,
-        json={
-            "model":       entry.model,
-            "messages":    messages,
-            "max_tokens":  GROQ_MAX_TOKENS,
-            "temperature": GROQ_TEMPERATURE,
-        },
+        json=payload,
         headers=headers,
-        timeout=120,
+        timeout=call_timeout,
     )
+    if not resp.ok:
+        # Surface the actual API error message (e.g. wrong model slug gives 404)
+        log.warning(
+            f"  [{entry.provider}] HTTP {resp.status_code} for {entry.model!r} — "
+            f"{resp.text[:400]}"
+        )
     resp.raise_for_status()
     return resp.json()
 
@@ -380,21 +406,53 @@ def _call_openai_compat(system_prompt: str, user_prompt: str,
 # Retry wrapper
 # ─────────────────────────────────────────────────────────────────────────────
 def _call_with_retry(system_prompt: str, user_prompt: str,
-                     entry: ProviderEntry, max_retries: int = 4) -> dict:
-    delays = [5, 15, 30, 60]; last_exc = None
+                     entry: ProviderEntry, max_retries: int = 3) -> dict:
+    """
+    Retry policy (revised):
+      • 429 (rate-limit)  → back off and retry (max 2 retries, short delays)
+      • 404/400/401/403   → fail immediately, no retry (bad key / wrong model)
+      • Timeout           → retry once with no delay (transient network blip)
+      • Any other error   → fail immediately
+    The old policy (4 retries × up to 60s sleep) could burn 110s in sleeps alone,
+    easily triggering the 180s client timeout before the LLM even responds.
+    """
+    # Short delays only for 429 — don't spend minutes waiting on a free-tier cap
+    rate_limit_delays = [10, 20]; last_exc = None
+    timeout_retries   = 1
+    timeouts_seen     = 0
+
     for attempt in range(max_retries):
         try:
             if entry.provider == "gemini":
                 return _call_gemini(system_prompt, user_prompt, entry.model, entry.api_key)
             return _call_openai_compat(system_prompt, user_prompt, entry)
+
+        except requests.exceptions.Timeout as e:
+            last_exc = e
+            timeouts_seen += 1
+            if timeouts_seen <= timeout_retries:
+                log.warning(
+                    f"  Timeout on {entry.model} (attempt {attempt+1}), retrying once..."
+                )
+                continue          # immediate retry — no sleep
+            raise                 # second timeout: give up on this provider
+
         except requests.HTTPError as e:
-            status = e.response.status_code; last_exc = e
-            if status == 429 and attempt < max_retries - 1:
-                wait = delays[attempt]
-                log.warning(f"  429 on {entry.model} (attempt {attempt+1}/{max_retries}), retry in {wait}s")
+            status   = e.response.status_code
+            last_exc = e
+            if status == 429 and attempt < len(rate_limit_delays):
+                wait = rate_limit_delays[attempt]
+                log.warning(
+                    f"  429 rate-limit on {entry.model} "
+                    f"(attempt {attempt+1}/{max_retries}), retry in {wait}s"
+                )
                 time.sleep(wait)
             else:
+                # 404 = wrong model slug, 401/403 = bad key, 5xx = server error
+                # None of these benefit from sleeping — fail fast so the caller
+                # can move to the next provider.
                 raise
+
     raise last_exc
 
 

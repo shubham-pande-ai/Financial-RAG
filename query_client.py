@@ -27,16 +27,16 @@ SERVER_URL = "http://localhost:8000"
 # ── Provider menu (mirrors rag_engine.py build_provider_catalogue) ────────────
 # Fetched dynamically from server so it stays in sync with rag_engine
 FALLBACK_PROVIDERS = [
-    {"id": "groq-llama",              "label": "Groq — llama-3.3-70b-versatile",           "note": "~5.5k tok (free cap)"},
-    {"id": "or-qwen30b",              "label": "OpenRouter — Qwen3 30B MoE [FREE]",         "note": "131k ctx, FREE"},
-    {"id": "or-qwen72b",              "label": "OpenRouter — Qwen2.5 72B Instruct [FREE]",  "note": "131k ctx, FREE"},
-    {"id": "or-qwen8b",               "label": "OpenRouter — Qwen3 8B [FREE]",              "note": "131k ctx, FREE"},
-    {"id": "or-gemini",               "label": "OpenRouter — Gemini 2.0 Flash",             "note": "1M ctx"},
-    {"id": "gemini",                  "label": "Google Gemini — gemini-2.0-flash",           "note": "1M ctx, 15 RPM free"},
-    {"id": "nvidia",                  "label": "NVIDIA NIM — llama-3.3-70b-instruct",        "note": "128k ctx"},
-    {"id": "ollama-llama3.1-latest",  "label": "Ollama local — llama3.1:latest",             "note": "4.9 GB, local"},
-    {"id": "ollama-phi3-latest",      "label": "Ollama local — phi3:latest",                 "note": "2.2 GB, local"},
-    {"id": "groq-gemma",              "label": "Groq — gemma2-9b-it [last resort]",          "note": "3.2k tok, tiny ctx"},
+    {"id": "groq-llama",              "label": "Groq — llama-3.3-70b-versatile",            "note": "~5.5k tok (free cap)"},
+    {"id": "or-qwen30b",              "label": "OpenRouter — Qwen3 30B A3B [FREE]",          "note": "131k ctx, FREE"},
+    {"id": "or-qwen72b",              "label": "OpenRouter — Qwen2.5 72B Instruct [FREE]",   "note": "131k ctx, FREE"},
+    {"id": "or-qwen8b",               "label": "OpenRouter — Qwen3 8B [FREE]",               "note": "131k ctx, FREE"},
+    {"id": "or-gemini",               "label": "OpenRouter — Gemini 2.0 Flash Exp [FREE]",   "note": "1M ctx, FREE"},
+    {"id": "gemini",                  "label": "Google Gemini — gemini-2.0-flash (direct)",  "note": "1M ctx, 15 RPM free"},
+    {"id": "nvidia",                  "label": "NVIDIA NIM — llama-3.3-70b-instruct",         "note": "128k ctx"},
+    {"id": "ollama-llama3.1-latest",  "label": "Ollama local — llama3.1:latest",              "note": "4.9 GB, local"},
+    {"id": "ollama-phi3-latest",      "label": "Ollama local — phi3:latest",                  "note": "2.2 GB, local"},
+    {"id": "groq-gemma",              "label": "Groq — gemma2-9b-it [last resort]",           "note": "3.2k tok, tiny ctx"},
 ]
 
 
@@ -131,13 +131,24 @@ def main():
 
     print("🔍 Retrieving and re-ranking...")
     try:
-        resp = requests.post(f"{SERVER_URL}/query", json=payload, timeout=180)
+        resp = requests.post(f"{SERVER_URL}/query", json=payload, timeout=175)
         resp.raise_for_status()
     except requests.exceptions.Timeout:
-        print("[error] Request timed out (>180s)")
+        print(
+            "\n[error] Client timed out waiting for server (>175s).\n"
+            "  The server is still processing — this is likely a slow/stalled LLM provider.\n"
+            "  Tips:\n"
+            "    • Use groq-llama (option 1) — fastest and most reliable\n"
+            "    • Use --auto to let the server try providers in order\n"
+            "    • Free OpenRouter models can queue for 60-120s under load\n"
+        )
         sys.exit(1)
     except requests.exceptions.HTTPError as e:
-        print(f"[error] Server error: {e}\n{resp.text}")
+        try:
+            detail = resp.json().get("detail", resp.text)
+        except Exception:
+            detail = resp.text
+        print(f"[error] Server returned HTTP {resp.status_code}:\n  {detail}")
         sys.exit(1)
 
     data = resp.json()

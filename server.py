@@ -140,17 +140,32 @@ class QueryResponse(BaseModel):
 # Query endpoint
 # ─────────────────────────────────────────────────────────────────────────────
 
+# Hard timeout for the whole pipeline (retrieval + reranking + LLM).
+# Must be shorter than the client's 180s so we return a clean 504 instead
+# of the client seeing a raw connection reset.
+_QUERY_TIMEOUT_SEC = 160
+
 @app.post("/query", response_model=QueryResponse)
 async def query_endpoint(req: QueryRequest):
     t0 = time.perf_counter()
     log.info(f"[server] Query: {req.query!r} | symbol={req.symbol} | provider={req.provider}")
 
     try:
-        loop = asyncio.get_event_loop()
-        result = await loop.run_in_executor(None, _run_query, req)
+        loop = asyncio.get_running_loop()
+        future = loop.run_in_executor(None, _run_query, req)
+        # asyncio.wait_for wraps the future so we can cancel it on timeout
+        result = await asyncio.wait_for(future, timeout=_QUERY_TIMEOUT_SEC)
         result["latency_sec"] = round(time.perf_counter() - t0, 2)
         log.info(f"[server] Done in {result['latency_sec']}s")
         return JSONResponse(content=result)
+    except asyncio.TimeoutError:
+        elapsed = round(time.perf_counter() - t0, 1)
+        msg = (
+            f"Query timed out after {elapsed}s (server limit {_QUERY_TIMEOUT_SEC}s). "
+            "Try a faster provider (groq-llama) or --auto."
+        )
+        log.error(f"[server] {msg}")
+        raise HTTPException(status_code=504, detail=msg)
     except Exception as e:
         log.error(f"[server] Query failed: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
