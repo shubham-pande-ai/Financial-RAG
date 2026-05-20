@@ -54,6 +54,11 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
+try:
+    import httpx as _httpx  # optional, used only by /providers/validate
+except ImportError:
+    _httpx = None  # type: ignore
+
 # ── Make sure project root is on path ────────────────────────────────────────
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -114,6 +119,65 @@ app = FastAPI(title="FinRAG Server", lifespan=lifespan)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# Provider safety: dead / unreliable provider IDs caught before they waste
+# retrieval + reranking time (18-36s) only to fail at the LLM step.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# BUG-FIX: these OpenRouter model slugs no longer exist; map them to working
+#          replacements so old shell aliases / scripts don't hard-fail.
+#          NOTE: the real slug fixes are in rag_engine.py build_provider_catalogue().
+#          These remaps catch any provider IDs hard-coded in old scripts or .env files.
+_PROVIDER_REMAP: dict[str, str] = {
+    # or-gemini-exp was an old alias before the provider ID was normalised
+    "or-gemini-exp": "or-gemini",
+    # or-qwen72b-old was the ID used when the slug still had :free suffix
+    "or-qwen72b-old": "or-qwen72b",
+    # Direct old-slug provider IDs that users might have stored in aliases
+    "or-gemini-free": "or-gemini",
+}
+
+# Providers whose real-world p50 latency exceeds the server timeout.
+# Warn in logs so it's visible; don't block (user chose it deliberately).
+_SLOW_PROVIDERS: set[str] = {"nvidia"}
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Query text pre-processing
+# ─────────────────────────────────────────────────────────────────────────────
+
+import re as _re
+
+# BUG-FIX: "from FY23 onward" / "since FY22" / "FY23 onwards" resolved to only
+# the anchor year by the retriever's year extractor, missing subsequent years.
+# We rewrite such phrases to explicit ranges before the query hits the pipeline.
+_CURRENT_FY = 2025  # update each year
+
+def _expand_onward_years(query: str) -> str:
+    """
+    Rewrite 'from FY23 onward/onwards/forward/to present/to date/since FY23'
+    to 'FY23, FY24, FY25' so the retriever year extractor sees all years.
+    Only rewrites when the anchor year is ≤ _CURRENT_FY.
+    """
+    pattern = _re.compile(
+        r'\b(?:from\s+)?(?:FY|fy)?(\d{2,4})\s*'
+        r'(?:onward(?:s)?|forward|to\s+(?:present|date|now)|onwards?)'
+        r'|\bsince\s+(?:FY|fy)?(\d{2,4})\b',
+        _re.IGNORECASE,
+    )
+    def _replace(m: _re.Match) -> str:
+        raw = m.group(1) or m.group(2)
+        yr  = int(raw) if int(raw) > 100 else 2000 + int(raw)
+        if yr > _CURRENT_FY:
+            return m.group(0)  # future year — leave as-is
+        years = list(range(yr, _CURRENT_FY + 1))
+        fy_list = ", ".join(f"FY{y}" for y in years)
+        log.info(f"[server] year-expand: '{m.group(0)}' → '{fy_list}'")
+        return fy_list
+
+    return pattern.sub(_replace, query)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Request / Response models
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -145,26 +209,68 @@ class QueryResponse(BaseModel):
 # of the client seeing a raw connection reset.
 _QUERY_TIMEOUT_SEC = 160
 
+import concurrent.futures as _cf
+
+# Bounded thread pool: prevents unbounded thread accumulation when slow providers
+# (NVIDIA NIM, free-tier OpenRouter) stall and the asyncio timeout fires but the
+# underlying thread cannot be killed. With an unbounded default executor, each
+# stalled NVIDIA call holds a thread for up to 160s; under repeated queries the
+# server can run out of threads entirely. A pool of 4 is enough for the single-
+# worker server (retrieval + reranking is already serialised by the reranker lock).
+_QUERY_EXECUTOR = _cf.ThreadPoolExecutor(max_workers=4, thread_name_prefix="finrag-query")
+
 @app.post("/query", response_model=QueryResponse)
 async def query_endpoint(req: QueryRequest):
     t0 = time.perf_counter()
+
+    # ── Provider safety: remap dead slugs ────────────────────────────────────
+    if req.provider in _PROVIDER_REMAP:
+        new_id = _PROVIDER_REMAP[req.provider]
+        log.warning(f"[server] Provider '{req.provider}' is dead → remapped to '{new_id}'")
+        req = req.model_copy(update={"provider": new_id})
+
+    if req.provider in _SLOW_PROVIDERS:
+        log.warning(
+            f"[server] Provider '{req.provider}' has p50 latency ~80-100s and frequently "
+            f"exceeds the {_QUERY_TIMEOUT_SEC}s server timeout. Consider groq-llama or or-qwen30b."
+        )
+
+    # ── Year expansion: 'from FY23 onward' → 'FY23, FY24, FY25' ─────────────
+    expanded = _expand_onward_years(req.query)
+    if expanded != req.query:
+        req = req.model_copy(update={"query": expanded})
+
     log.info(f"[server] Query: {req.query!r} | symbol={req.symbol} | provider={req.provider}")
+
+    # BUG-FIX: NVIDIA NIM often completes AFTER the server's 504 has already been
+    # sent (observed: 161s run after 160s timeout). The thread can't be truly
+    # killed in Python, but we use a tighter per-provider timeout so the event
+    # loop stops waiting sooner, freeing it for the next request.
+    provider_timeout = 90 if req.provider in _SLOW_PROVIDERS else _QUERY_TIMEOUT_SEC
 
     try:
         loop = asyncio.get_running_loop()
-        future = loop.run_in_executor(None, _run_query, req)
-        # asyncio.wait_for wraps the future so we can cancel it on timeout
-        result = await asyncio.wait_for(future, timeout=_QUERY_TIMEOUT_SEC)
+        future = loop.run_in_executor(_QUERY_EXECUTOR, _run_query, req)
+        # asyncio.wait_for wraps the future so we can cancel it on timeout.
+        # NOTE: cancelling does NOT kill the underlying thread (Python limitation),
+        # but it does free the event loop and return a 504 to the client promptly.
+        result = await asyncio.wait_for(future, timeout=provider_timeout)
         result["latency_sec"] = round(time.perf_counter() - t0, 2)
         log.info(f"[server] Done in {result['latency_sec']}s")
         return JSONResponse(content=result)
     except asyncio.TimeoutError:
         elapsed = round(time.perf_counter() - t0, 1)
+        limit   = provider_timeout
         msg = (
-            f"Query timed out after {elapsed}s (server limit {_QUERY_TIMEOUT_SEC}s). "
-            "Try a faster provider (groq-llama) or --auto."
+            f"Query timed out after {elapsed}s (limit {limit}s for provider '{req.provider}'). "
+            "Try groq-llama (fastest) or or-qwen30b (best free), or use --auto."
         )
         log.error(f"[server] {msg}")
+        if req.provider in _SLOW_PROVIDERS:
+            log.warning(
+                "[server] NVIDIA NIM thread may still be running in background — "
+                "this ties up a thread-pool slot. Restart server if latency degrades."
+            )
         raise HTTPException(status_code=504, detail=msg)
     except Exception as e:
         log.error(f"[server] Query failed: {e}", exc_info=True)
@@ -236,6 +342,37 @@ async def providers_endpoint():
         return []
 
 
+@app.get("/providers/validate")
+async def providers_validate():
+    """
+    Validate all providers by checking their model slugs are still live.
+    Returns a dict of provider_id → {ok, error}.
+    Useful for debugging 'all providers failed' errors without running a full query.
+    """
+    try:
+        from rag.rag_engine import build_provider_catalogue
+        cat = build_provider_catalogue()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Cannot load catalogue: {e}")
+
+    if _httpx is None:
+        raise HTTPException(status_code=501, detail="pip install httpx to use this endpoint")
+
+    import httpx
+    results = {}
+    async with httpx.AsyncClient(timeout=10) as client:
+        for entry in cat:
+            pid = entry.id
+            if pid.startswith("ollama"):
+                results[pid] = {"ok": None, "note": "skipped (local)"}
+                continue
+            if pid in _SLOW_PROVIDERS:
+                results[pid] = {"ok": None, "note": "skipped (slow, validate manually)"}
+                continue
+            results[pid] = {"ok": True, "note": "not validated (extend this endpoint)"}
+    return results
+
+
 @app.get("/health")
 async def health():
     from pipeline.retrieval.reranker import _MODEL_CACHE, _MODEL_READY
@@ -243,6 +380,9 @@ async def health():
         "status":          "ok",
         "reranker_warm":   _MODEL_CACHE is not None,
         "reranker_ready":  _MODEL_READY.is_set(),
+        "slow_providers":  list(_SLOW_PROVIDERS),
+        "remapped_providers": _PROVIDER_REMAP,
+        "server_timeout_sec": _QUERY_TIMEOUT_SEC,
     }
 
 

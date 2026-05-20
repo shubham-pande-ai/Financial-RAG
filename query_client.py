@@ -27,15 +27,25 @@ SERVER_URL = "http://localhost:8000"
 # ── Provider menu (mirrors rag_engine.py build_provider_catalogue) ────────────
 # Fetched dynamically from server so it stays in sync with rag_engine
 FALLBACK_PROVIDERS = [
-    {"id": "groq-llama",              "label": "Groq — llama-3.3-70b-versatile",            "note": "~5.5k tok (free cap)"},
-    {"id": "or-qwen30b",              "label": "OpenRouter — Qwen3 30B A3B [FREE]",          "note": "131k ctx, FREE"},
+    # ── Fast / recommended ────────────────────────────────────────────────────
+    {"id": "groq-llama",              "label": "Groq — llama-3.3-70b-versatile ★ FASTEST",   "note": "~5.5k tok (free)"},
+    {"id": "or-qwen30b",              "label": "OpenRouter — Qwen3 30B A3B [FREE] ★ BEST",   "note": "131k ctx, FREE"},
+    # ── OpenRouter free tier ──────────────────────────────────────────────────
+    # BUG-FIX: or-qwen72b slug corrected to 'qwen/qwen2.5-72b-instruct' (no :free suffix).
     {"id": "or-qwen72b",              "label": "OpenRouter — Qwen2.5 72B Instruct [FREE]",   "note": "131k ctx, FREE"},
     {"id": "or-qwen8b",               "label": "OpenRouter — Qwen3 8B [FREE]",               "note": "131k ctx, FREE"},
-    {"id": "or-gemini",               "label": "OpenRouter — Gemini 2.0 Flash Exp [FREE]",   "note": "1M ctx, FREE"},
-    {"id": "gemini",                  "label": "Google Gemini — gemini-2.0-flash (direct)",  "note": "1M ctx, 15 RPM free"},
-    {"id": "nvidia",                  "label": "NVIDIA NIM — llama-3.3-70b-instruct",         "note": "128k ctx"},
+    # BUG-FIX: or-gemini slug corrected to 'google/gemini-2.0-flash-001'.
+    # Old slug 'google/gemini-2.0-flash-exp:free' was removed by OpenRouter (HTTP 404).
+    {"id": "or-gemini",               "label": "OpenRouter — Gemini 2.0 Flash [FREE]",       "note": "1M ctx, FREE"},
+    # ── Direct APIs ───────────────────────────────────────────────────────────
+    {"id": "gemini",                  "label": "Google Gemini — gemini-2.0-flash (direct)",  "note": "1M ctx, 15 RPM"},
+    # BUG-FIX: NVIDIA NIM is unreliable — p50 latency ~80-100s, frequent timeouts
+    #          at 160s server limit. Use only as fallback, not for interactive use.
+    {"id": "nvidia",                  "label": "NVIDIA NIM — llama-3.3-70b ⚠ SLOW (~90s)",  "note": "128k ctx, slow"},
+    # ── Local Ollama ──────────────────────────────────────────────────────────
     {"id": "ollama-llama3.1-latest",  "label": "Ollama local — llama3.1:latest",              "note": "4.9 GB, local"},
     {"id": "ollama-phi3-latest",      "label": "Ollama local — phi3:latest",                  "note": "2.2 GB, local"},
+    # ── Last resort ───────────────────────────────────────────────────────────
     {"id": "groq-gemma",              "label": "Groq — gemma2-9b-it [last resort]",           "note": "3.2k tok, tiny ctx"},
 ]
 
@@ -70,7 +80,8 @@ def pick_provider(providers) -> str:
         print(f"│ {i:<3}│ {label}│ {note}│")
     print(bot)
     print()
-    print("  💡 Tip: use or-qwen30b for best results (free, 131k ctx)")
+    print("  💡 Tip: groq-llama = fastest (2s LLM) | or-qwen30b = best quality (free, 131k ctx)")
+    print("         ⚠  Avoid NVIDIA NIM for interactive use — frequently times out at 160s")
     print("         use --auto flag to skip this menu")
     print()
 

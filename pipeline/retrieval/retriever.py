@@ -269,8 +269,14 @@ def parse_year_intent(query: str) -> Tuple[List[int], List[int]]:
     all_fy = re.findall(r"\bfy[\s\-]*(\d{2,4})\b", q)
     if len(all_fy) > 1:
         years = sorted({_normalise_fy(y) for y in all_fy})
+        # BUG-FIX: only auto-fill gaps when ALL intermediate years are implied,
+        # i.e. the mentions form a contiguous run (e.g. FY23, FY24, FY25).
+        # For non-contiguous sets like "FY23 and FY25" do NOT insert FY24 —
+        # that retrieves data the user never asked for and pollutes explicit_years.
         if years[-1] - years[0] == len(years) - 1:
-            years = list(range(years[0], years[-1] + 1))
+            # already contiguous — leave as-is
+            pass
+        # Non-contiguous: keep the exact set; do NOT expand
         return years, years
 
     # ── 3. Single FY mention ─────────────────────────────────────────────
@@ -409,10 +415,13 @@ def _run_annual_query(query: str, symbol: Optional[str],
 
     results = []
     for cid, text, meta, fs, vs, bs in zip(ids, docs, metas, fused, vscore, bscore):
-        # NOTE: recency_boost is intentionally NOT applied here.
-        # Applied post-rerank in reranker.py [BUG FIX C].
+        # BUG-FIX: recency_boost was declared but never applied anywhere.
+        # The comment "applied post-rerank in reranker.py" was wrong —
+        # reranker.py has no boost logic. Apply it here on the fused score
+        # so recent years are meaningfully preferred at equal semantic similarity.
+        boost = recency_boost(meta.get("year", 0))
         results.append(RetrievedChunk(
-            chunk_id=cid, text=text, score=fs,
+            chunk_id=cid, text=text, score=fs + boost,
             vector_score=vs, bm25_score=bs, metadata=meta,
         ))
 
