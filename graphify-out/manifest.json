@@ -3,17 +3,29 @@
     "mtime": 1777273739.4768798,
     "hash": "289e2838ad657eb5c99916d1ef642442"
   },
+  "C:\\Users\\hp\\Downloads\\FinRag\\latency_optimizer.py": {
+    "mtime": 1778919068.591284,
+    "hash": "48b80c5116a3ef54fb28ddc7593359f5"
+  },
   "C:\\Users\\hp\\Downloads\\FinRag\\query.py": {
-    "mtime": 1778171864.0307474,
-    "hash": "72ac2ecfcfdae21348fad6a402cd023e"
+    "mtime": 1778839499.3694222,
+    "hash": "ad23ab07a3030df0ec67d362d81fa2df"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\query_client.py": {
+    "mtime": 1779286792.8391287,
+    "hash": "81a2e03d7830f5065a76cc1a98f0b8fc"
   },
   "C:\\Users\\hp\\Downloads\\FinRag\\screener_downloader.py": {
     "mtime": 1776957786.1739545,
     "hash": "783d17f5db11a24b7419610e2947033a"
   },
+  "C:\\Users\\hp\\Downloads\\FinRag\\server.py": {
+    "mtime": 1779286987.7938025,
+    "hash": "a3b2f4d485da0eded4067f3f98e1380a"
+  },
   "C:\\Users\\hp\\Downloads\\FinRag\\config\\settings.py": {
-    "mtime": 1777444253.1199012,
-    "hash": "cbfadd08c1d0dd42d27b28b4bb35a77e"
+    "mtime": 1778737786.0883577,
+    "hash": "15623fcb76d35f62a261bdded7dae0c3"
   },
   "C:\\Users\\hp\\Downloads\\FinRag\\config\\__init__.py": {
     "mtime": 1777273966.1459556,
@@ -28,8 +40,8 @@
     "hash": "a4293a401df6568f4e9060de273785ac"
   },
   "C:\\Users\\hp\\Downloads\\FinRag\\decomposer\\atomic_decomposer.py": {
-    "mtime": 1778662331.7254837,
-    "hash": "1a712de03579b37ea8c309502bd642ef"
+    "mtime": 1778918500.4383116,
+    "hash": "120b6d4071906a2b565954fad6d4a117"
   },
   "C:\\Users\\hp\\Downloads\\FinRag\\decomposer\\test_decomposer.py": {
     "mtime": 1778662371.2295952,
@@ -38,6 +50,22 @@
   "C:\\Users\\hp\\Downloads\\FinRag\\decomposer\\__init__.py": {
     "mtime": 1778662483.2067008,
     "hash": "be720f7ae4fd33467833f0f2e85235a3"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\eval\\eval_suite.py": {
+    "mtime": 1778956436.9965398,
+    "hash": "ff5f5f587aabd08b5f0938c64ba4bc09"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\fusion\\fusion_layer.py": {
+    "mtime": 1778835616.5156753,
+    "hash": "1db4c8fb61e36021199c2fba9a8e099e"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\fusion\\test_fusion_layer.py": {
+    "mtime": 1778835889.188545,
+    "hash": "319f88c154e774ced72090f575ca8a58"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\fusion\\__init__.py": {
+    "mtime": 1778739149.8237226,
+    "hash": "25031dbf5599f6e15048523da7c54b83"
   },
   "C:\\Users\\hp\\Downloads\\FinRag\\pipeline\\extract\\pdf_extractor.py": {
     "mtime": 1777315435.2239764,
@@ -68,36 +96,60 @@
     "hash": "fd6dfd54510d4303c565a3fbf49a1515"
   },
   "C:\\Users\\hp\\Downloads\\FinRag\\pipeline\\retrieval\\reranker.py": {
-    "mtime": 1777444241.9002485,
-    "hash": "78c89bd229b818fa1191fe89ef73a81f"
+    "mtime": 1778958698.4860392,
+    "hash": "23cba592a5b0d8dd9e1369cefde3de65"
   },
   "C:\\Users\\hp\\Downloads\\FinRag\\pipeline\\retrieval\\retriever.py": {
-    "mtime": 1777459292.8384342,
-    "hash": "003b21b04a9e0e8c7066be2f3be61dcb"
+    "mtime": 1779286894.5962536,
+    "hash": "d1e7fe766e71d13b202b973423e9ae78"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\pipeline\\retrieval\\semantic_cache.py": {
+    "mtime": 1778941399.8158581,
+    "hash": "6999e726e96c6477163e4316c6f80eac"
   },
   "C:\\Users\\hp\\Downloads\\FinRag\\pipeline\\retrieval\\__init__.py": {
     "mtime": 1777380516.5068216,
     "hash": "8a5919f63fb4c9ca478a194032432f11"
   },
   "C:\\Users\\hp\\Downloads\\FinRag\\rag\\rag_engine.py": {
-    "mtime": 1777459307.9492407,
-    "hash": "a34d3077d27cbceae433708d750da1a9"
+    "mtime": 1779015098.313593,
+    "hash": "c0fda0d3c311cc3646fcda6e8e4b17ff"
   },
   "C:\\Users\\hp\\Downloads\\FinRag\\rag\\__init__.py": {
     "mtime": 1777280143.3362348,
     "hash": "7b444a388898cc05516e35b1943bfdaf"
   },
   "C:\\Users\\hp\\Downloads\\FinRag\\schema_bridge\\schema_bridge.py": {
-    "mtime": 1778675437.230812,
-    "hash": "52a569c28fa82a7011582a80891834bf"
+    "mtime": 1778737808.3275232,
+    "hash": "206ef146c9bdc823a504ee15cc7f9670"
   },
   "C:\\Users\\hp\\Downloads\\FinRag\\schema_bridge\\test_schema_bridge.py": {
-    "mtime": 1778675463.340479,
-    "hash": "9908593a19c443a8849a9cdce6e1a779"
+    "mtime": 1778737825.13008,
+    "hash": "c959617a940b267610939b8653c52c9c"
   },
   "C:\\Users\\hp\\Downloads\\FinRag\\schema_bridge\\__init__.py": {
     "mtime": 1778675491.3129046,
     "hash": "a53ddc20d6ae90c6aa3c4cfab9e812ec"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\synthesis\\pipeline.py": {
+    "mtime": 1778918980.0472653,
+    "hash": "9513807e51a9efa0f594caf00fdeec97"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\synthesis\\prompt_builder.py": {
+    "mtime": 1778918709.559021,
+    "hash": "1b0d90d10857c1aac194d5099046e31e"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\synthesis\\test_pipeline.py": {
+    "mtime": 1778857772.0499313,
+    "hash": "07cf03aa593fef07ff2116633bd913b7"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\synthesis\\__init__.py": {
+    "mtime": 1778839163.834198,
+    "hash": "c9fb7c781bcee2bab0e38881fcd0a0fa"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\tools\\quantize_reranker.py": {
+    "mtime": 1778957692.043372,
+    "hash": "c3b07ddd2483291ee9eb1803187ffad5"
   },
   "C:\\Users\\hp\\Downloads\\FinRag\\utils\\logger.py": {
     "mtime": 1777273528.0202153,
@@ -112,8 +164,12 @@
     "hash": "bd13a82620214b69526e4c52b4199600"
   },
   "C:\\Users\\hp\\Downloads\\FinRag\\Requirements.txt": {
-    "mtime": 1777200382.5962403,
-    "hash": "f081867aa4719df8c6305702c4ac6288"
+    "mtime": 1779208669.3262303,
+    "hash": "e376cfb0f263571d013d66adec6b366b"
+  },
+  "C:\\Users\\hp\\Downloads\\FinRag\\bug_reports\\BUG_REPORT.md": {
+    "mtime": 1778922630.2107377,
+    "hash": "c60fe2b454b39c30ae0d3f644a83d917"
   },
   "C:\\Users\\hp\\Downloads\\FinRag\\data\\raw\\screener_docs\\ADANIPORTS\\annual_report\\2012\\2012_Financial Year 2012 from bse.pdf": {
     "mtime": 1777016426.8060603,
