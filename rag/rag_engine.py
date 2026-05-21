@@ -27,8 +27,8 @@ trimmer, RAGResponse) is exactly as before.
 
 import os
 import time
-from typing import List, Optional, Dict
-from dataclasses import dataclass
+from typing import List, Optional, Dict, Tuple
+from dataclasses import dataclass, field
 
 import requests
 
@@ -42,6 +42,12 @@ from utils.logger import get_logger
 log = get_logger(__name__)
 
 # ─────────────────────────────────────────────────────────────────────────────
+# Validation result cache  (populated by validate_provider / validate_all)
+# ─────────────────────────────────────────────────────────────────────────────
+_HEALTHY_PROVIDERS: List["ProviderEntry"] = []
+_VALIDATION_TS: float = 0.0
+
+# ─────────────────────────────────────────────────────────────────────────────
 # API endpoints
 # ─────────────────────────────────────────────────────────────────────────────
 GROQ_API_URL       = "https://api.groq.com/openai/v1/chat/completions"
@@ -53,22 +59,40 @@ GEMINI_API_URL     = "https://generativelanguage.googleapis.com/v1beta/models/{m
 # Context window budgets (tokens)
 # ─────────────────────────────────────────────────────────────────────────────
 _MODEL_CTX: Dict[str, int] = {
-    "llama-3.3-70b-versatile":           5_500,
-    "gemma2-9b-it":                      3_200,
-    "llama3-8b-8192":                    6_000,
-    "gemini-2.0-flash":                200_000,
-    "gemini-1.5-flash":                200_000,
-    "gemini-1.5-pro":                  200_000,
-    "qwen/qwen3-30b-a3b":               30_000,   # OR free tier (no :free suffix needed)
-    "qwen/qwen3-30b-a3b:free":          30_000,   # keep old key for compat
-    "qwen/qwen3-8b":                    30_000,
-    "qwen/qwen3-8b:free":               30_000,
-    "qwen/qwen2.5-72b-instruct:free":   30_000,
-    "google/gemini-2.0-flash-001":     200_000,
-    "google/gemini-2.0-flash-exp:free":200_000,
-    "anthropic/claude-3-haiku":         50_000,
-    "meta/llama-3.3-70b-instruct":      50_000,
-    "_ollama_default":                 100_000,
+    # ── Groq ─────────────────────────────────────────────────────────────────
+    "llama-3.3-70b-versatile":                    5_500,
+    "llama-3.1-8b-instant":                       6_000,
+    "llama3-8b-8192":                             6_000,
+    "gemma2-9b-it":                               3_200,   # kept for compat only
+    # ── Gemini (direct) ───────────────────────────────────────────────────────
+    "gemini-2.0-flash":                         200_000,
+    "gemini-2.0-flash-lite":                    200_000,
+    "gemini-1.5-flash":                         200_000,
+    "gemini-1.5-pro":                           200_000,
+    # ── OpenRouter — Qwen3 (current, no :free needed for catalogue) ───────────
+    "qwen/qwen3-30b-a3b":                        30_000,
+    "qwen/qwen3-30b-a3b:free":                   30_000,   # compat
+    "qwen/qwen3-8b":                             30_000,
+    "qwen/qwen3-8b:free":                        30_000,   # compat
+    "qwen/qwen2.5-72b-instruct":                 30_000,
+    # ── OpenRouter — Gemini ────────────────────────────────────────────────────
+    "google/gemini-2.0-flash-001":              200_000,   # fixed slug
+    "google/gemini-2.5-flash-preview":          200_000,
+    # ── OpenRouter — Meta Llama (free) ────────────────────────────────────────
+    "meta-llama/llama-3.3-70b-instruct:free":    30_000,
+    "meta-llama/llama-3.1-8b-instruct:free":     30_000,
+    # ── OpenRouter — Mistral (free) ───────────────────────────────────────────
+    "mistralai/mistral-7b-instruct:free":        30_000,
+    # ── OpenRouter — DeepSeek (free) ─────────────────────────────────────────
+    "deepseek/deepseek-r1:free":                 30_000,
+    "deepseek/deepseek-chat-v3-0324:free":       30_000,
+    # ── OpenRouter — Claude via OR (paid — needs key with credits) ────────────
+    "anthropic/claude-3-haiku":                  50_000,
+    "anthropic/claude-3.5-haiku":               100_000,
+    # ── NVIDIA NIM ────────────────────────────────────────────────────────────
+    "meta/llama-3.3-70b-instruct":               50_000,
+    # ── Ollama fallback ───────────────────────────────────────────────────────
+    "_ollama_default":                          100_000,
 }
 _DEFAULT_CTX             = 12_000
 _CHARS_PER_TOKEN: float  = 3.5
@@ -118,50 +142,94 @@ def _discover_ollama(base_url: str) -> List[ProviderEntry]:
 # Provider catalogue
 # ─────────────────────────────────────────────────────────────────────────────
 def build_provider_catalogue() -> List[ProviderEntry]:
+    """
+    Build the full catalogue of configured providers.
+
+    Model slug correctness (as of 2025-06):
+      - OpenRouter free models use   model_slug:free   OR no suffix (both work
+        if the model has a free tier).  We use the explicit :free suffix only
+        when required by OR to avoid routing to paid variants.
+      - Dead slugs removed:
+          google/gemini-2.0-flash-exp:free  → google/gemini-2.0-flash-001
+          qwen/qwen2.5-72b-instruct:free   → qwen/qwen2.5-72b-instruct  (no :free)
+          gemma2-9b-it (Groq)              → replaced by llama-3.1-8b-instant
+    """
     cat: List[ProviderEntry] = []
 
-    groq_key   = GROQ_API_KEY or os.getenv("GROQ_API_KEY", "")
-    gemini_key = os.getenv("GEMINI_API_KEY", "")
-    or_key     = os.getenv("OPENROUTER_API_KEY", "")
-    nv_key     = os.getenv("NVIDIA_API_KEY", "")
-    ollama_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+    groq_key      = GROQ_API_KEY or os.getenv("GROQ_API_KEY", "")
+    gemini_key    = os.getenv("GEMINI_API_KEY", "")
+    or_key        = os.getenv("OPENROUTER_API_KEY", "")
+    nv_key        = os.getenv("NVIDIA_API_KEY", "")
+    anthropic_key = os.getenv("ANTHROPIC_API_KEY", "")
+    ollama_url    = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 
+    # ── Groq (fast, free tier, limited context) ───────────────────────────────
     if groq_key:
         cat.append(ProviderEntry(
-            id="groq-llama", label="Groq — llama-3.3-70b-versatile",
+            id="groq-llama", label="Groq — llama-3.3-70b-versatile ★ FASTEST",
             provider="groq", model=GROQ_MODEL,
             api_key=groq_key, api_url=GROQ_API_URL,
             context_note="~5.5k tok (free cap)",
         ))
+        cat.append(ProviderEntry(
+            id="groq-llama-8b", label="Groq — llama-3.1-8b-instant (fast fallback)",
+            provider="groq", model="llama-3.1-8b-instant",
+            api_key=groq_key, api_url=GROQ_API_URL,
+            context_note="6k tok, fastest",
+        ))
 
+    # ── OpenRouter free-tier models (verified working slugs) ─────────────────
+        # ── OpenRouter free-tier models (verified working slugs as of 2026-05) ──
     if or_key:
         cat.extend([
             ProviderEntry(
-                id="or-qwen30b", label="OpenRouter — Qwen3 30B A3B [FREE]",
-                provider="openrouter", model="qwen/qwen3-30b-a3b",
+                id="or-gemini", label="OpenRouter — Gemini 2.0 Flash [FREE]",
+                provider="openrouter", model="google/gemini-2.0-flash-001",
+                api_key=or_key, api_url=OPENROUTER_API_URL,
+                context_note="1M ctx, FREE",
+            ),
+            ProviderEntry(
+                id="or-llama70b", label="OpenRouter — Llama 3.3 70B Instruct [FREE]",
+                provider="openrouter", model="meta-llama/llama-3.3-70b-instruct:free",
                 api_key=or_key, api_url=OPENROUTER_API_URL,
                 context_note="131k ctx, FREE",
             ),
+
+        ])
+        # Claude via OpenRouter (paid)
+        cat.extend([
             ProviderEntry(
-                id="or-qwen72b", label="OpenRouter — Qwen2.5 72B Instruct [FREE]",
-                provider="openrouter", model="qwen/qwen2.5-72b-instruct:free",
+                id="or-claude-haiku", label="OpenRouter — Claude 3.5 Haiku (via OR, paid)",
+                provider="openrouter", model="anthropic/claude-3.5-haiku",
                 api_key=or_key, api_url=OPENROUTER_API_URL,
-                context_note="131k ctx, FREE",
+                context_note="100k ctx, paid",
             ),
             ProviderEntry(
-                id="or-qwen8b", label="OpenRouter — Qwen3 8B [FREE]",
-                provider="openrouter", model="qwen/qwen3-8b",
+                id="or-claude-haiku-3", label="OpenRouter — Claude 3 Haiku (via OR, paid)",
+                provider="openrouter", model="anthropic/claude-3-haiku",
                 api_key=or_key, api_url=OPENROUTER_API_URL,
-                context_note="131k ctx, FREE",
-            ),
-            ProviderEntry(
-                id="or-gemini", label="OpenRouter — Gemini 2.0 Flash",
-                provider="openrouter", model="google/gemini-2.0-flash-exp:free",
-                api_key=or_key, api_url=OPENROUTER_API_URL,
-                context_note="1M ctx",
+                context_note="50k ctx, paid",
             ),
         ])
 
+    # ── Claude direct API (Anthropic) ─────────────────────────────────────────
+    if anthropic_key:
+        cat.extend([
+            ProviderEntry(
+                id="claude-haiku", label="Claude 3.5 Haiku (Anthropic direct)",
+                provider="anthropic", model="claude-3-5-haiku-20241022",
+                api_key=anthropic_key, api_url="https://api.anthropic.com/v1/messages",
+                context_note="200k ctx, fast",
+            ),
+            ProviderEntry(
+                id="claude-sonnet", label="Claude 3.5 Sonnet (Anthropic direct)",
+                provider="anthropic", model="claude-3-5-sonnet-20241022",
+                api_key=anthropic_key, api_url="https://api.anthropic.com/v1/messages",
+                context_note="200k ctx, best",
+            ),
+        ])
+
+    # ── Gemini direct API ─────────────────────────────────────────────────────
     if gemini_key:
         cat.append(ProviderEntry(
             id="gemini", label="Google Gemini — gemini-2.0-flash (direct API)",
@@ -169,40 +237,230 @@ def build_provider_catalogue() -> List[ProviderEntry]:
             api_key=gemini_key, api_url=GEMINI_API_URL,
             context_note="1M ctx, 15 RPM free",
         ))
+        cat.append(ProviderEntry(
+            id="gemini-lite", label="Google Gemini — gemini-2.0-flash-lite (direct API)",
+            provider="gemini", model="gemini-2.0-flash-lite",
+            api_key=gemini_key, api_url=GEMINI_API_URL,
+            context_note="1M ctx, faster",
+        ))
 
+    # ── NVIDIA NIM (slow — warn users) ───────────────────────────────────────
     if nv_key:
         cat.append(ProviderEntry(
-            id="nvidia", label="NVIDIA NIM — llama-3.3-70b-instruct",
+            id="nvidia", label="NVIDIA NIM — llama-3.3-70b-instruct ⚠ SLOW (~90s)",
             provider="nvidia", model="meta/llama-3.3-70b-instruct",
             api_key=nv_key, api_url=NVIDIA_API_URL,
-            context_note="128k ctx",
+            context_note="128k ctx, slow",
         ))
 
+    # ── Local Ollama (autodiscovered) ─────────────────────────────────────────
     cat.extend(_discover_ollama(ollama_url))
-
-    if groq_key:
-        cat.append(ProviderEntry(
-            id="groq-gemma", label="Groq — gemma2-9b-it [last resort]",
-            provider="groq", model=GROQ_FALLBACK_MODEL,
-            api_key=groq_key, api_url=GROQ_API_URL,
-            context_note="3.2k tok, tiny ctx",
-        ))
 
     return cat
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Interactive provider picker
+# Claude direct API call  (Anthropic Messages API — not OpenAI-compatible)
+# ─────────────────────────────────────────────────────────────────────────────
+def _call_anthropic(system_prompt: str, user_prompt: str,
+                    entry: "ProviderEntry") -> dict:
+    """Call Anthropic Messages API directly."""
+    resp = requests.post(
+        entry.api_url,
+        json={
+            "model":      entry.model,
+            "max_tokens": GROQ_MAX_TOKENS,
+            "system":     system_prompt,
+            "messages":   [{"role": "user", "content": user_prompt}],
+        },
+        headers={
+            "Content-Type":      "application/json",
+            "x-api-key":         entry.api_key,
+            "anthropic-version": "2023-06-01",
+        },
+        timeout=90,
+    )
+    resp.raise_for_status()
+    data = resp.json()
+    try:
+        text = data["content"][0]["text"]
+    except (KeyError, IndexError) as exc:
+        raise ValueError(f"Unexpected Anthropic response: {data}") from exc
+    usage = data.get("usage", {})
+    return {
+        "choices": [{"message": {"content": text}}],
+        "usage": {
+            "prompt_tokens":     usage.get("input_tokens", 0),
+            "completion_tokens": usage.get("output_tokens", 0),
+            "total_tokens":      usage.get("input_tokens", 0) + usage.get("output_tokens", 0),
+        },
+    }
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Provider validation
+# ─────────────────────────────────────────────────────────────────────────────
+def validate_provider(entry: "ProviderEntry") -> Tuple[bool, str]:
+    """
+    Lightweight health-check for a single provider.
+
+    Strategy per provider type:
+      • groq / openrouter / nvidia  → GET /models (cheap list endpoint)
+      • gemini (direct)             → GET /v1beta/models?key=...
+      • anthropic (direct)          → GET /v1/models
+      • ollama                      → GET /api/tags (already used in discovery)
+
+    Returns (is_healthy: bool, error_message: str).
+    """
+    try:
+        if entry.provider == "ollama":
+            base = entry.api_url.replace("/v1/chat/completions", "")
+            r = requests.get(f"{base}/api/tags", timeout=5)
+            r.raise_for_status()
+            return True, ""
+
+        if entry.provider == "gemini":
+            url = "https://generativelanguage.googleapis.com/v1beta/models"
+            r = requests.get(url, params={"key": entry.api_key}, timeout=8)
+            r.raise_for_status()
+            # Verify the specific model slug exists in the response
+            names = [m.get("name", "") for m in r.json().get("models", [])]
+            model_path = f"models/{entry.model}"
+            if names and not any(entry.model in n for n in names):
+                return False, f"Model '{entry.model}' not found in Gemini catalogue"
+            return True, ""
+
+        if entry.provider == "anthropic":
+            r = requests.get(
+                "https://api.anthropic.com/v1/models",
+                headers={"x-api-key": entry.api_key, "anthropic-version": "2023-06-01"},
+                timeout=8,
+            )
+            if r.status_code == 401:
+                return False, "Invalid Anthropic API key (401)"
+            r.raise_for_status()
+            ids = [m.get("id", "") for m in r.json().get("data", [])]
+            if ids and entry.model not in ids:
+                return False, f"Model '{entry.model}' not in Anthropic catalogue"
+            return True, ""
+
+        # groq / openrouter / nvidia — all expose /models
+        if entry.provider == "groq":
+            models_url = "https://api.groq.com/openai/v1/models"
+        elif entry.provider == "openrouter":
+            models_url = "https://openrouter.ai/api/v1/models"
+        elif entry.provider == "nvidia":
+            models_url = "https://integrate.api.nvidia.com/v1/models"
+        else:
+            # Unknown provider — attempt a tiny completion as a last resort
+            return _validate_via_completion(entry)
+
+        headers = {"Authorization": f"Bearer {entry.api_key}"}
+        if entry.provider == "openrouter":
+            headers["HTTP-Referer"] = "https://github.com/Import-Saurabh/FinancialRag"
+            headers["X-Title"]      = "FinancialRAG"
+
+        r = requests.get(models_url, headers=headers, timeout=10)
+        if r.status_code in (401, 403):
+            return False, f"Auth error ({r.status_code}) — check API key"
+        r.raise_for_status()
+
+        # For OpenRouter, verify the specific free model is available
+        if entry.provider == "openrouter":
+            ids = [m.get("id", "") for m in r.json().get("data", [])]
+            if ids and entry.model not in ids:
+                return False, f"Model '{entry.model}' not listed on OpenRouter"
+
+        return True, ""
+
+    except requests.exceptions.Timeout:
+        return False, "Timed out during validation"
+    except requests.exceptions.ConnectionError as e:
+        return False, f"Connection error: {e}"
+    except requests.HTTPError as e:
+        return False, f"HTTP {e.response.status_code}: {e.response.text[:200]}"
+    except Exception as e:
+        return False, f"Unexpected error: {e}"
+
+
+def _validate_via_completion(entry: "ProviderEntry") -> Tuple[bool, str]:
+    """Fallback: send a 1-token completion to check the provider is alive."""
+    try:
+        payload = {
+            "model":      entry.model,
+            "messages":   [{"role": "user", "content": "hi"}],
+            "max_tokens": 1,
+        }
+        headers = {"Authorization": f"Bearer {entry.api_key}", "Content-Type": "application/json"}
+        r = requests.post(entry.api_url, json=payload, headers=headers, timeout=15)
+        if r.status_code in (401, 403):
+            return False, f"Auth error ({r.status_code})"
+        if r.status_code == 404:
+            return False, f"Model not found (404)"
+        r.raise_for_status()
+        return True, ""
+    except Exception as e:
+        return False, str(e)
+
+
+def validate_all_providers(catalogue: Optional[List["ProviderEntry"]] = None) -> List["ProviderEntry"]:
+    """
+    Validate every entry in *catalogue* (or build a fresh one if None).
+    Updates the module-level _HEALTHY_PROVIDERS cache and returns healthy list.
+    Skips NVIDIA NIM (known slow — validated separately).
+    """
+    global _HEALTHY_PROVIDERS, _VALIDATION_TS
+
+    if catalogue is None:
+        catalogue = build_provider_catalogue()
+
+    healthy: List[ProviderEntry] = []
+    for entry in catalogue:
+        if entry.provider == "nvidia":
+            # Keep NVIDIA in catalogue but skip live validation (too slow)
+            log.info(f"[validate] {entry.id}: skipped (NVIDIA NIM — validate manually)")
+            healthy.append(entry)   # include but warn at query time
+            continue
+
+        ok, err = validate_provider(entry)
+        if ok:
+            log.info(f"[validate] {entry.id}: ✓ healthy")
+            healthy.append(entry)
+        else:
+            log.warning(f"[validate] {entry.id}: ✗ unhealthy — {err}")
+
+    _HEALTHY_PROVIDERS = healthy
+    _VALIDATION_TS     = time.time()
+    log.info(f"[validate] {len(healthy)}/{len(catalogue)} providers healthy")
+    return healthy
+
+
+def get_healthy_providers() -> List["ProviderEntry"]:
+    """Return cached healthy providers; rebuild if cache is empty."""
+    if _HEALTHY_PROVIDERS:
+        return _HEALTHY_PROVIDERS
+    return validate_all_providers()
+
+
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Interactive provider picker  (shows only validated-healthy providers)
 # ─────────────────────────────────────────────────────────────────────────────
 def pick_provider_interactive(catalogue: List[ProviderEntry]) -> ProviderEntry:
+    # Filter to healthy providers only; fall back to full catalogue if cache empty
+    healthy = [e for e in catalogue if e in _HEALTHY_PROVIDERS] if _HEALTHY_PROVIDERS else catalogue
+    if not healthy:
+        healthy = catalogue   # nothing validated yet — show everything
+
     W_LABEL = 46; W_NOTE = 18
     border  = "─" * (W_LABEL + W_NOTE + 10)
     print(f"\n┌{border}┐")
-    print(f"│  🤖  Select LLM Provider{' ' * (len(border) - 24)}│")
+    print(f"│  🤖  Select LLM Provider  (✓ = validated healthy){' ' * (len(border) - 50)}│")
     print(f"├────┬{'─'*W_LABEL}┬{'─'*W_NOTE}┤")
     print(f"│ #  │ {'Provider / Model'.ljust(W_LABEL-1)}│ {'Context / Notes'.ljust(W_NOTE-1)}│")
     print(f"├────┼{'─'*W_LABEL}┼{'─'*W_NOTE}┤")
-    for i, e in enumerate(catalogue, 1):
+    for i, e in enumerate(healthy, 1):
         label = e.label[:W_LABEL-1].ljust(W_LABEL-1)
         note  = e.context_note[:W_NOTE-1].ljust(W_NOTE-1)
         print(f"│ {str(i).ljust(2)} │ {label}│ {note}│")
@@ -211,14 +469,14 @@ def pick_provider_interactive(catalogue: List[ProviderEntry]) -> ProviderEntry:
     print("  💡 Tip: use --provider or-qwen30b for best results (free, 131k ctx, no trimming)")
     print("         use --auto to skip this menu\n")
     while True:
-        raw = input(f"  Enter number [1-{len(catalogue)}] (or 'q' to quit): ").strip()
+        raw = input(f"  Enter number [1-{len(healthy)}] (or 'q' to quit): ").strip()
         if raw.lower() in ("q", "quit", "exit"):
             raise KeyboardInterrupt
-        if raw.isdigit() and 1 <= int(raw) <= len(catalogue):
-            chosen = catalogue[int(raw) - 1]
+        if raw.isdigit() and 1 <= int(raw) <= len(healthy):
+            chosen = healthy[int(raw) - 1]
             print(f"  ✔  Using: {chosen.label}\n")
             return chosen
-        print(f"  ⚠  Enter a number between 1 and {len(catalogue)}")
+        print(f"  ⚠  Enter a number between 1 and {len(healthy)}")
 
 
 def get_provider(
@@ -425,6 +683,8 @@ def _call_with_retry(system_prompt: str, user_prompt: str,
         try:
             if entry.provider == "gemini":
                 return _call_gemini(system_prompt, user_prompt, entry.model, entry.api_key)
+            if entry.provider == "anthropic":
+                return _call_anthropic(system_prompt, user_prompt, entry)
             return _call_openai_compat(system_prompt, user_prompt, entry)
 
         except requests.exceptions.Timeout as e:

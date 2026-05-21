@@ -47,7 +47,7 @@ import sys
 import asyncio
 import time
 from contextlib import asynccontextmanager
-from typing import Optional
+from typing import Optional, List
 
 import uvicorn
 from fastapi import FastAPI, HTTPException
@@ -70,6 +70,47 @@ except Exception:
     import logging
     log = logging.getLogger("server")
 
+# ── In-memory healthy providers cache ────────────────────────────────────────
+# Populated by validate_all_providers() at startup and refreshed every 5 min.
+HEALTHY_PROVIDERS: list = []          # list[dict]  — JSON-serialisable
+_LAST_VALIDATION_TS: float = 0.0
+_REVALIDATION_INTERVAL: int = 300     # seconds (5 minutes)
+_revalidation_task: Optional[asyncio.Task] = None
+
+
+async def _validate_all_providers_async() -> list:
+    """
+    Run provider validation in a thread (blocking I/O) without blocking the
+    event loop.  Returns a list of healthy provider dicts and updates the
+    module-level HEALTHY_PROVIDERS cache.
+    """
+    global HEALTHY_PROVIDERS, _LAST_VALIDATION_TS
+    try:
+        from rag.rag_engine import build_provider_catalogue, validate_all_providers
+        loop = asyncio.get_running_loop()
+        catalogue = await loop.run_in_executor(None, build_provider_catalogue)
+        healthy   = await loop.run_in_executor(None, validate_all_providers, catalogue)
+        HEALTHY_PROVIDERS = [
+            {"id": e.id, "label": e.label, "note": e.context_note}
+            for e in healthy
+        ]
+        _LAST_VALIDATION_TS = time.time()
+        log.info(
+            f"[server] Provider validation complete: "
+            f"{len(HEALTHY_PROVIDERS)} healthy providers cached"
+        )
+    except Exception as exc:
+        log.warning(f"[server] Provider validation failed: {exc}")
+    return HEALTHY_PROVIDERS
+
+
+async def _revalidation_loop() -> None:
+    """Background task: re-validate providers every _REVALIDATION_INTERVAL seconds."""
+    while True:
+        await asyncio.sleep(_REVALIDATION_INTERVAL)
+        log.info("[server] Background revalidation starting...")
+        await _validate_all_providers_async()
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Warm ALL heavy models at startup so the first query is fast
 # ─────────────────────────────────────────────────────────────────────────────
@@ -77,6 +118,7 @@ except Exception:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Pre-warm every heavy component before accepting requests."""
+    global _revalidation_task
     log.info("[server] Warming models...")
     t0 = time.perf_counter()
 
@@ -111,8 +153,30 @@ async def lifespan(app: FastAPI):
 
     elapsed = time.perf_counter() - t0
     log.info(f"[server] All models warm in {elapsed:.1f}s — ready for queries")
+
+    # ── Validate all LLM providers and cache healthy list ─────────────────────
+    log.info("[server] Validating LLM providers (non-blocking)...")
+    await _validate_all_providers_async()
+
+    # ── Start background revalidation every 5 minutes ────────────────────────
+    _revalidation_task = asyncio.create_task(_revalidation_loop())
+    log.info("[server] Background provider revalidation task started (every 5 min)")
+
     yield
-    log.info("[server] Shutting down.")
+
+    # ── Shutdown ──────────────────────────────────────────────────────────────
+    # CancelledError is suppressed here so uvicorn's Windows signal re-raise
+    # doesn't produce a noisy ERROR traceback on Ctrl+C.
+    try:
+        if _revalidation_task and not _revalidation_task.done():
+            _revalidation_task.cancel()
+            try:
+                await _revalidation_task
+            except asyncio.CancelledError:
+                pass
+        log.info("[server] Shutting down.")
+    except asyncio.CancelledError:
+        pass
 
 
 app = FastAPI(title="FinRAG Server", lifespan=lifespan)
@@ -393,11 +457,17 @@ async def health():
 if __name__ == "__main__":
     port = int(os.getenv("FINRAG_PORT", "8000"))
     log.info(f"[server] Starting FinRAG server on port {port}")
-    uvicorn.run(
-        "server:app",
-        host    = "0.0.0.0",
-        port    = port,
-        workers = 1,        # single worker: models are process-level singletons
-        reload  = False,    # never reload in production — would kill warm models
-        log_level = "warning",
-    )
+    try:
+        uvicorn.run(
+            "server:app",
+            host    = "0.0.0.0",
+            port    = port,
+            workers = 1,        # single worker: models are process-level singletons
+            reload  = False,    # never reload in production — would kill warm models
+            log_level = "warning",
+        )
+    except (KeyboardInterrupt, SystemExit):
+        # Normal Ctrl+C shutdown — uvicorn on Windows re-raises these during
+        # signal cleanup, producing a noisy but harmless traceback.  Catching
+        # them here keeps the terminal output clean.
+        pass
