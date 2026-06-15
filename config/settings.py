@@ -2,58 +2,14 @@
 config/settings.py
 Central configuration for the Financial RAG system.
 
-FIXES applied in this version:
-  [FIX 3] COMBINED_ANNUAL_CHUNKS raised 6 → 12
-          COMBINED_CONCALL_CHUNKS raised 3 →  6
-  [FIX 3] ANNUAL_RETRIEVAL top_k_rerank raised 8 → 15
-          CONCALL_RETRIEVAL top_k_rerank raised 4 →  8
-  [FIX 3] CONCALL_RETRIEVAL top_k_vector raised 15 → 25
-          search_type "semantic" → "hybrid" (BM25 fusion now applied to concall)
+Migration notes (v2):
+  - SQLite  → MySQL 8.0   (metadata store)
+  - MinIO               (PDF source — replaces screener_docs/ local dir)
+  - ChromaDB → Qdrant   (vector store)
+  - pdfplumber → Docling (PDF extraction)
 
-  ══════════════════════════════════════════════════════════════════════
-  [FIX ROOT-CAUSE] ChromaDB dimension mismatch  384 vs 768
-  ══════════════════════════════════════════════════════════════════════
-  ERROR:
-    chromadb.errors.InvalidArgumentError:
-      Collection expecting embedding with dimension of 384, got 768
-
-  ROOT CAUSE:
-    chroma_store/ was created with all-MiniLM-L6-v2 (384-dim vectors).
-    EMBEDDING_MODEL was later changed to
-    FinLang/finance-embeddings-investopedia (768-dim vectors) but the
-    store was never deleted — ChromaDB locked the dimension on first
-    write and now rejects 768-dim query vectors at runtime.
-
-  ONE-TIME FIX — run ONCE, then re-ingest:
-    Windows : rmdir /s /q chroma_store
-    Linux   : rm -rf chroma_store/
-    Then    : python ingest.py --symbol ADANIPORTS   (repeat per symbol)
-  ══════════════════════════════════════════════════════════════════════
-
-  ══════════════════════════════════════════════════════════════════════
-  [FIX RERANKER FALLBACK] Qwen3-Reranker-8B replaced with
-  BAAI/bge-reranker-v2-m3 as the local fallback.
-
-  WHY NOT Fin-E5 or Qwen3-Reranker-8B on i5-1240P / 16 GB RAM:
-    - Fin-E5 is fine-tuned on e5-mistral-7b-instruct (7B causal LM).
-      fp16 weight size alone is ~14 GB — leaves <2 GB for OS + Python +
-      ChromaDB + the 768-dim embedding model. Will OOM or swap-thrash.
-    - Qwen3-Reranker-8B is 8B parameters: ~16 GB fp32, ~8 GB fp16.
-      Same problem — competes directly with available system RAM.
-    Both are causal LLMs repurposed as rerankers; they were designed for
-    GPU servers, not a 16 GB laptop CPU.
-
-  WHY BAAI/bge-reranker-v2-m3 is the right choice here:
-    - Cross-encoder architecture (BERT-style), NOT a causal LM.
-    - ~568 M parameters → ~1.1 GB fp16 / ~2.2 GB fp32.
-    - Leaves 13-14 GB free for everything else — fully comfortable.
-    - 512-token context window matches your chunk_size exactly.
-    - Top-ranked cross-encoder on MTEB reranking leaderboard.
-    - Produces raw logit scores (not softmax-collapsed), giving real
-      separation between relevant and irrelevant chunks.
-    - Install: pip install sentence-transformers   (~already present)
-    - No extra dependencies, no bitsandbytes, no CUDA required.
-  ══════════════════════════════════════════════════════════════════════
+EMBEDDING_MODEL is still FinLang/finance-embeddings-investopedia (768-dim).
+If you change it, drop + recreate both Qdrant collections and re-ingest.
 """
 
 import os
@@ -77,22 +33,54 @@ def _load_dotenv():
             if "=" not in line:
                 continue
             key, _, value = line.partition("=")
-            key = key.strip()
+            key   = key.strip()
             value = value.strip().strip('"').strip("'")
             if key and key not in os.environ:
                 os.environ[key] = value
 
 _load_dotenv()
 
+
 # ─────────────────────────────────────────────
-# Paths
+# Paths (local only — no more SQLite, no more screener_docs)
 # ─────────────────────────────────────────────
-BASE_DIR          = Path(__file__).resolve().parent.parent
-DATA_DIR          = BASE_DIR / "data"
-CHROMA_DIR        = BASE_DIR / "chroma_store"
-DB_PATH           = BASE_DIR / "financial_rag.db"
-LOG_DIR           = BASE_DIR / "logs"
-SCREENER_DOCS_DIR = BASE_DIR / "screener_docs"
+BASE_DIR = Path(__file__).resolve().parent.parent
+LOG_DIR  = BASE_DIR / "logs"
+
+
+# ─────────────────────────────────────────────
+# MySQL  (metadata store: companies, documents, chunks, ingestion_log)
+# ─────────────────────────────────────────────
+DB_HOST     = os.getenv("DB_HOST",     "localhost")
+DB_PORT     = int(os.getenv("DB_PORT", "3306"))
+DB_NAME     = os.getenv("DB_NAME",     "ai_hedge_fund")
+DB_USER     = os.getenv("DB_USER",     "quant_user")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "quant_password")
+DB_POOL_SIZE = int(os.getenv("DB_POOL_SIZE", "5"))
+
+
+# ─────────────────────────────────────────────
+# MinIO  (PDF source — annual reports + concalls)
+# ─────────────────────────────────────────────
+# Bucket key layout (mirrors old screener_docs/ tree):
+#   {SYMBOL}/{doc_type}/{year}/{filename}.pdf
+#   e.g.  RELIANCE/annual_report/2024/reliance_ar_2024.pdf
+MINIO_ENDPOINT   = os.getenv("MINIO_ENDPOINT",   "localhost:9000")
+MINIO_ACCESS_KEY = os.getenv("MINIO_ACCESS_KEY", "minioadmin")
+MINIO_SECRET_KEY = os.getenv("MINIO_SECRET_KEY", "minioadmin")
+MINIO_SECURE     = os.getenv("MINIO_SECURE",     "false").lower() == "true"
+MINIO_BUCKET     = os.getenv("MINIO_BUCKET",     "quant-docs")
+
+
+# ─────────────────────────────────────────────
+# Qdrant  (vector store — replaces ChromaDB)
+# ─────────────────────────────────────────────
+QDRANT_HOST             = os.getenv("QDRANT_HOST",     "localhost")
+QDRANT_PORT             = int(os.getenv("QDRANT_PORT", "6333"))
+QDRANT_API_KEY          = os.getenv("QDRANT_API_KEY",  "")   # empty = no auth (local)
+QDRANT_ANNUAL_COLLECTION  = "annual_reports"
+QDRANT_CONCALL_COLLECTION = "concalls"
+
 
 # ─────────────────────────────────────────────
 # Groq
@@ -103,104 +91,78 @@ GROQ_FALLBACK_MODEL = "gemma2-9b-it"
 GROQ_MAX_TOKENS     = 1024
 GROQ_TEMPERATURE    = 0.1
 
+
 # ─────────────────────────────────────────────
 # Embeddings
 # ─────────────────────────────────────────────
 # FinLang/finance-embeddings-investopedia → 768-dim vectors.
-#
-# ⚠  If you see "Collection expecting dimension 384, got 768":
-#    Delete chroma_store/ and re-run ingest.py for every symbol.
-#    Changing EMBEDDING_MODEL always requires full re-ingestion.
+# ⚠  Changing EMBEDDING_MODEL requires dropping Qdrant collections + re-ingesting.
 EMBEDDING_MODEL      = "FinLang/finance-embeddings-investopedia"
-EMBEDDING_DIM        = 768    # must match model output — used for validation
+EMBEDDING_DIM        = 768
 EMBEDDING_BATCH_SIZE = 64
+
 
 # ─────────────────────────────────────────────
 # Re-ranker
 # ─────────────────────────────────────────────
-# Primary  : Voyage Rerank-2.5 — finance/SEC domain-tuned, 32k ctx.
-#            Requires VOYAGE_API_KEY → https://dash.voyageai.com/
-#            Auto-used when key is present.
-#
-# Fallback : BAAI/bge-reranker-v2-m3 — cross-encoder, ~1.1 GB fp16.
-#            Activates automatically when VOYAGE_API_KEY is absent or
-#            Voyage returns HTTP 429/402 (rate limit / quota exceeded).
-#
-#            ✅ Fits comfortably on 16 GB RAM (i5-1240P or similar).
-#            ✅ 512-token context — matches chunk_size exactly.
-#            ✅ Top cross-encoder on MTEB reranking leaderboard.
-#            ✅ No extra dependencies beyond sentence-transformers.
-#
-#            Install: pip install sentence-transformers
-#            (sentence-transformers is almost certainly already installed
-#             for the embedding pipeline — no new packages needed.)
-#
-#  ❌ DO NOT use Fin-E5 or Qwen3-Reranker-8B on this machine:
-#     Both are 7-8B causal LLMs repurposed as rerankers.
-#     Fin-E5 (e5-mistral-7b base) = ~14 GB fp16 alone.
-#     Qwen3-Reranker-8B          = ~8  GB fp16 alone.
-#     On 16 GB total RAM this leaves nothing for OS + Python + ChromaDB.
 RERANKER_MODEL    = "rerank-2"                    # Voyage Rerank-2.5
-RERANKER_FALLBACK = "BAAI/bge-reranker-v2-m3"    # local cross-encoder fallback
+RERANKER_FALLBACK = "BAAI/bge-reranker-v2-m3"
 VOYAGE_API_KEY    = os.getenv("VOYAGE_API_KEY", "")
 
-# ─────────────────────────────────────────────
-# ChromaDB collections
-# ─────────────────────────────────────────────
-CHROMA_ANNUAL_COLLECTION  = "annual_reports"
-CHROMA_CONCALL_COLLECTION = "concalls"
 
 # ─────────────────────────────────────────────
 # Chunking
 # ─────────────────────────────────────────────
 ANNUAL_REPORT = {
-    "chunk_size": 512,
-    "chunk_overlap": 64,
-    "table_row_group": 8,
+    "chunk_size":            512,
+    "chunk_overlap":          64,
+    "table_row_group":         8,
     "inject_section_header": True,
 }
 
 CONCALL = {
-    "chunk_size": 1024,
-    "chunk_overlap": 128,
-    "respect_speaker_turns": True,
-    "inject_speaker_label": True,
+    "chunk_size":              1024,
+    "chunk_overlap":            128,
+    "respect_speaker_turns":   True,
+    "inject_speaker_label":    True,
 }
 
+
 # ─────────────────────────────────────────────
-# Retrieval  [FIX 3]
+# Retrieval
 # ─────────────────────────────────────────────
 ANNUAL_RETRIEVAL = {
     "top_k_vector": 30,
     "top_k_bm25":   10,
-    "top_k_rerank": 15,       # was 8
+    "top_k_rerank": 15,
     "search_type":  "hybrid",
 }
 
 CONCALL_RETRIEVAL = {
-    "top_k_vector": 25,       # was 15
-    "top_k_rerank":  8,       # was 4
-    "search_type":  "hybrid", # FIX: was "semantic" — now BM25 hybrid too
+    "top_k_vector": 25,
+    "top_k_rerank":  8,
+    "search_type":  "hybrid",
 }
 
-# "both" mode chunk budget  [FIX 3]
-COMBINED_ANNUAL_CHUNKS  = 12    # was 6
-COMBINED_CONCALL_CHUNKS =  6    # was 3
+COMBINED_ANNUAL_CHUNKS  = 12
+COMBINED_CONCALL_CHUNKS =  6
+
 
 # ─────────────────────────────────────────────
 # Ingestion
 # ─────────────────────────────────────────────
-MIN_CHUNK_WORDS = 20
-MAX_PDF_SIZE_MB = 100
-# ─── ADD THIS LINE to your existing config/settings.py ───────────────────────
-#
-# Structured financial database (Ai_Hedge_Fund.db).
-# This is what the schema bridge queries for SQL atoms.
-# financial_rag.db is RAG metadata only — NOT the same database.
-#
-FINANCE_DB_PATH = Path("C:/Users/hp/Downloads/Fund/database/Ai_Hedge_Fund.db")
-#
-# If you want to make it portable (relative to project root), use:
-#   FINANCE_DB_PATH = BASE_DIR.parent / "Fund" / "database" / "Ai_Hedge_Fund.db"
-# ─────────────────────────────────────────────────────────────────────────────
- 
+MIN_CHUNK_WORDS  = 20
+MAX_PDF_SIZE_MB  = 100
+
+# Temp dir for MinIO downloads during ingestion (cleaned up after each PDF)
+import tempfile
+INGEST_TMP_DIR = Path(tempfile.gettempdir()) / "finrag_ingest"
+
+
+# ─────────────────────────────────────────────
+# Structured financial DB  (Quant Copilot MySQL — same DB_* vars above)
+# Tables: sm_*, price_*, fundamentals_*, etc. populated by the ETL repo.
+# metric_engine.py queries this directly.
+# ─────────────────────────────────────────────
+# No separate path needed — it's the same MySQL instance.
+# FINANCE_DB_PATH (old SQLite ref) is removed.
