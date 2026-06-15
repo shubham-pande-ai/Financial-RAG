@@ -2,7 +2,10 @@
 pipeline/loader/embedder.py
 
 Singleton embedding model — loaded ONCE per process, never reloaded.
-Fix: module-level _model with explicit process-level guard using os.getpid().
+PID guard ensures subprocesses reload safely.
+
+build_embedding_text is imported from chunker to avoid circular imports.
+Re-exported here so qdrant_loader can do a single import from embedder.
 """
 
 import os
@@ -13,10 +16,8 @@ from utils.logger import get_logger
 
 log = get_logger(__name__)
 
-# (model_instance, pid_it_was_loaded_in)
-# If PID changes (new subprocess), reload. Otherwise reuse.
-_model       = None
-_loaded_pid  = None
+_model      = None
+_loaded_pid = None
 
 
 def _get_model():
@@ -24,7 +25,7 @@ def _get_model():
     current_pid = os.getpid()
 
     if _model is not None and _loaded_pid == current_pid:
-        return _model  # already loaded in this process — skip
+        return _model
 
     log.info(f"Loading embedding model: {EMBEDDING_MODEL} (PID {current_pid})")
     from sentence_transformers import SentenceTransformer
@@ -39,17 +40,16 @@ def embed_texts(texts: List[str]) -> List[List[float]]:
         return []
 
     model      = _get_model()
-    batch_size = EMBEDDING_BATCH_SIZE
     all_embs   = []
 
-    for i in range(0, len(texts), batch_size):
-        batch = texts[i: i + batch_size]
+    for i in range(0, len(texts), EMBEDDING_BATCH_SIZE):
+        batch = texts[i: i + EMBEDDING_BATCH_SIZE]
         embs  = model.encode(
             batch,
-            batch_size=batch_size,
-            show_progress_bar=False,
-            convert_to_numpy=True,
-            normalize_embeddings=True,
+            batch_size          = EMBEDDING_BATCH_SIZE,
+            show_progress_bar   = False,
+            convert_to_numpy    = True,
+            normalize_embeddings = True,
         )
         all_embs.extend(embs.tolist())
 
@@ -57,5 +57,9 @@ def embed_texts(texts: List[str]) -> List[List[float]]:
 
 
 def embed_query(query: str) -> List[float]:
-    """Embed a single query — same model, no reload."""
+    """Embed a single query string."""
     return embed_texts([query])[0]
+
+
+# Re-export so qdrant_loader only needs: from pipeline.loader.embedder import ...
+from pipeline.loader.chunker import build_embedding_text  # noqa: E402, F401
