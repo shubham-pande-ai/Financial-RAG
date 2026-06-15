@@ -2,21 +2,35 @@
 """
 ingest.py
 CLI to run the full ingestion pipeline:
-  PDF files (from screener_downloader.py) → extract → chunk → embed → ChromaDB + SQLite
+  MinIO PDFs (annual reports / concalls)
+    → Docling extract → chunk → embed → Qdrant + MySQL
+
+PDFs live in MinIO under:
+  {BUCKET}/{SYMBOL}/{doc_type}/{year}/{filename}.pdf
+  e.g.  quant-docs/RELIANCE/annual_report/2024/reliance_ar_2024.pdf
 
 Usage:
     python ingest.py --symbol RELIANCE
     python ingest.py --symbol RELIANCE --type annual
     python ingest.py --symbol RELIANCE --type concall
-    python ingest.py --all           # ingest everything in screener_docs/
+    python ingest.py --all           # ingest every object in the bucket
     python ingest.py --stats         # show DB stats
+    python ingest.py --list          # list all MinIO keys available
 """
 
 import argparse
 import sys
 import time
+import tempfile
 from pathlib import Path
-from config.settings import SCREENER_DOCS_DIR, LOG_DIR
+
+from minio import Minio
+from minio.error import S3Error
+
+from config.settings import (
+    MINIO_ENDPOINT, MINIO_ACCESS_KEY, MINIO_SECRET_KEY,
+    MINIO_SECURE, MINIO_BUCKET, INGEST_TMP_DIR, LOG_DIR,
+)
 from db.database import (
     init_db,
     upsert_document,
@@ -28,149 +42,201 @@ from db.database import (
     insert_chunk,
 )
 from pipeline.extract import extract_pdf
-from pipeline.loader import chunk_document, load_chunks_to_chroma
+from pipeline.loader import chunk_document, load_chunks_to_qdrant
 from utils.logger import get_logger
 
 log = get_logger(__name__, LOG_DIR)
 
 
 # ─────────────────────────────────────────────
-# Helpers
+# MinIO client (module-level singleton)
 # ─────────────────────────────────────────────
-def resolve_doc_type(folder_name: str) -> str:
-    """Map screener_downloader output folder name to doc_type."""
-    if "annual" in folder_name.lower():
-        return "annual_report"
-    if "concall" in folder_name.lower():
-        return "concall"
-    return None
+def _minio_client() -> Minio:
+    return Minio(
+        endpoint   = MINIO_ENDPOINT,
+        access_key = MINIO_ACCESS_KEY,
+        secret_key = MINIO_SECRET_KEY,
+        secure     = MINIO_SECURE,
+    )
 
 
-def extract_year_from_path(path: Path) -> int:
-    """screener_downloader saves to symbol/doc_type/year/filename.pdf"""
-    parts = path.parts
-    for part in reversed(parts):
-        if part.isdigit() and 2000 <= int(part) <= 2035:
-            return int(part)
-    return None
+# ─────────────────────────────────────────────
+# Key parsing helpers
+# Key layout: {SYMBOL}/{doc_type}/{year}/{filename}.pdf
+# ─────────────────────────────────────────────
+def _parse_minio_key(key: str) -> dict | None:
+    """
+    Parse a MinIO object key into (symbol, doc_type, year, title).
+    Returns None if the key doesn't match the expected layout or isn't a PDF.
+    """
+    if not key.lower().endswith(".pdf"):
+        return None
+
+    parts = key.split("/")
+    # Minimum: SYMBOL/doc_type/year/file.pdf  → 4 parts
+    if len(parts) < 4:
+        return None
+
+    symbol   = parts[0].upper()
+    raw_type = parts[1].lower()
+    raw_year = parts[2]
+    filename = parts[-1]
+
+    # Normalise doc_type
+    if "annual" in raw_type:
+        doc_type = "annual_report"
+    elif "concall" in raw_type:
+        doc_type = "concall"
+    else:
+        return None
+
+    # Year
+    year = int(raw_year) if raw_year.isdigit() and 2000 <= int(raw_year) <= 2035 else None
+
+    return {
+        "minio_key": key,
+        "symbol":    symbol,
+        "doc_type":  doc_type,
+        "year":      year,
+        "title":     Path(filename).stem,
+    }
 
 
-def find_pdfs(symbol: str, doc_type_filter: str = None) -> list:
-    """Find all PDF files for a symbol under screener_docs/."""
-    symbol_dir = SCREENER_DOCS_DIR / symbol.upper()
-    if not symbol_dir.exists():
-        log.error(f"No data directory for {symbol}: {symbol_dir}")
-        log.info("Run: python screener_downloader.py {symbol}")
+# ─────────────────────────────────────────────
+# PDF discovery from MinIO
+# ─────────────────────────────────────────────
+def list_minio_pdfs(
+    symbol:          str  = None,
+    doc_type_filter: str  = None,
+    client:          Minio = None,
+) -> list[dict]:
+    """List all matching PDF objects in MinIO bucket."""
+    if client is None:
+        client = _minio_client()
+
+    prefix = ""
+    if symbol:
+        prefix = f"{symbol.upper()}/"
+        if doc_type_filter:
+            # map normalised type back to folder name
+            folder = "annual_report" if doc_type_filter == "annual_report" else "concall"
+            prefix += f"{folder}/"
+
+    try:
+        objects = client.list_objects(MINIO_BUCKET, prefix=prefix, recursive=True)
+    except S3Error as e:
+        log.error(f"MinIO list failed: {e}")
         return []
 
     pdfs = []
-    for pdf_path in symbol_dir.rglob("*.pdf"):
-        # Infer doc_type from parent folder
-        doc_type = None
-        for part in pdf_path.parts:
-            dt = resolve_doc_type(part)
-            if dt:
-                doc_type = dt
-                break
-
-        if not doc_type:
+    for obj in objects:
+        parsed = _parse_minio_key(obj.object_name)
+        if parsed is None:
             continue
-        if doc_type_filter and doc_type != doc_type_filter:
+        if doc_type_filter and parsed["doc_type"] != doc_type_filter:
             continue
-
-        year = extract_year_from_path(pdf_path)
-        pdfs.append({
-            "path": pdf_path,
-            "doc_type": doc_type,
-            "year": year,
-            "symbol": symbol.upper(),
-            "title": pdf_path.stem,
-        })
+        parsed["size_bytes"] = obj.size or 0
+        pdfs.append(parsed)
 
     return pdfs
 
 
 # ─────────────────────────────────────────────
+# Download one PDF from MinIO to a temp file
+# ─────────────────────────────────────────────
+def _download_pdf(minio_key: str, client: Minio) -> Path:
+    """Download object to INGEST_TMP_DIR and return local Path."""
+    INGEST_TMP_DIR.mkdir(parents=True, exist_ok=True)
+    local_path = INGEST_TMP_DIR / Path(minio_key).name
+    client.fget_object(MINIO_BUCKET, minio_key, str(local_path))
+    return local_path
+
+
+# ─────────────────────────────────────────────
 # Core ingestion function (one PDF)
 # ─────────────────────────────────────────────
-def ingest_pdf(pdf_info: dict, force: bool = False) -> bool:
-    path: Path = pdf_info["path"]
-    doc_type: str = pdf_info["doc_type"]
-    symbol: str = pdf_info["symbol"]
-    year: int = pdf_info["year"]
-    title: str = pdf_info["title"]
+def ingest_pdf(pdf_info: dict, force: bool = False, client: Minio = None) -> bool:
+    minio_key: str = pdf_info["minio_key"]
+    doc_type:  str = pdf_info["doc_type"]
+    symbol:    str = pdf_info["symbol"]
+    year:      int = pdf_info.get("year")
+    title:     str = pdf_info["title"]
 
     log.info(f"\n{'='*60}")
-    log.info(f"Ingesting: {path.name}")
+    log.info(f"Ingesting: {minio_key}")
     log.info(f"  type={doc_type} | symbol={symbol} | year={year}")
 
-    # Skip if already done
-    if not force and is_already_ingested(str(path)):
-        log.info(f"  ⏭ Already ingested, skipping (use --force to re-ingest)")
+    if not force and is_already_ingested(minio_key):
+        log.info("  ⏭ Already ingested, skipping (use --force to re-ingest)")
         return True
 
-    file_size_kb = path.stat().st_size // 1024
+    file_size_kb = pdf_info.get("size_bytes", 0) // 1024
 
-    # Register in SQLite
     doc_id = upsert_document(
-        symbol=symbol,
-        doc_type=doc_type,
-        year=year,
-        title=title,
-        file_path=str(path),
-        file_size_kb=file_size_kb,
+        symbol      = symbol,
+        doc_type    = doc_type,
+        year        = year,
+        title       = title,
+        minio_key   = minio_key,
+        file_size_kb = file_size_kb,
     )
 
+    if client is None:
+        client = _minio_client()
+
+    local_path = None
     t0 = time.time()
 
     try:
-        # Step 1: Extract
-        log.info("[1/3] Extracting PDF...")
-        extracted = extract_pdf(path, doc_type)
+        # Step 1: Download from MinIO
+        log.info("[1/4] Downloading from MinIO...")
+        local_path = _download_pdf(minio_key, client)
+        log.info(f"  → {local_path} ({file_size_kb} KB)")
+
+        # Step 2: Extract (Docling)
+        log.info("[2/4] Extracting with Docling...")
+        extracted = extract_pdf(local_path, doc_type)
         if not extracted or not extracted.blocks:
             raise ValueError("Extraction returned no content")
-
         log.info(f"  → {len(extracted.blocks)} blocks | {extracted.total_pages} pages")
 
-        # Step 2: Chunk
-        log.info("[2/3] Chunking...")
+        # Step 3: Chunk
+        log.info("[3/4] Chunking...")
         chunks = chunk_document(extracted, symbol, year, title)
         if not chunks:
             raise ValueError("Chunker returned no chunks")
-
         log.info(f"  → {len(chunks)} chunks")
 
-        # Step 3: Embed + load to ChromaDB
-        log.info("[3/3] Embedding + loading to ChromaDB...")
-        collection_name = load_chunks_to_chroma(chunks, doc_type)
+        # Step 4: Embed + upsert to Qdrant
+        log.info("[4/4] Embedding + loading to Qdrant...")
+        collection_name = load_chunks_to_qdrant(chunks, doc_type)
 
-        # Step 4: Record chunks in SQLite
+        # Record chunks in MySQL
         for chunk in chunks:
             insert_chunk(
-                doc_id=doc_id,
-                chroma_id=chunk.chunk_id,
-                collection=collection_name,
-                chunk_index=chunk.chunk_index,
-                chunk_type=chunk.chunk_type,
-                section=chunk.section,
-                speaker=chunk.speaker,
-                page_start=chunk.page_start,
-                page_end=chunk.page_end,
-                word_count=chunk.word_count,
+                doc_id      = doc_id,
+                qdrant_id   = chunk.chunk_id,
+                collection  = collection_name,
+                chunk_index = chunk.chunk_index,
+                chunk_type  = chunk.chunk_type,
+                section     = chunk.section,
+                speaker     = chunk.speaker,
+                page_start  = chunk.page_start,
+                page_end    = chunk.page_end,
+                word_count  = chunk.word_count,
             )
 
         duration = time.time() - t0
         mark_document_ingested(doc_id, len(chunks), extracted.total_pages)
         log_ingestion(
-            symbol=symbol,
-            doc_type=doc_type,
-            file_path=str(path),
-            status="success",
-            chunks_created=len(chunks),
-            duration_sec=duration,
+            symbol         = symbol,
+            doc_type       = doc_type,
+            minio_key      = minio_key,
+            status         = "success",
+            chunks_created = len(chunks),
+            duration_sec   = duration,
         )
-
-        log.info(f"  ✓ Done in {duration:.1f}s | {len(chunks)} chunks stored")
+        log.info(f"  ✓ Done in {duration:.1f}s | {len(chunks)} chunks stored in Qdrant")
         return True
 
     except Exception as e:
@@ -178,86 +244,101 @@ def ingest_pdf(pdf_info: dict, force: bool = False) -> bool:
         log.exception(f"  ✗ Failed: {e}")
         mark_document_failed(doc_id)
         log_ingestion(
-            symbol=symbol,
-            doc_type=doc_type,
-            file_path=str(path),
-            status="failed",
-            message=str(e),
-            duration_sec=duration,
+            symbol    = symbol,
+            doc_type  = doc_type,
+            minio_key = minio_key,
+            status    = "failed",
+            message   = str(e),
+            duration_sec = duration,
         )
         return False
+
+    finally:
+        # Always clean up the temp file
+        if local_path and local_path.exists():
+            try:
+                local_path.unlink()
+            except Exception:
+                pass
 
 
 # ─────────────────────────────────────────────
 # CLI
 # ─────────────────────────────────────────────
 def main():
-    ap = argparse.ArgumentParser(description="Financial RAG — Ingestion Pipeline")
-    ap.add_argument("--symbol", "-s", help="Company symbol (e.g. RELIANCE)")
+    ap = argparse.ArgumentParser(description="Financial RAG — Ingestion Pipeline (MinIO → Qdrant)")
+    ap.add_argument("--symbol", "-s",  help="Company symbol (e.g. RELIANCE)")
     ap.add_argument(
         "--type", "-t",
         choices=["annual", "concall"],
         help="Filter by document type",
     )
-    ap.add_argument("--all", action="store_true", help="Ingest all symbols in screener_docs/")
+    ap.add_argument("--all",   action="store_true", help="Ingest all objects in MinIO bucket")
     ap.add_argument("--force", action="store_true", help="Re-ingest already ingested docs")
     ap.add_argument("--stats", action="store_true", help="Show database stats and exit")
+    ap.add_argument("--list",  action="store_true", help="List available MinIO objects and exit")
     args = ap.parse_args()
 
-    # Init DB
     init_db()
 
-    # Stats mode
     if args.stats:
         stats = get_stats()
-        print("\n── Financial RAG DB Stats ──────────────────")
+        print("\n── Financial RAG DB Stats (MySQL) ──────────────────")
         print(f"  Companies  : {stats['companies']}")
         print(f"  Documents  : {stats['documents_ingested']}")
         print(f"  Chunks     : {stats['total_chunks']}")
         for dtype, n in stats.get("by_type", {}).items():
-            print(f"  {dtype:<20}: {n} docs")
-        print("────────────────────────────────────────────\n")
+            print(f"  {dtype:<22}: {n} docs")
+        print("────────────────────────────────────────────────────\n")
         return
 
-    # Resolve symbols to process
-    if args.all:
-        if not SCREENER_DOCS_DIR.exists():
-            log.error(f"screener_docs/ not found at {SCREENER_DOCS_DIR}")
-            sys.exit(1)
-        symbols = [d.name for d in SCREENER_DOCS_DIR.iterdir() if d.is_dir()]
-        log.info(f"Found {len(symbols)} symbols: {', '.join(symbols)}")
-    elif args.symbol:
-        symbols = [args.symbol.upper()]
-    else:
-        ap.print_help()
-        sys.exit(1)
+    client = _minio_client()
 
-    # Map type arg
+    if args.list:
+        pdfs = list_minio_pdfs(client=client)
+        print(f"\n── MinIO bucket '{MINIO_BUCKET}' — {len(pdfs)} PDF(s) ──")
+        for p in pdfs:
+            ingested = "✓" if is_already_ingested(p["minio_key"]) else "·"
+            print(f"  [{ingested}] {p['minio_key']}")
+        print()
+        return
+
+    # Resolve doc_type filter
     doc_type_filter = None
     if args.type == "annual":
         doc_type_filter = "annual_report"
     elif args.type == "concall":
         doc_type_filter = "concall"
 
-    # Run ingestion
-    total_success = 0
-    total_fail = 0
-
-    for symbol in symbols:
-        log.info(f"\n{'#'*60}")
-        log.info(f"Processing symbol: {symbol}")
-
-        pdfs = find_pdfs(symbol, doc_type_filter)
+    # Resolve symbols
+    if args.all:
+        pdfs = list_minio_pdfs(doc_type_filter=doc_type_filter, client=client)
+        log.info(f"Found {len(pdfs)} PDF(s) in bucket")
+    elif args.symbol:
+        pdfs = list_minio_pdfs(
+            symbol=args.symbol.upper(),
+            doc_type_filter=doc_type_filter,
+            client=client,
+        )
         if not pdfs:
-            log.warning(f"No PDFs found for {symbol}")
-            continue
+            log.error(
+                f"No PDFs found for {args.symbol.upper()} in "
+                f"MinIO bucket '{MINIO_BUCKET}' "
+                f"(prefix: {args.symbol.upper()}/)"
+            )
+            sys.exit(1)
+    else:
+        ap.print_help()
+        sys.exit(1)
 
-        log.info(f"Found {len(pdfs)} PDF(s)")
-        for pdf_info in pdfs:
-            if ingest_pdf(pdf_info, force=args.force):
-                total_success += 1
-            else:
-                total_fail += 1
+    total_success = 0
+    total_fail    = 0
+
+    for pdf_info in pdfs:
+        if ingest_pdf(pdf_info, force=args.force, client=client):
+            total_success += 1
+        else:
+            total_fail += 1
 
     print(f"\n{'='*50}")
     print(f"Ingestion complete: {total_success} success | {total_fail} failed")
