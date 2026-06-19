@@ -6,7 +6,7 @@ Fixes BUG-1: new PID (new process) per query.
 YOUR ACTUAL PROBLEM (from logs):
   Every query shows a new PID:  PID 14212, PID 10396, PID 23948...
   Python process dies after query.py exits.
-  ALL singletons die with it: embedder, reranker, ChromaDB connection.
+  ALL singletons die with it: embedder, reranker, Qdrant connection.
   Next query pays full cold-start: ~36s embed + ~9s reranker = 45s before
   a single token is scored.
 
@@ -15,7 +15,7 @@ THE FIX:
   and are reused for every subsequent query. From query 2 onward:
     - Embedder: 0s (already loaded)
     - Reranker model: 0s (already loaded)
-    - ChromaDB: 0s (already connected)
+    - Qdrant: 0s (already connected)
     - Reranking (INT8 + parallel): ~8-15s
     - LLM: ~2-3s
     - Total: ~10-18s per query
@@ -142,14 +142,14 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         log.warning(f"[server] Reranker warm failed: {e}")
 
-    # Warm ChromaDB connection
+    # Warm Qdrant connection
     try:
-        from pipeline.loader.chroma_loader import get_chroma_client
+        from pipeline.loader.qdrant_loader import get_qdrant_client
         loop = asyncio.get_event_loop()
-        await loop.run_in_executor(None, get_chroma_client)
-        log.info("[server] ChromaDB warm ✓")
+        await loop.run_in_executor(None, get_qdrant_client)
+        log.info("[server] Qdrant warm ✓")
     except Exception as e:
-        log.warning(f"[server] ChromaDB warm failed: {e}")
+        log.warning(f"[server] Qdrant warm failed: {e}")
 
     elapsed = time.perf_counter() - t0
     log.info(f"[server] All models warm in {elapsed:.1f}s — ready for queries")
@@ -344,7 +344,7 @@ async def query_endpoint(req: QueryRequest):
 def _run_query(req: QueryRequest) -> dict:
     """
     Synchronous query execution — runs in a thread pool so it doesn't
-    block the event loop. All heavy objects (embedder, reranker, chroma)
+    block the event loop. All heavy objects (embedder, reranker, qdrant)
     are already warm from lifespan startup.
     """
     from pipeline.retrieval.retriever import retrieve_with_years

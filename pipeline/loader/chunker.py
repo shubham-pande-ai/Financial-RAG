@@ -94,32 +94,227 @@ _TYPE_SCORE = {
 }
 
 _OUTLOOK_SIGNALS = [
-    "guidance", "outlook", "expect", "forecast", "target", "pipeline",
-    "capacity", "expansion", "order book", "capex", "revenue guidance",
+    # Guidance
+    "guidance", "revenue guidance", "earnings guidance",
+    "ebitda guidance", "margin guidance", "full year guidance",
+    "quarterly guidance", "outlook", "forecast", "projection",
+    "estimate", "target", "expect", "expects", "expected",
+    "anticipate", "anticipated", "anticipating",
+
+    # Future language
+    "going forward", "looking ahead", "future",
+    "next quarter", "next year", "coming quarters",
+    "medium term", "long term", "near term",
+    "over the next", "in the coming months",
+    "for the remainder of the year",
+
+    # Growth
+    "growth", "double digit growth", "strong growth",
+    "sustainable growth", "accelerate", "acceleration",
+    "growth trajectory", "growth drivers",
+    "expansion", "scale", "scaling",
+    "market expansion", "international expansion",
+
+    # Demand
+    "strong demand", "healthy demand",
+    "robust demand", "demand environment",
+    "customer demand", "improving demand",
+    "visibility on demand", "order momentum",
+
+    # Orders
+    "order book", "backlog", "bookings",
+    "order inflow", "pipeline", "deal pipeline",
+    "sales pipeline", "conversion pipeline",
+    "large deal wins", "deal wins",
+    "qualified pipeline",
+
+    # Capacity
+    "capacity expansion", "capacity addition",
+    "new facility", "new plant",
+    "commissioning", "brownfield expansion",
+    "greenfield project", "utilization",
+    "capacity utilization",
+
+    # Investment
+    "capex", "capital expenditure",
+    "investment cycle", "investing in",
+    "growth investments", "strategic investments",
+
+    # Profitability
+    "margin expansion", "margin improvement",
+    "operating leverage", "profitability improvement",
+    "efficiency gains", "cost optimization",
+    "higher utilization",
+
+    # Industry outlook
+    "industry outlook", "market outlook",
+    "sector outlook", "positive outlook",
+    "favorable environment",
+
+    # Confidence language
+    "confident", "remain confident",
+    "well positioned", "positioned for growth",
+    "strong visibility", "healthy visibility",
+    "positive momentum", "encouraged by",
+    "bullish", "optimistic",
 ]
-_RISK_SIGNALS    = ["risk", "headwind", "challenge", "uncertain", "concern"]
+
+_RISK_SIGNALS = [
+    # Direct risk
+    "risk", "risks", "headwind", "headwinds",
+    "challenge", "challenges", "concern",
+    "concerns", "uncertain", "uncertainty",
+
+    # Demand weakness
+    "weak demand", "soft demand",
+    "slowdown", "demand slowdown",
+    "market slowdown", "softness",
+    "muted demand", "sluggish demand",
+
+    # Margin risks
+    "margin pressure", "pricing pressure",
+    "cost pressure", "margin contraction",
+    "profitability pressure",
+    "higher costs", "input cost inflation",
+
+    # Macro risks
+    "inflation", "interest rates",
+    "high interest rates", "macroeconomic",
+    "economic uncertainty", "recession",
+    "economic slowdown", "volatile environment",
+
+    # FX
+    "currency volatility", "foreign exchange",
+    "fx risk", "forex impact",
+    "currency headwinds",
+
+    # Supply chain
+    "supply chain", "disruption",
+    "logistics challenges", "bottleneck",
+    "shortage", "inventory correction",
+
+    # Competition
+    "competitive pressure", "competition",
+    "pricing competition", "market share loss",
+    "intense competition",
+
+    # Regulatory
+    "regulatory risk", "regulatory changes",
+    "compliance risk", "policy uncertainty",
+    "government intervention",
+
+    # Customer risk
+    "budget cuts", "deal delays",
+    "deal postponement", "project delays",
+    "client caution", "customer concentration",
+    "customer attrition",
+
+    # Labor
+    "attrition", "talent shortage",
+    "hiring challenges", "wage inflation",
+    "employee costs",
+
+    # Execution
+    "execution risk", "implementation risk",
+    "project overruns", "operational challenges",
+
+    # Geopolitical
+    "geopolitical risk", "trade tensions",
+    "sanctions", "tariffs", "conflict",
+    "political instability",
+
+    # Warning language
+    "cautious", "remain cautious",
+    "limited visibility", "difficult environment",
+    "challenging environment", "not immune",
+    "pressure on demand", "pressure on margins",
+    "monitoring closely", "adverse impact",
+]
+
+_OPPORTUNITY_SIGNALS = [
+    # Market opportunity
+    "opportunity", "opportunities",
+    "addressable market", "market opportunity",
+    "untapped market", "white space",
+
+    # Demand
+    "strong demand", "robust demand",
+    "healthy pipeline", "record pipeline",
+    "strong order book", "record backlog",
+
+    # Customers
+    "new customer wins", "customer additions",
+    "cross sell", "upsell",
+    "wallet share", "customer expansion",
+
+    # Deals
+    "large deals", "mega deal",
+    "strategic deal", "multi year contract",
+    "contract wins", "deal momentum",
+
+    # Technology
+    "artificial intelligence", "ai",
+    "generative ai", "genai",
+    "machine learning", "automation",
+    "digital transformation", "cloud migration",
+    "data modernization",
+
+    # Product
+    "product launch", "new offering",
+    "new platform", "innovation",
+    "research and development",
+
+    # Expansion
+    "new geography", "new markets",
+    "market penetration", "expansion plans",
+    "capacity addition",
+
+    # Partnerships
+    "strategic partnership",
+    "alliance", "joint venture",
+    "ecosystem partnership",
+
+    # Efficiency
+    "productivity gains",
+    "cost savings opportunity",
+    "operating leverage",
+
+    # Positive management language
+    "excited about", "encouraged by",
+    "significant opportunity",
+    "strong momentum",
+    "well positioned",
+    "competitive advantage",
+    "market leadership",
+]
 
 
 def _score_chunk(chunk: Chunk) -> float:
-    base  = _TYPE_SCORE.get(chunk.chunk_type, 0.5)
+    base   = _TYPE_SCORE.get(chunk.chunk_type, 0.5)
     text_l = chunk.text.lower()
     if any(s in text_l for s in _OUTLOOK_SIGNALS):
         base = min(base + 0.2, 1.0)
     if any(s in text_l for s in _RISK_SIGNALS):
         base = min(base + 0.1, 1.0)
+    if any(s in text_l for s in _OPPORTUNITY_SIGNALS):
+        base = min(base + 0.15, 1.0)
     return round(base, 2)
 
 
 def _tag_chunk(chunk: Chunk) -> List[str]:
-    """Simple keyword-based retrieval tag assignment."""
+    """Keyword-based retrieval tag assignment."""
     text_l = chunk.text.lower()
     tags   = []
     if any(w in text_l for w in ["revenue", "income", "sales", "turnover"]):
         tags.append("revenue")
     if any(w in text_l for w in ["ebitda", "operating profit", "ebit"]):
         tags.append("ebitda")
-    if any(w in text_l for w in ["guidance", "outlook", "forecast", "expect"]):
+    if any(s in text_l for s in _OUTLOOK_SIGNALS):
         tags.append("forward_looking")
+    if any(s in text_l for s in _RISK_SIGNALS):
+        tags.append("risk")
+    if any(s in text_l for s in _OPPORTUNITY_SIGNALS):
+        tags.append("opportunity")
     if any(w in text_l for w in ["capex", "capital expenditure", "investment"]):
         tags.append("capex")
     if any(w in text_l for w in ["margin", "profitability"]):
