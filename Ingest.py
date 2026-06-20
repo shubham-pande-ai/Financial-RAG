@@ -5,23 +5,32 @@ CLI to run the full ingestion pipeline:
   MinIO PDFs (annual reports / concalls)
     → Docling extract → chunk → embed → Qdrant + MySQL
 
-PDFs live in MinIO under:
-  {BUCKET}/{SYMBOL}/{doc_type}/{year}/{filename}.pdf
-  e.g.  quant-docs/RELIANCE/annual_report/2024/reliance_ar_2024.pdf
+PDFs live in MinIO across two doc-type-specific buckets (no shared bucket,
+no year subfolder — year is parsed from the filename):
+
+  annual-reports/{symbol_lower}/{filename}.pdf
+  concall-transcripts/{symbol_lower}/{filename}.pdf
+
+  e.g.  annual-reports/hal/2024_Financial_Year_2024_from_bse.pdf
+        concall-transcripts/hal/2024_May_2024_Transcript.pdf
+
+The stored `minio_key` in MySQL is the full "{bucket}/{key}" path, matching
+the `object_path` convention already used by the Quant Copilot pdf_documents
+table, so it stays globally unique across both buckets.
 
 Usage:
-    python ingest.py --symbol RELIANCE
-    python ingest.py --symbol RELIANCE --type annual
-    python ingest.py --symbol RELIANCE --type concall
-    python ingest.py --all           # ingest every object in the bucket
+    python ingest.py --symbol HAL
+    python ingest.py --symbol HAL --type annual
+    python ingest.py --symbol HAL --type concall
+    python ingest.py --all           # ingest every object in both buckets
     python ingest.py --stats         # show DB stats
     python ingest.py --list          # list all MinIO keys available
 """
 
 import argparse
+import re
 import sys
 import time
-import tempfile
 from pathlib import Path
 
 from minio import Minio
@@ -29,7 +38,7 @@ from minio.error import S3Error
 
 from config.settings import (
     MINIO_ENDPOINT, MINIO_ACCESS_KEY, MINIO_SECRET_KEY,
-    MINIO_SECURE, MINIO_BUCKET, INGEST_TMP_DIR, LOG_DIR,
+    MINIO_SECURE, INGEST_TMP_DIR, LOG_DIR,
 )
 from db.database import (
     init_db,
@@ -49,6 +58,17 @@ log = get_logger(__name__, LOG_DIR)
 
 
 # ─────────────────────────────────────────────
+# Doc-type → bucket mapping (real layout, not a single shared bucket)
+# ─────────────────────────────────────────────
+DOC_TYPE_BUCKETS = {
+    "annual_report": "annual-reports",
+    "concall":       "concall-transcripts",
+}
+
+_YEAR_RE = re.compile(r"^(\d{4})")
+
+
+# ─────────────────────────────────────────────
 # MinIO client (module-level singleton)
 # ─────────────────────────────────────────────
 def _minio_client() -> Minio:
@@ -62,39 +82,35 @@ def _minio_client() -> Minio:
 
 # ─────────────────────────────────────────────
 # Key parsing helpers
-# Key layout: {SYMBOL}/{doc_type}/{year}/{filename}.pdf
+# Key layout within a doc-type bucket: {symbol_lower}/{filename}.pdf
 # ─────────────────────────────────────────────
-def _parse_minio_key(key: str) -> dict | None:
+def _parse_minio_key(key: str, doc_type: str, bucket: str) -> dict | None:
     """
-    Parse a MinIO object key into (symbol, doc_type, year, title).
-    Returns None if the key doesn't match the expected layout or isn't a PDF.
+    Parse a MinIO object key (within a doc_type-specific bucket) into
+    (symbol, doc_type, year, title). Returns None if the key doesn't match
+    the expected layout or isn't a PDF.
+
+    Year is parsed from the leading 4 digits of the filename since there's
+    no separate year folder in the real layout.
     """
     if not key.lower().endswith(".pdf"):
         return None
 
     parts = key.split("/")
-    # Minimum: SYMBOL/doc_type/year/file.pdf  → 4 parts
-    if len(parts) < 4:
+    # Minimum: symbol/file.pdf → 2 parts
+    if len(parts) < 2:
         return None
 
     symbol   = parts[0].upper()
-    raw_type = parts[1].lower()
-    raw_year = parts[2]
     filename = parts[-1]
 
-    # Normalise doc_type
-    if "annual" in raw_type:
-        doc_type = "annual_report"
-    elif "concall" in raw_type:
-        doc_type = "concall"
-    else:
-        return None
-
-    # Year
-    year = int(raw_year) if raw_year.isdigit() and 2000 <= int(raw_year) <= 2035 else None
+    m = _YEAR_RE.match(filename)
+    year = int(m.group(1)) if m else None
 
     return {
-        "minio_key": key,
+        "minio_key": f"{bucket}/{key}",   # full identifier — stored in MySQL, globally unique
+        "bucket":    bucket,
+        "key":       key,                 # raw key — used for MinIO API calls
         "symbol":    symbol,
         "doc_type":  doc_type,
         "year":      year,
@@ -110,33 +126,28 @@ def list_minio_pdfs(
     doc_type_filter: str  = None,
     client:          Minio = None,
 ) -> list[dict]:
-    """List all matching PDF objects in MinIO bucket."""
+    """List all matching PDF objects across the doc-type-specific MinIO buckets."""
     if client is None:
         client = _minio_client()
 
-    prefix = ""
-    if symbol:
-        prefix = f"{symbol.upper()}/"
-        if doc_type_filter:
-            # map normalised type back to folder name
-            folder = "annual_report" if doc_type_filter == "annual_report" else "concall"
-            prefix += f"{folder}/"
-
-    try:
-        objects = client.list_objects(MINIO_BUCKET, prefix=prefix, recursive=True)
-    except S3Error as e:
-        log.error(f"MinIO list failed: {e}")
-        return []
+    doc_types = [doc_type_filter] if doc_type_filter else list(DOC_TYPE_BUCKETS.keys())
+    prefix = f"{symbol.lower()}/" if symbol else ""
 
     pdfs = []
-    for obj in objects:
-        parsed = _parse_minio_key(obj.object_name)
-        if parsed is None:
+    for doc_type in doc_types:
+        bucket = DOC_TYPE_BUCKETS[doc_type]
+        try:
+            objects = client.list_objects(bucket, prefix=prefix, recursive=True)
+        except S3Error as e:
+            log.error(f"MinIO list failed for bucket '{bucket}': {e}")
             continue
-        if doc_type_filter and parsed["doc_type"] != doc_type_filter:
-            continue
-        parsed["size_bytes"] = obj.size or 0
-        pdfs.append(parsed)
+
+        for obj in objects:
+            parsed = _parse_minio_key(obj.object_name, doc_type, bucket)
+            if parsed is None:
+                continue
+            parsed["size_bytes"] = obj.size or 0
+            pdfs.append(parsed)
 
     return pdfs
 
@@ -144,11 +155,11 @@ def list_minio_pdfs(
 # ─────────────────────────────────────────────
 # Download one PDF from MinIO to a temp file
 # ─────────────────────────────────────────────
-def _download_pdf(minio_key: str, client: Minio) -> Path:
+def _download_pdf(bucket: str, key: str, client: Minio) -> Path:
     """Download object to INGEST_TMP_DIR and return local Path."""
     INGEST_TMP_DIR.mkdir(parents=True, exist_ok=True)
-    local_path = INGEST_TMP_DIR / Path(minio_key).name
-    client.fget_object(MINIO_BUCKET, minio_key, str(local_path))
+    local_path = INGEST_TMP_DIR / Path(key).name
+    client.fget_object(bucket, key, str(local_path))
     return local_path
 
 
@@ -156,6 +167,8 @@ def _download_pdf(minio_key: str, client: Minio) -> Path:
 # Core ingestion function (one PDF)
 # ─────────────────────────────────────────────
 def ingest_pdf(pdf_info: dict, force: bool = False, client: Minio = None) -> bool:
+    bucket:    str = pdf_info["bucket"]
+    key:       str = pdf_info["key"]
     minio_key: str = pdf_info["minio_key"]
     doc_type:  str = pdf_info["doc_type"]
     symbol:    str = pdf_info["symbol"]
@@ -190,7 +203,7 @@ def ingest_pdf(pdf_info: dict, force: bool = False, client: Minio = None) -> boo
     try:
         # Step 1: Download from MinIO
         log.info("[1/4] Downloading from MinIO...")
-        local_path = _download_pdf(minio_key, client)
+        local_path = _download_pdf(bucket, key, client)
         log.info(f"  → {local_path} ({file_size_kb} KB)")
 
         # Step 2: Extract (Docling)
@@ -267,13 +280,13 @@ def ingest_pdf(pdf_info: dict, force: bool = False, client: Minio = None) -> boo
 # ─────────────────────────────────────────────
 def main():
     ap = argparse.ArgumentParser(description="Financial RAG — Ingestion Pipeline (MinIO → Qdrant)")
-    ap.add_argument("--symbol", "-s",  help="Company symbol (e.g. RELIANCE)")
+    ap.add_argument("--symbol", "-s",  help="Company symbol (e.g. HAL)")
     ap.add_argument(
         "--type", "-t",
         choices=["annual", "concall"],
         help="Filter by document type",
     )
-    ap.add_argument("--all",   action="store_true", help="Ingest all objects in MinIO bucket")
+    ap.add_argument("--all",   action="store_true", help="Ingest all objects across both buckets")
     ap.add_argument("--force", action="store_true", help="Re-ingest already ingested docs")
     ap.add_argument("--stats", action="store_true", help="Show database stats and exit")
     ap.add_argument("--list",  action="store_true", help="List available MinIO objects and exit")
@@ -296,7 +309,7 @@ def main():
 
     if args.list:
         pdfs = list_minio_pdfs(client=client)
-        print(f"\n── MinIO bucket '{MINIO_BUCKET}' — {len(pdfs)} PDF(s) ──")
+        print(f"\n── MinIO objects — buckets {list(DOC_TYPE_BUCKETS.values())} — {len(pdfs)} PDF(s) ──")
         for p in pdfs:
             ingested = "✓" if is_already_ingested(p["minio_key"]) else "·"
             print(f"  [{ingested}] {p['minio_key']}")
@@ -313,7 +326,7 @@ def main():
     # Resolve symbols
     if args.all:
         pdfs = list_minio_pdfs(doc_type_filter=doc_type_filter, client=client)
-        log.info(f"Found {len(pdfs)} PDF(s) in bucket")
+        log.info(f"Found {len(pdfs)} PDF(s) across bucket(s)")
     elif args.symbol:
         pdfs = list_minio_pdfs(
             symbol=args.symbol.upper(),
@@ -321,10 +334,13 @@ def main():
             client=client,
         )
         if not pdfs:
+            buckets = (
+                [DOC_TYPE_BUCKETS[doc_type_filter]] if doc_type_filter
+                else list(DOC_TYPE_BUCKETS.values())
+            )
             log.error(
-                f"No PDFs found for {args.symbol.upper()} in "
-                f"MinIO bucket '{MINIO_BUCKET}' "
-                f"(prefix: {args.symbol.upper()}/)"
+                f"No PDFs found for {args.symbol.upper()} in bucket(s) {buckets} "
+                f"(prefix: {args.symbol.lower()}/)"
             )
             sys.exit(1)
     else:

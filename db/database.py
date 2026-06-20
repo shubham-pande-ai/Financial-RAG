@@ -48,7 +48,7 @@ _SCHEMA_STMTS = [
         doc_type     VARCHAR(30) NOT NULL,
         year         SMALLINT,
         title        VARCHAR(500),
-        minio_key    VARCHAR(1000) UNIQUE,
+        minio_key    VARCHAR(500) UNIQUE,
         file_size_kb INT DEFAULT 0,
         total_pages  INT DEFAULT 0,
         total_chunks INT DEFAULT 0,
