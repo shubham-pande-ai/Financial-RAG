@@ -55,14 +55,14 @@ _client: Optional[QdrantClient] = None
 def get_qdrant_client() -> QdrantClient:
     global _client
     if _client is None:
-        kwargs: dict = {"host": QDRANT_HOST, "port": QDRANT_PORT}
+        # Build the URL with explicit http:// to avoid SSL mismatch
+        url = f"http://{QDRANT_HOST}:{QDRANT_PORT}"
+        kwargs = {"url": url}
         if QDRANT_API_KEY:
             kwargs["api_key"] = QDRANT_API_KEY
         _client = QdrantClient(**kwargs)
-        log.info(f"Qdrant client initialised → {QDRANT_HOST}:{QDRANT_PORT}")
+        log.info(f"Qdrant client initialised → {url}")
     return _client
-
-
 # ─────────────────────────────────────────────
 # Collection bootstrap
 # ─────────────────────────────────────────────

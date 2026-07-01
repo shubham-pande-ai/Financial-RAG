@@ -61,17 +61,36 @@ def _get_converter():
     if _converter is not None:
         return _converter
 
-    from docling.document_converter import DocumentConverter
+    from docling.document_converter import DocumentConverter, PdfFormatOption
     from docling.datamodel.base_models import InputFormat
-    from docling.datamodel.pipeline_options import PdfPipelineOptions
+    from docling.datamodel.pipeline_options import PdfPipelineOptions, TableFormerMode
+    from docling.datamodel.accelerator_options import AcceleratorOptions, AcceleratorDevice
+    from docling.backend.pypdfium2_backend import PyPdfiumDocumentBackend
 
     pipeline_options = PdfPipelineOptions()
     pipeline_options.do_ocr             = False   # native PDFs — skip OCR for speed
     pipeline_options.do_table_structure = True    # TableFormer for accurate tables
 
+    # FAST mode trades a bit of cell-matching precision for a big speedup —
+    # worth it on CPU-only hardware. Switch back to ACCURATE if table quality
+    # on financial statements turns out too rough.
+    pipeline_options.table_structure_options.mode = TableFormerMode.FAST
+
+    # No GPU here — pin thread count explicitly. i5-1240P is 4P+8E cores;
+    # 8 threads is a reasonable starting point. Tune up/down and re-time a
+    # single ingest run if you want to chase the sweet spot.
+    pipeline_options.accelerator_options = AcceleratorOptions(
+        num_threads=8,
+        device=AcceleratorDevice.CPU,
+    )
+
     _converter = DocumentConverter(
         format_options={
-            InputFormat.PDF: pipeline_options,
+            InputFormat.PDF: PdfFormatOption(
+                pipeline_options=pipeline_options,
+                backend=PyPdfiumDocumentBackend,   # lighter-weight backend — avoids
+                                                    # std::bad_alloc on large/scanned PDFs
+            ),
         }
     )
     log.info("Docling DocumentConverter initialised")
