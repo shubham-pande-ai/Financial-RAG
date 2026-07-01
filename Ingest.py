@@ -23,6 +23,7 @@ Usage:
     python ingest.py --symbol HAL --type annual
     python ingest.py --symbol HAL --type concall
     python ingest.py --all           # ingest every object in both buckets
+    python ingest.py --all --year 2020   # ingest only PDFs from 2020
     python ingest.py --stats         # show DB stats
     python ingest.py --list          # list all MinIO keys available
 """
@@ -124,6 +125,7 @@ def _parse_minio_key(key: str, doc_type: str, bucket: str) -> dict | None:
 def list_minio_pdfs(
     symbol:          str  = None,
     doc_type_filter: str  = None,
+    year:            int  = None,
     client:          Minio = None,
 ) -> list[dict]:
     """List all matching PDF objects across the doc-type-specific MinIO buckets."""
@@ -145,6 +147,9 @@ def list_minio_pdfs(
         for obj in objects:
             parsed = _parse_minio_key(obj.object_name, doc_type, bucket)
             if parsed is None:
+                continue
+            # Apply year filter if provided
+            if year is not None and parsed.get("year") != year:
                 continue
             parsed["size_bytes"] = obj.size or 0
             pdfs.append(parsed)
@@ -286,6 +291,7 @@ def main():
         choices=["annual", "concall"],
         help="Filter by document type",
     )
+    ap.add_argument("--year", "-y", type=int, help="Filter by year (e.g. 2020)")
     ap.add_argument("--all",   action="store_true", help="Ingest all objects across both buckets")
     ap.add_argument("--force", action="store_true", help="Re-ingest already ingested docs")
     ap.add_argument("--stats", action="store_true", help="Show database stats and exit")
@@ -308,7 +314,7 @@ def main():
     client = _minio_client()
 
     if args.list:
-        pdfs = list_minio_pdfs(client=client)
+        pdfs = list_minio_pdfs(client=client, year=args.year)
         print(f"\n── MinIO objects — buckets {list(DOC_TYPE_BUCKETS.values())} — {len(pdfs)} PDF(s) ──")
         for p in pdfs:
             ingested = "✓" if is_already_ingested(p["minio_key"]) else "·"
@@ -325,12 +331,13 @@ def main():
 
     # Resolve symbols
     if args.all:
-        pdfs = list_minio_pdfs(doc_type_filter=doc_type_filter, client=client)
+        pdfs = list_minio_pdfs(doc_type_filter=doc_type_filter, year=args.year, client=client)
         log.info(f"Found {len(pdfs)} PDF(s) across bucket(s)")
     elif args.symbol:
         pdfs = list_minio_pdfs(
             symbol=args.symbol.upper(),
             doc_type_filter=doc_type_filter,
+            year=args.year,
             client=client,
         )
         if not pdfs:
@@ -338,9 +345,10 @@ def main():
                 [DOC_TYPE_BUCKETS[doc_type_filter]] if doc_type_filter
                 else list(DOC_TYPE_BUCKETS.values())
             )
+            year_msg = f" with year {args.year}" if args.year else ""
             log.error(
                 f"No PDFs found for {args.symbol.upper()} in bucket(s) {buckets} "
-                f"(prefix: {args.symbol.lower()}/)"
+                f"(prefix: {args.symbol.lower()}/){year_msg}"
             )
             sys.exit(1)
     else:

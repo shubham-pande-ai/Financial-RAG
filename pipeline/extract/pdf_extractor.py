@@ -192,8 +192,14 @@ def extract_annual_report(pdf_path: Path) -> ExtractedDocument:
     result = converter.convert(source=str(pdf_path))
     dl_doc = result.document
 
-    # Total pages from document metadata
-    doc_out.total_pages = getattr(dl_doc, "num_pages", 0) or _count_pages(dl_doc)
+    # ─── FIX: safely get page count ───
+    total_pages = getattr(dl_doc, "num_pages", None)
+    if callable(total_pages):
+        total_pages = total_pages()
+    if total_pages is None or total_pages == 0:
+        total_pages = _count_pages(dl_doc)
+    doc_out.total_pages = total_pages
+    # ─────────────────────────────────
 
     current_section = "General"
 
@@ -264,7 +270,14 @@ def extract_concall(pdf_path: Path) -> ExtractedDocument:
     result = converter.convert(source=str(pdf_path))
     dl_doc = result.document
 
-    doc_out.total_pages = getattr(dl_doc, "num_pages", 0) or _count_pages(dl_doc)
+    # ─── FIX: safely get page count ───
+    total_pages = getattr(dl_doc, "num_pages", None)
+    if callable(total_pages):
+        total_pages = total_pages()
+    if total_pages is None or total_pages == 0:
+        total_pages = _count_pages(dl_doc)
+    doc_out.total_pages = total_pages
+    # ─────────────────────────────────
 
     # Collect all text blocks grouped by page, then run speaker-turn parser
     page_texts: dict[int, list[str]] = {}
