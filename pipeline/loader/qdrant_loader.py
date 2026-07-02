@@ -184,13 +184,19 @@ def query_collection(
 
     qdrant_filter = _build_filter(where) if where else None
 
-    results = client.search(
+    # client.search() was removed in newer qdrant-client versions (1.10+);
+    # query_points() is the current API. It takes `query=` (not
+    # `query_vector=`) and returns a QueryResponse whose `.points` list
+    # holds the ScoredPoint results (same shape `.search()` used to return
+    # directly).
+    response = client.query_points(
         collection_name = collection_name,
-        query_vector    = query_embedding,
-        limit           = top_k,
-        query_filter    = qdrant_filter,
-        with_payload    = True,
+        query           = query_embedding,
+        limit            = top_k,
+        query_filter     = qdrant_filter,
+        with_payload     = True,
     )
+    results = response.points
 
     return [
         {
