@@ -28,6 +28,7 @@ from qdrant_client.models import (
     Filter,
     FieldCondition,
     MatchValue,
+    MatchAny,
     Range,
     UpdateStatus,
 )
@@ -207,16 +208,30 @@ def query_collection(
 def _build_filter(where: dict) -> Filter:
     """
     Convert a flat {key: value} dict to a Qdrant Filter.
-    Supports: str/int equality and int range via {"$gte": x, "$lte": y}.
+    Supports:
+      - str/int equality:            {"symbol": "HAL"}
+      - int range:                   {"year": {"$gte": 2022, "$lte": 2024}}
+      - "any of" / multi-value ($in): {"year": [2023, 2024, 2025]}
+                                       or {"year": {"$in": [2023, 2024]}}
     """
     conditions = []
     for key, value in where.items():
-        if isinstance(value, dict):
+        if isinstance(value, dict) and ("$gte" in value or "$lte" in value):
             # Range filter: {"year": {"$gte": 2022, "$lte": 2024}}
             gte = value.get("$gte")
             lte = value.get("$lte")
             conditions.append(
                 FieldCondition(key=key, range=Range(gte=gte, lte=lte))
+            )
+        elif isinstance(value, dict) and "$in" in value:
+            # {"year": {"$in": [2023, 2024, 2025]}}
+            conditions.append(
+                FieldCondition(key=key, match=MatchAny(any=list(value["$in"])))
+            )
+        elif isinstance(value, (list, tuple, set)):
+            # {"year": [2023, 2024, 2025]}  — plain list shorthand for $in
+            conditions.append(
+                FieldCondition(key=key, match=MatchAny(any=list(value)))
             )
         else:
             conditions.append(

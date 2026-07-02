@@ -27,7 +27,7 @@ USAGE:
     python server.py
 
     # Terminal 2 — query it (replace your old query.py calls)
-    curl -X POST http://localhost:8000/query \
+    curl -X POST http://localhost:8001/query \
       -H "Content-Type: application/json" \
       -d '{"query": "ADANIPORTS revenue FY25", "symbol": "ADANIPORTS", "provider": "groq"}'
 

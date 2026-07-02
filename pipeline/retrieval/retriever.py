@@ -52,7 +52,7 @@ from dataclasses import dataclass
 
 from config.settings import ANNUAL_RETRIEVAL, CONCALL_RETRIEVAL
 from pipeline.loader.embedder import embed_query
-from pipeline.loader.chroma_loader import query_collection
+from pipeline.loader.qdrant_loader import query_collection
 from utils.logger import get_logger
 
 log = get_logger(__name__)
@@ -366,20 +366,21 @@ def _minmax(scores: List[float]) -> List[float]:
 
 
 # ─────────────────────────────────────────────
-# ChromaDB where filter
+# Qdrant where filter
 # ─────────────────────────────────────────────
 def _build_where(symbol: Optional[str], years: Optional[List[int]]) -> Optional[dict]:
-    conditions = []
+    """
+    Build a flat filter dict consumed by qdrant_loader.query_collection().
+    Qdrant filters are just {field: value} (equality), {field: [v1, v2]}
+    (any-of / $in), or {field: {"$gte": x, "$lte": y}} (range) — no
+    ChromaDB-style $eq/$and wrapper needed; all top-level keys are AND'ed.
+    """
+    where: dict = {}
     if symbol:
-        conditions.append({"symbol": {"$eq": symbol.upper()}})
+        where["symbol"] = symbol.upper()
     if years:
-        if len(years) == 1:
-            conditions.append({"year": {"$eq": years[0]}})
-        else:
-            conditions.append({"year": {"$in": years}})
-    if not conditions:
-        return None
-    return conditions[0] if len(conditions) == 1 else {"$and": conditions}
+        where["year"] = years[0] if len(years) == 1 else list(years)
+    return where or None
 
 
 # ─────────────────────────────────────────────
@@ -397,14 +398,18 @@ def _run_annual_query(query: str, symbol: Optional[str],
         top_k=top_k,
         where=where,
     )
-    if not result["ids"] or not result["ids"][0]:
+    if not result:
         return []
 
-    ids    = result["ids"][0]
-    docs   = result["documents"][0]
-    metas  = result["metadatas"][0]
-    dists  = result["distances"][0]
-    vscore = [1 - d for d in dists]
+    # qdrant_loader.query_collection() returns a flat list of dicts:
+    #   {"id", "score", "text", "metadata", "payload"} — no nested
+    #   ids[0]/documents[0]/... ChromaDB shape.
+    ids    = [r["id"] for r in result]
+    docs   = [r["text"] for r in result]
+    metas  = [r["metadata"] for r in result]
+    # Qdrant's cosine "score" is already a similarity (higher = better),
+    # not a distance, so use it directly instead of `1 - distance`.
+    vscore = [r["score"] for r in result]
 
     bm25   = BM25(docs)
     bscore = bm25.get_scores(expanded_query)
@@ -463,22 +468,14 @@ def retrieve_concall(
     expanded_query = _expand_query(query)
     query_vec = embed_query(expanded_query)
 
-    conditions = []
+    where: dict = {}
     if symbol:
-        conditions.append({"symbol": {"$eq": symbol.upper()}})
+        where["symbol"] = symbol.upper()
     if years:
-        conditions.append(
-            {"year": {"$in": years}} if len(years) > 1
-            else {"year": {"$eq": years[0]}}
-        )
+        where["year"] = years[0] if len(years) == 1 else list(years)
     if speaker_role:
-        conditions.append({"speaker_role": {"$eq": speaker_role}})
-
-    where = None
-    if len(conditions) == 1:
-        where = conditions[0]
-    elif len(conditions) > 1:
-        where = {"$and": conditions}
+        where["speaker_role"] = speaker_role
+    where = where or None
 
     result = query_collection(
         doc_type="concall",
@@ -487,24 +484,24 @@ def retrieve_concall(
         where=where,
     )
 
-    if not result["ids"] or not result["ids"][0]:
+    if not result:
         if years:
             log.warning("  Concall: no results with year filter, falling back")
-            where_fallback = {"symbol": {"$eq": symbol.upper()}} if symbol else None
+            where_fallback = {"symbol": symbol.upper()} if symbol else None
             result = query_collection(
                 doc_type="concall",
                 query_embedding=query_vec,
                 top_k=cfg["top_k_vector"],
                 where=where_fallback,
             )
-        if not result["ids"] or not result["ids"][0]:
+        if not result:
             return []
 
-    ids    = result["ids"][0]
-    docs   = result["documents"][0]
-    metas  = result["metadatas"][0]
-    dists  = result["distances"][0]
-    vscore = [1 - d for d in dists]
+    # Flat list-of-dicts, same shape as _run_annual_query above.
+    ids    = [r["id"] for r in result]
+    docs   = [r["text"] for r in result]
+    metas  = [r["metadata"] for r in result]
+    vscore = [r["score"] for r in result]
 
     bm25   = BM25(docs)
     bscore = bm25.get_scores(expanded_query)

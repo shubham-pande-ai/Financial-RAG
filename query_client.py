@@ -22,7 +22,7 @@ except ImportError:
     print("[error] pip install requests")
     sys.exit(1)
 
-SERVER_URL = "http://localhost:8000"
+SERVER_URL = "http://localhost:8001"
 
 # ── Provider menu (mirrors rag_engine.py build_provider_catalogue) ────────────
 # Fetched dynamically from server so it stays in sync with rag_engine
