@@ -357,7 +357,7 @@ def validate_provider(entry: "ProviderEntry") -> Tuple[bool, str]:
 
         headers = {"Authorization": f"Bearer {entry.api_key}"}
         if entry.provider == "openrouter":
-            headers["HTTP-Referer"] = "https://github.com/Import-Saurabh/FinancialRag"
+            headers["HTTP-Referer"] = "https://github.com/Financial-Rag-App"
             headers["X-Title"]      = "FinancialRAG"
 
         r = requests.get(models_url, headers=headers, timeout=10)
@@ -615,7 +615,7 @@ def _call_openai_compat(system_prompt: str, user_prompt: str,
         headers["Authorization"] = f"Bearer {entry.api_key}"
     if "openrouter" in entry.api_url:
         # These headers are required by OpenRouter — missing them causes 403/429
-        headers["HTTP-Referer"] = "https://github.com/Import-Saurabh/FinancialRag"
+        headers["HTTP-Referer"] = "https://github.com/Financial-Rag-App"
         headers["X-Title"]      = "FinancialRAG"
     messages = (
         [{"role": "user", "content": f"{system_prompt}\n\n---\n\n{user_prompt}"}]

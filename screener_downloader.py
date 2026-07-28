@@ -230,7 +230,7 @@ def main():
     success = 0
     fail = 0
 
-    for doc in docs:
+    for doc in docs[2:3]:
         if download_pdf(session, doc, out_dir):
             success += 1
         else:
