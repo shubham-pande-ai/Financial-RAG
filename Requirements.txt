@@ -17,4 +17,4 @@ tf-keras
 numpy>=1.24.0
 qdrant-client
 minio
-mysql-connector-python
+mysql-connector-pythonstreamlit>=1.35.0

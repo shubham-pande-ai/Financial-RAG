@@ -44,6 +44,9 @@ _load_dotenv()
 # ─────────────────────────────────────────────
 # Paths (local only — no more SQLite, no more screener_docs)
 # ─────────────────────────────────────────────
+# Schema Bridge DB Paths (Set to None because local DB is missing)
+# ─────────────────────────────────────────────
+DB_PATH = None
 BASE_DIR = Path(__file__).resolve().parent.parent
 LOG_DIR  = BASE_DIR / "logs"
 

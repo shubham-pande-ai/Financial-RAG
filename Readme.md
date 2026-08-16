@@ -11,6 +11,7 @@ Free, fully local vector DB + Groq (free cloud LLM) — no GPU, no paid APIs.
 | Re-ranker | ms-marco-MiniLM (CPU) | Free |
 | LLM | Groq API (llama-3.3-70b) | Free tier |
 | Metadata DB | SQLite | Free |
+| Web UI | Streamlit | Free |
 
 ## Architecture
 
@@ -72,10 +73,16 @@ python ingest.py --symbol RELIANCE
 python ingest.py --symbol RELIANCE --type concall   # only concalls
 python ingest.py --symbol RELIANCE --type annual    # only annual reports
 
-# 6. Query
-python query.py --symbol RELIANCE "What is the revenue growth trend over last 3 years?"
-python query.py --symbol RELIANCE --type concall "What did management say about capex guidance?"
-python query.py  "Compare Reliance and ADANIPORTS debt levels"  # cross-company
+# 6. Query (CLI)
+python query_client.py --symbol RELIANCE "What is the revenue growth trend over last 3 years?"
+python query_client.py --symbol RELIANCE --type concall "What did management say about capex guidance?"
+python query_client.py  "Compare Reliance and ADANIPORTS debt levels"  # cross-company
+
+# 7. Query (Web UI)
+# Start the backend server first
+python server.py
+# In a new terminal, run the Streamlit UI
+streamlit run app.py
 ```
 
 ## Groq Free Tier

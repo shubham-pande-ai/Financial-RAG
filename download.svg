@@ -1,0 +1,153 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 976.7384166666666 1031" width="976.7384166666666" height="1031" style="--bg:#1F1F1F;--fg:#CCCCCC;--line:#CCCCCC;--accent:#0078D4;--muted:#CCCCCCCC;--surface:#181818;--border:#CCCCCC;background:var(--bg)">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap');
+  text { font-family: 'Inter', system-ui, sans-serif; }
+  svg {
+    /* Derived from --bg and --fg (overridable via --line, --accent, etc.) */
+    --_text:          var(--fg);
+    --_text-sec:      var(--muted, color-mix(in srgb, var(--fg) 60%, var(--bg)));
+    --_text-muted:    var(--muted, color-mix(in srgb, var(--fg) 40%, var(--bg)));
+    --_text-faint:    color-mix(in srgb, var(--fg) 25%, var(--bg));
+    --_line:          var(--line, color-mix(in srgb, var(--fg) 50%, var(--bg)));
+    --_arrow:         var(--accent, color-mix(in srgb, var(--fg) 85%, var(--bg)));
+    --_node-fill:     var(--surface, color-mix(in srgb, var(--fg) 3%, var(--bg)));
+    --_node-stroke:   var(--border, color-mix(in srgb, var(--fg) 20%, var(--bg)));
+    --_group-fill:    var(--bg);
+    --_group-hdr:     color-mix(in srgb, var(--fg) 5%, var(--bg));
+    --_inner-stroke:  color-mix(in srgb, var(--fg) 12%, var(--bg));
+    --_key-badge:     color-mix(in srgb, var(--fg) 10%, var(--bg));
+  }
+</style>
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="5" refX="7" refY="2.5" orient="auto">
+    <polygon points="0 0, 8 2.5, 0 5" fill="var(--_arrow)" stroke="var(--_arrow)" stroke-width="0.75" stroke-linejoin="round" />
+  </marker>
+  <marker id="arrowhead-start" markerWidth="8" markerHeight="5" refX="1" refY="2.5" orient="auto-start-reverse">
+    <polygon points="8 0, 0 2.5, 8 5" fill="var(--_arrow)" stroke="var(--_arrow)" stroke-width="0.75" stroke-linejoin="round" />
+  </marker>
+</defs>
+<g class="subgraph" data-id="Phase_1_Data_Ingestion__Parsing" data-label="Phase 1: Data Ingestion &amp; Parsing">
+  <rect x="722.7394166666667" y="91.5" width="213.99899999999997" height="365.6" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="722.7394166666667" y="91.5" width="213.99899999999997" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="734.7394166666667" y="105.5" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">Phase 1: Data Ingestion &amp; Parsing</text>
+</g>
+<g class="subgraph" data-id="Phase_2_Storage" data-label="Phase 2: Storage">
+  <rect x="559.07225" y="517.1" width="326.79933333333327" height="447.9000000000001" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="559.07225" y="517.1" width="326.79933333333327" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="571.07225" y="531.1" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">Phase 2: Storage</text>
+</g>
+<g class="subgraph" data-id="Phase_3_Retrieval_Pipeline" data-label="Phase 3: Retrieval Pipeline">
+  <rect x="209.61800000000005" y="70" width="424.73900000000003" height="318.8" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="209.61800000000005" y="70" width="424.73900000000003" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="221.61800000000005" y="84" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">Phase 3: Retrieval Pipeline</text>
+</g>
+<g class="subgraph" data-id="Phase_4_Generation" data-label="Phase 4: Generation">
+  <rect x="236.29399999999998" y="856.1000000000001" width="208.81199999999998" height="96.9" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="236.29399999999998" y="856.1000000000001" width="208.81199999999998" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="248.29399999999998" y="870.1000000000001" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">Phase 4: Generation</text>
+</g>
+<polyline class="edge" data-from="D" data-to="E" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="829.7389166666667,441.1 829.7389166666667,499.1 760.7175833333333,499.1 760.7175833333333,561.1" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="I" data-to="H" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="1. Extract Year/Symbol" points="591.442,161.65 591.442,430.8 638.1394166666665,430.8 638.1394166666665,499.1 640.5635833333332,499.1 640.5635833333333,730.9000000000001" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="I" data-to="G" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="3. Cosine Search" points="564.527,161.65 564.527,162.9 570.9028333333333,162.9 570.9028333333333,430.8 524.2054166666666,430.8 524.2054166666666,499.1 575.0722499999999,499.1 575.07225,862.1000000000001 631.7572500000001,862.1000000000001 631.7572500000001,899.1000000000001" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="G" data-to="J" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="Returns Top 30" points="667.80925,950.0000000000001 667.80925,983.0000000000001 81.5,983.0000000000001 81.5,40 340.70000000000005,40 340.70000000000005,124.75" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="K" data-to="L" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="340.70000000000005,364.50000000000006 340.7,899.1000000000001" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="L" data-to="I" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="Generates Answer in 2.5s" points="340.7,936.0000000000001 340.6999999999999,971.0000000000001 199.61799999999994,971.0000000000001 199.61799999999994,52 551.0695,52 551.0695000000001,124.75" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="A" data-to="B" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="829.7389166666667,161.65 829.7389166666667,209.65" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="B" data-to="C" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="829.7389166666667,260.55 829.7389166666667,327.6" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="C" data-to="D" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="829.7389166666667,364.50000000000006 829.7389166666667,404.20000000000005" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="E" data-to="F" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="760.7175833333333,598 760.7175833333333,646" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="F" data-to="G" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="760.7175833333333,682.9 760.7175833333333,706.9000000000001 667.8092500000001,706.9000000000001 667.8092500000001,899.1000000000001" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="F" data-to="H" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="760.7175833333333,682.9 760.7175833333333,706.9000000000001 667.80925,706.9000000000001 667.80925,730.9000000000001" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="H" data-to="G" data-style="dotted" data-arrow-start="false" data-arrow-end="true" data-label="2. Metadata Filter" points="667.80925,781.8000000000001 667.80925,899.1000000000001" fill="none" stroke="var(--_line)" stroke-width="1" stroke-dasharray="4 4" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="User" data-to="I" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="501.56950000000006,209.65 501.56950000000006,162.9 510.69700000000006,162.9 510.69700000000006,161.65" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="J" data-to="K" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="Filters to Top 10" points="340.70000000000005,161.65 340.70000000000005,327.6" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="I" data-to="User" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="537.6120000000001,161.65 537.6120000000001,162.9 531.2361666666667,162.9 531.2361666666667,209.65" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<g class="edge-label" data-from="I" data-to="H" data-label="1. Extract Year/Symbol">
+  <rect x="577.1394166666666" y="437.8" width="121.60000000000001" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="637.9394166666666" y="452.95" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">1. Extract Year/Symbol</text>
+</g>
+<g class="edge-label" data-from="I" data-to="G" data-label="3. Cosine Search">
+  <rect x="474.7054166666667" y="437.8" width="98.43400000000003" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="523.9224166666667" y="452.95" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">3. Cosine Search</text>
+</g>
+<g class="edge-label" data-from="G" data-to="J" data-label="Returns Top 30">
+  <rect x="36" y="945.7000000000002" width="90.11800000000002" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="81.05900000000001" y="960.8500000000001" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">Returns Top 30</text>
+</g>
+<g class="edge-label" data-from="L" data-to="I" data-label="Generates Answer in 2.5s">
+  <rect x="130.11800000000005" y="776.8000000000002" width="138.23200000000003" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="199.23400000000007" y="791.9500000000002" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">Generates Answer in 2.5s</text>
+</g>
+<g class="edge-label" data-from="H" data-to="G" data-label="2. Metadata Filter">
+  <rect x="618.80925" y="824.8000000000001" width="97.84000000000003" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="667.7292500000001" y="839.95" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">2. Metadata Filter</text>
+</g>
+<g class="edge-label" data-from="J" data-to="K" data-label="Filters to Top 10">
+  <rect x="295.70000000000005" y="228.25" width="89.52400000000003" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="340.46200000000005" y="243.4" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">Filters to Top 10</text>
+</g>
+<g class="node" data-id="A" data-label="Annual Reports PDFs" data-shape="rectangle">
+  <rect x="745.0379166666667" y="124.75" width="169.402" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="829.7389166666667" y="143.2" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Annual Reports PDFs</text>
+</g>
+<g class="node" data-id="B" data-label="MinIO Object Storage" data-shape="cylinder">
+  <rect x="747.6314166666666" y="216.65" width="164.21499999999997" height="36.900000000000006" fill="var(--_node-fill)" stroke="none" />
+  <line x1="747.6314166666666" y1="216.65" x2="747.6314166666666" y2="253.55" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <line x1="911.8464166666665" y1="216.65" x2="911.8464166666665" y2="253.55" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <ellipse cx="829.7389166666666" cy="253.55" rx="82.10749999999999" ry="7" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <ellipse cx="829.7389166666666" cy="216.65" rx="82.10749999999999" ry="7" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="829.7389166666666" y="235.10000000000002" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">MinIO Object Storage</text>
+</g>
+<g class="node" data-id="C" data-label="IBM Docling Parser" data-shape="rectangle">
+  <rect x="751.3364166666667" y="327.6" width="156.805" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="829.7389166666667" y="346.05" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">IBM Docling Parser</text>
+</g>
+<g class="node" data-id="D" data-label="Extracted Text &amp; Tables" data-shape="rectangle">
+  <rect x="738.7394166666667" y="404.20000000000005" width="181.99899999999997" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="829.7389166666667" y="422.65000000000003" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Extracted Text &amp; Tables</text>
+</g>
+<g class="node" data-id="E" data-label="Chunking Engine" data-shape="rectangle">
+  <rect x="689.7250833333334" y="561.1" width="141.985" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="760.7175833333333" y="579.5500000000001" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Chunking Engine</text>
+</g>
+<g class="node" data-id="F" data-label="FinLang / FinBERT Embedder" data-shape="rectangle">
+  <rect x="651.5635833333333" y="646" width="218.30799999999996" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="760.7175833333333" y="664.45" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">FinLang / FinBERT Embedder</text>
+</g>
+<g class="node" data-id="G" data-label="Qdrant Vector DB" data-shape="cylinder">
+  <rect x="595.7052500000001" y="906.1000000000001" width="144.208" height="36.900000000000006" fill="var(--_node-fill)" stroke="none" />
+  <line x1="595.7052500000001" y1="906.1000000000001" x2="595.7052500000001" y2="943.0000000000001" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <line x1="739.9132500000001" y1="906.1000000000001" x2="739.9132500000001" y2="943.0000000000001" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <ellipse cx="667.8092500000001" cy="943.0000000000001" rx="72.104" ry="7" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <ellipse cx="667.8092500000001" cy="906.1000000000001" rx="72.104" ry="7" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="667.8092500000001" y="924.5500000000002" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Qdrant Vector DB</text>
+</g>
+<g class="node" data-id="H" data-label="MySQL Metadata DB" data-shape="cylinder">
+  <rect x="586.07225" y="737.9000000000001" width="163.474" height="36.900000000000006" fill="var(--_node-fill)" stroke="none" />
+  <line x1="586.07225" y1="737.9000000000001" x2="586.07225" y2="774.8000000000001" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <line x1="749.5462500000001" y1="737.9000000000001" x2="749.5462500000001" y2="774.8000000000001" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <ellipse cx="667.80925" cy="774.8000000000001" rx="81.737" ry="7" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <ellipse cx="667.80925" cy="737.9000000000001" rx="81.737" ry="7" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="667.80925" y="756.3500000000001" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">MySQL Metadata DB</text>
+</g>
+<g class="node" data-id="User" data-label="User" data-shape="circle">
+  <circle cx="516.4028333333333" cy="254.15" r="44.5" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="516.4028333333333" y="254.15" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">User</text>
+</g>
+<g class="node" data-id="I" data-label="FastAPI Server" data-shape="rectangle">
+  <rect x="483.78200000000004" y="124.75" width="134.57500000000002" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="551.0695000000001" y="143.2" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">FastAPI Server</text>
+</g>
+<g class="node" data-id="J" data-label="BAAI Cross-Encoder Re-ranker" data-shape="rectangle">
+  <rect x="225.61800000000005" y="124.75" width="230.164" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="340.70000000000005" y="143.2" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">BAAI Cross-Encoder Re-ranker</text>
+</g>
+<g class="node" data-id="K" data-label="Highly Relevant Context" data-shape="rectangle">
+  <rect x="250.81200000000007" y="327.6" width="179.77599999999995" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="340.70000000000005" y="346.05" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Highly Relevant Context</text>
+</g>
+<g class="node" data-id="L" data-label="Groq API / Llama-3-70B" data-shape="rectangle">
+  <rect x="252.29399999999998" y="899.1000000000001" width="176.81199999999998" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="340.7" y="917.5500000000002" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Groq API / Llama-3-70B</text>
+</g>
+</svg>

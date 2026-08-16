@@ -93,7 +93,8 @@ log = get_logger(__name__)
 # Set FINANCE_DB_PATH in config/settings.py:
 #   FINANCE_DB_PATH = Path("C:/Users/hp/Downloads/Fund/database/Ai_Hedge_Fund.db")
 # ─────────────────────────────────────────────────────────────────────────────
-from config.settings import DB_PATH, FINANCE_DB_PATH   # noqa: E402
+from config.settings import DB_PATH   # noqa: E402
+from db.database import get_conn
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Table metadata: which column holds the date/period, and which holds symbol
@@ -278,6 +279,12 @@ def _build_sql(atom: AtomicNeed) -> Tuple[str, tuple]:
 
     where_str = f"WHERE {' AND '.join(conditions)}" if conditions else ""
 
+    table_map = {
+        "annual_results": "profit_loss",
+        "quarterly_results": "profit_loss",
+    }
+    actual_table = table_map.get(table, table)
+
     # --- ORDER BY / LIMIT ----------------------------------------------------
     # For current / no-year queries: newest row first, cap at 5 rows.
     # For historical queries with years: order newest first, no cap (user asked for all).
@@ -288,14 +295,15 @@ def _build_sql(atom: AtomicNeed) -> Tuple[str, tuple]:
     else:
         order_limit = f"ORDER BY {date_col} DESC LIMIT 10"
 
-    sql = f"SELECT {select_str} FROM {table} {where_str} {order_limit}".strip()
+    sql = f"SELECT {select_str} FROM {actual_table} {where_str} {order_limit}".strip()
+    sql = sql.replace("?", "%s")
     return sql, tuple(params)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # SQL executor
 # ─────────────────────────────────────────────────────────────────────────────
-def _execute_sql_atom(atom: AtomicNeed, db_path: Path) -> SqlAtomResult:
+def _execute_sql_atom(atom: AtomicNeed) -> SqlAtomResult:
     """Run the SQL for one atom, return SqlAtomResult (never raises)."""
     try:
         sql, params = _build_sql(atom)
@@ -306,19 +314,17 @@ def _execute_sql_atom(atom: AtomicNeed, db_path: Path) -> SqlAtomResult:
     log.debug(f"  [bridge] SQL: {sql} | params={params}")
 
     try:
-        conn = sqlite3.connect(str(db_path))
-        conn.row_factory = sqlite3.Row
-        try:
-            cursor = conn.execute(sql, params)
-            rows = [dict(r) for r in cursor.fetchall()]
-        finally:
-            conn.close()
+        with get_conn() as conn:
+            cursor = conn.cursor(dictionary=True)
+            cursor.execute(sql, params)
+            rows = cursor.fetchall()
+            cursor.close()
 
         log.info(f"  [bridge] {atom.sub_type}: {len(rows)} row(s) from {atom.sql_table}")
         return SqlAtomResult(atom=atom, rows=rows, sql=sql, params=params)
 
-    except sqlite3.Error as e:
-        msg = f"SQLite error for {atom.sub_type} ({atom.sql_table}): {e}"
+    except Exception as e:
+        msg = f"MySQL error for {atom.sub_type} ({atom.sql_table}): {e}"
         log.error(f"  [bridge] {msg}")
         return SqlAtomResult(atom=atom, sql=sql, params=params, error=msg)
 
@@ -443,10 +449,7 @@ class SchemaBridge:
         finance_db_path: Optional[Path] = None,
         max_workers:     int = 8,
     ):
-        # SQL atoms query Ai_Hedge_Fund.db (structured financial tables).
-        # Pass finance_db_path explicitly to override the settings default.
-        self.finance_db_path = finance_db_path or FINANCE_DB_PATH
-        self.max_workers     = max_workers
+        self.max_workers = max_workers
 
     # ── Main entry point ──────────────────────────────────────────────────────
 
@@ -526,7 +529,7 @@ class SchemaBridge:
     # ── Internal helpers ──────────────────────────────────────────────────────
 
     def _safe_sql(self, atom: AtomicNeed) -> SqlAtomResult:
-        return _execute_sql_atom(atom, self.finance_db_path)
+        return _execute_sql_atom(atom)
 
     def _safe_vector(self, atom: AtomicNeed) -> VectorAtomResult:
         return _execute_vector_atom(atom)

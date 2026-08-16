@@ -84,11 +84,7 @@ except ModuleNotFoundError:
     import logging
     log = logging.getLogger(__name__)
 
-# ── FINANCE_DB_PATH — where the structured financial SQLite lives ─────────────
-try:
-    from config.settings import FINANCE_DB_PATH as _FINANCE_DB_PATH
-except (ImportError, AttributeError):
-    _FINANCE_DB_PATH = None   # bridge will skip SQL if None
+
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -128,10 +124,6 @@ def _pipeline_available() -> bool:
     """True only when every component is importable AND finance DB exists."""
     if not (_HAS_DECOMPOSER and _HAS_BRIDGE and _HAS_FUSION and _HAS_BUILDER):
         return False
-    if _FINANCE_DB_PATH is None:
-        return False
-    if not Path(str(_FINANCE_DB_PATH)).exists():
-        return False
     return True
 
 
@@ -165,11 +157,9 @@ class SynthesisPipeline:
 
     def __init__(
         self,
-        finance_db_path: Optional[Path] = None,
-        max_workers:     int = 6,
     ):
-        self._db = finance_db_path or (_FINANCE_DB_PATH and Path(str(_FINANCE_DB_PATH)))
-        self._max_workers = max_workers
+        """Lazy-loads dependencies (transformers etc) when instantiated."""
+        self._max_workers = 6
 
         # Lazy-init components — only instantiated when actually needed
         self._decomposer:  Optional[Any] = None
@@ -186,11 +176,10 @@ class SynthesisPipeline:
         return self._decomposer
 
     def _get_bridge(self) -> Optional[Any]:
-        if not (_HAS_BRIDGE and self._db and Path(str(self._db)).exists()):
+        if not _HAS_BRIDGE:
             return None
         if self._bridge is None:
             self._bridge = SchemaBridge(
-                finance_db_path=Path(str(self._db)),
                 max_workers=self._max_workers,
             )
         return self._bridge
@@ -269,12 +258,7 @@ class SynthesisPipeline:
                 warnings.append("decomposer not importable — using vector-only path")
             elif not _HAS_BRIDGE:
                 warnings.append("schema_bridge not importable — using vector-only path")
-            elif _FINANCE_DB_PATH is None:
-                warnings.append("FINANCE_DB_PATH not set — using vector-only path")
-            elif not Path(str(_FINANCE_DB_PATH)).exists():
-                warnings.append(
-                    f"FINANCE_DB_PATH={_FINANCE_DB_PATH} not found — using vector-only path"
-                )
+
             else:
                 warnings.append("fusion layer unavailable — using vector-only path")
 
