@@ -73,6 +73,7 @@ _YEAR_RE = re.compile(r"^(\d{4})")
 # MinIO client (module-level singleton)
 # ─────────────────────────────────────────────
 def _minio_client() -> Minio:
+    # Initialize and return a configured MinIO client instance
     return Minio(
         endpoint   = MINIO_ENDPOINT,
         access_key = MINIO_ACCESS_KEY,
@@ -97,6 +98,7 @@ def _parse_minio_key(key: str, doc_type: str, bucket: str) -> dict | None:
     if not key.lower().endswith(".pdf"):
         return None
 
+    # Split key to extract symbol and filename components
     parts = key.split("/")
     # Minimum: symbol/file.pdf → 2 parts
     if len(parts) < 2:
@@ -105,9 +107,11 @@ def _parse_minio_key(key: str, doc_type: str, bucket: str) -> dict | None:
     symbol   = parts[0].upper()
     filename = parts[-1]
 
+    # Extract the leading 4-digit year from the filename
     m = _YEAR_RE.match(filename)
     year = int(m.group(1)) if m else None
 
+    # Return structured metadata including the globally unique MySQL key
     return {
         "minio_key": f"{bucket}/{key}",   # full identifier — stored in MySQL, globally unique
         "bucket":    bucket,
@@ -129,13 +133,16 @@ def list_minio_pdfs(
     client:          Minio = None,
 ) -> list[dict]:
     """List all matching PDF objects across the doc-type-specific MinIO buckets."""
+    # Ensure a MinIO client is available
     if client is None:
         client = _minio_client()
 
+    # Determine which document types and buckets to scan
     doc_types = [doc_type_filter] if doc_type_filter else list(DOC_TYPE_BUCKETS.keys())
     prefix = f"{symbol.lower()}/" if symbol else ""
 
     pdfs = []
+    # Loop through each chosen document type and fetch objects from its bucket
     for doc_type in doc_types:
         bucket = DOC_TYPE_BUCKETS[doc_type]
         try:
@@ -144,6 +151,7 @@ def list_minio_pdfs(
             log.error(f"MinIO list failed for bucket '{bucket}': {e}")
             continue
 
+        # Process each object into structured metadata
         for obj in objects:
             parsed = _parse_minio_key(obj.object_name, doc_type, bucket)
             if parsed is None:
@@ -162,8 +170,10 @@ def list_minio_pdfs(
 # ─────────────────────────────────────────────
 def _download_pdf(bucket: str, key: str, client: Minio) -> Path:
     """Download object to INGEST_TMP_DIR and return local Path."""
+    # Create the temporary download directory if it doesn't exist
     INGEST_TMP_DIR.mkdir(parents=True, exist_ok=True)
     local_path = INGEST_TMP_DIR / Path(key).name
+    # Download the file from the specified MinIO bucket to the local filesystem
     client.fget_object(bucket, key, str(local_path))
     return local_path
 
@@ -184,12 +194,14 @@ def ingest_pdf(pdf_info: dict, force: bool = False, client: Minio = None) -> boo
     log.info(f"Ingesting: {minio_key}")
     log.info(f"  type={doc_type} | symbol={symbol} | year={year}")
 
+    # Skip processing if document is already ingested and force flag is absent
     if not force and is_already_ingested(minio_key):
         log.info("  ⏭ Already ingested, skipping (use --force to re-ingest)")
         return True
 
     file_size_kb = pdf_info.get("size_bytes", 0) // 1024
 
+    # Upsert document metadata into the MySQL database
     doc_id = upsert_document(
         symbol      = symbol,
         doc_type    = doc_type,
@@ -213,6 +225,7 @@ def ingest_pdf(pdf_info: dict, force: bool = False, client: Minio = None) -> boo
 
         # Step 2: Extract (Docling)
         log.info("[2/4] Extracting with Docling...")
+        # Parse PDF structure and text using Docling extractor
         extracted = extract_pdf(local_path, doc_type)
         if not extracted or not extracted.blocks:
             raise ValueError("Extraction returned no content")
@@ -220,6 +233,7 @@ def ingest_pdf(pdf_info: dict, force: bool = False, client: Minio = None) -> boo
 
         # Step 3: Chunk
         log.info("[3/4] Chunking...")
+        # Split the extracted content into semantic chunks for vector storage
         chunks = chunk_document(extracted, symbol, year, title)
         if not chunks:
             raise ValueError("Chunker returned no chunks")
@@ -227,9 +241,10 @@ def ingest_pdf(pdf_info: dict, force: bool = False, client: Minio = None) -> boo
 
         # Step 4: Embed + upsert to Qdrant
         log.info("[4/4] Embedding + loading to Qdrant...")
+        # Embed the chunks and push them to the Qdrant vector database
         collection_name = load_chunks_to_qdrant(chunks, doc_type)
 
-        # Record chunks in MySQL
+        # Record chunks in MySQL to maintain relational metadata
         for chunk in chunks:
             insert_chunk(
                 doc_id      = doc_id,
@@ -300,6 +315,7 @@ def main():
 
     init_db()
 
+    # Handle the --stats argument to show database metrics and exit
     if args.stats:
         stats = get_stats()
         print("\n── Financial RAG DB Stats (MySQL) ──────────────────")
@@ -313,6 +329,7 @@ def main():
 
     client = _minio_client()
 
+    # Handle the --list argument to print all discovered MinIO objects and exit
     if args.list:
         pdfs = list_minio_pdfs(client=client, year=args.year)
         print(f"\n── MinIO objects — buckets {list(DOC_TYPE_BUCKETS.values())} — {len(pdfs)} PDF(s) ──")
@@ -322,14 +339,14 @@ def main():
         print()
         return
 
-    # Resolve doc_type filter
+    # Resolve doc_type filter string based on CLI argument
     doc_type_filter = None
     if args.type == "annual":
         doc_type_filter = "annual_report"
     elif args.type == "concall":
         doc_type_filter = "concall"
 
-    # Resolve symbols
+    # Retrieve the list of PDFs to process based on symbols or the --all flag
     if args.all:
         pdfs = list_minio_pdfs(doc_type_filter=doc_type_filter, year=args.year, client=client)
         log.info(f"Found {len(pdfs)} PDF(s) across bucket(s)")
@@ -358,6 +375,7 @@ def main():
     total_success = 0
     total_fail    = 0
 
+    # Iterate through all discovered PDFs and trigger the ingestion process
     for pdf_info in pdfs:
         if ingest_pdf(pdf_info, force=args.force, client=client):
             total_success += 1

@@ -64,6 +64,7 @@ def build_embedding_text(chunk: Chunk) -> str:
     tags) not just what it says.  This dramatically improves retrieval
     precision for financial queries.
     """
+    # Formats a rich context header above the raw text for better vector embedding
     tags = ", ".join(chunk.retrieval_tags) if chunk.retrieval_tags else "none"
 
     lines = [
@@ -290,6 +291,7 @@ _OPPORTUNITY_SIGNALS = [
 
 
 def _score_chunk(chunk: Chunk) -> float:
+    # Calculates a retrieval priority score based on document type and keyword signals
     base   = _TYPE_SCORE.get(chunk.chunk_type, 0.5)
     text_l = chunk.text.lower()
     if any(s in text_l for s in _OUTLOOK_SIGNALS):
@@ -303,6 +305,7 @@ def _score_chunk(chunk: Chunk) -> float:
 
 def _tag_chunk(chunk: Chunk) -> List[str]:
     """Keyword-based retrieval tag assignment."""
+    # Applies categorical tags (e.g., 'revenue', 'risk') based on keyword presence
     text_l = chunk.text.lower()
     tags   = []
     if any(w in text_l for w in ["revenue", "income", "sales", "turnover"]):
@@ -338,6 +341,7 @@ def _approx_tokens(text: str) -> int:
 
 
 def _split_by_tokens(text: str, max_tokens: int, overlap_tokens: int) -> List[str]:
+    # Divides large text blocks into overlapping chunks based on a max token heuristic
     words        = text.split()
     max_words    = int(max_tokens / 1.3)
     overlap_words = int(overlap_tokens / 1.3)
@@ -372,6 +376,7 @@ def chunk_annual_report(
     year:   Optional[int],
     title:  str,
 ) -> List[Chunk]:
+    # Processes annual reports using a sliding window for prose and row-grouping for tables
     cfg    = ANNUAL_REPORT
     chunks: List[Chunk] = []
     idx    = 0
@@ -486,6 +491,7 @@ def chunk_concall(
     year:   Optional[int],
     title:  str,
 ) -> List[Chunk]:
+    # Groups concall text by speaker turns while avoiding splits in the middle of Q&A
     cfg    = CONCALL
     chunks: List[Chunk] = []
     idx    = 0
@@ -570,6 +576,7 @@ def chunk_document(
     year:   Optional[int],
     title:  str,
 ) -> List[Chunk]:
+    # Routes the document to the appropriate chunking strategy based on its type
     if doc.doc_type == "annual_report":
         return chunk_annual_report(doc, symbol, year, title)
     elif doc.doc_type == "concall":

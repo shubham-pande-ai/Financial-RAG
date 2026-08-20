@@ -1,81 +1,81 @@
-# Financial RAG — Equity Research System
+# Financial RAG — Quant CoPilot System
 
-Free, fully local vector DB + Groq (free cloud LLM) — no GPU, no paid APIs.
+An end-to-end, highly structured Retrieval-Augmented Generation (RAG) system built specifically for Indian Equity Research (BSE/NSE). It processes Annual Reports and Earnings Concalls to answer complex financial queries with strictly cited math and qualitative context.
 
-## Architecture
+## Stack & Architecture
 
-### High-Level Architecture
-![High Level Architecture](./images/ai_hedge_rag_high_level.svg)
+| Component | Tool / Technology |
+|---|---|
+| **Data Scraping** | BeautifulSoup (screener.in) |
+| **Object Storage** | MinIO |
+| **Structured DB** | MySQL 8.0 |
+| **Extraction (PDFs)** | IBM Docling (TableFormer) + Custom Regex |
+| **Embeddings** | sentence-transformers (FinLang Model) |
+| **Vector DB** | Qdrant |
+| **API Backend** | FastAPI |
+| **Re-ranker** | BAAI Cross-Encoders (ONNX Runtime INT8) |
+| **LLM Generation** | Llama-3 70B (via Groq API) / OpenRouter |
+| **Web UI** | Streamlit |
+| **Evaluation** | Custom Eval Suite (Hit Rate, MRR, Precision, Faithfulness) |
 
-### Low-Level Pipeline Design
-![Low Level Pipeline](./images/ai_hedge_rag_low_level.svg)
-### Structured-Semantic Fusion RAG
-![Low Level Pipeline](./images/quant_copilot_intent_architecture.svg)
+### System Architecture
+![Financial RAG System Architecture](./images/architecture.jpg)
 
-This architecture utilizes atomic decomposition to route queries through a Schema Bridge, bridging the gap between SQLite and Vector DB. By executing parallel retrievals and using a dedicated Fusion Layer to cross-reference quantitative stats with qualitative narratives, the system ensures high-fidelity attribution. Final responses are generated via typed templates to deliver structured, data-driven financial insights.
+### Core Pipeline (14 Steps)
+1. **Scraping**: Automatically downloads Annual Reports & Concalls.
+2. **Storage**: PDFs are saved in MinIO; metadata logs in MySQL 8.0.
+3. **Extraction**: IBM Docling extracts layout-aware tables; Custom Regex slices Concalls into exact Speaker Turns.
+4. **Embedding**: FinLang models convert chunks to semantic vectors.
+5. **Vector DB**: Qdrant stores and indexes text.
+6. **Query Interface**: Streamlit provides a clean chat UI.
+7. **API Layer**: FastAPI keeps large models pre-loaded in RAM for millisecond latency.
+8. **Decomposition**: Splitting questions into Quantitative (Math) and Qualitative (Text) needs.
+9. **Parallel Retrieval (Schema Bridge)**: Fetches hard numbers from MySQL and qualitative chunks from Qdrant simultaneously.
+10. **Re-ranking**: Cross-encoders guarantee absolute precision of retrieved chunks.
+11. **Fusion**: Cross-references textual management claims against hard SQL numbers to detect contradictions (⚠) or confirmations (✓).
+12. **Prompt Building**: Formats data into a strict citation-heavy structure.
+13. **Generation**: Llama-3 answers based purely on retrieved context without hallucinating math.
+14. **Validation**: Offline automated testing ensures precision and reliability.
 
 ## Directory Structure
-```
+```text
 Financial-Rag/
-├── config/
-│   └── settings.py          # All config in one place
-├── db/
-│   └── database.py          # SQLite schema + helpers
+├── config/              # Centralized settings
+├── db/                  # MySQL schema and helpers
+├── decomposer/          # Intent parser & Atomic Decomposer
+├── eval/                # Custom eval suite (Hit Rate, MRR)
+├── fusion/              # SQL/Text cross-referencing logic
 ├── pipeline/
-│   ├── extract/
-│   │   ├── pdf_extractor.py     # Parse PDF → structured text
-│   │   └── text_cleaner.py      # Clean + normalize text
-│   ├── loader/
-│   │   ├── chunker.py           # Chunking strategies (annual vs concall)
-│   │   ├── embedder.py          # sentence-transformers embedding
-│   │   └── chroma_loader.py     # Write chunks → ChromaDB
-│   └── retrieval/
-│       ├── retriever.py         # Hybrid search (vector + BM25)
-│       └── reranker.py          # Cross-encoder re-ranking
-├── rag/
-│   └── rag_engine.py        # Groq LLM + prompt builder
-├── utils/
-│   └── logger.py            # Structured logging
-├── ingest.py                # CLI: run full ingestion pipeline
-├── query.py                 # CLI: ask questions
-├── screener_downloader.py   # (existing) scrape PDFs
-└── requirements.txt
+│   ├── extract/         # Docling PDF extraction
+│   ├── loader/          # Chunker and Qdrant integration
+│   └── retrieval/       # Hybrid search and Re-ranker
+├── rag/                 # LLM connection (Groq, Gemini)
+├── schema_bridge/       # SQL + Vector parallel fetching
+├── synthesis/           # Prompt formatting rules
+├── utils/               # Loggers
+├── screener_downloader.py # Scraper tool
+├── Ingest.py            # Master ingestion script
+├── server.py            # FastAPI backend
+├── app.py               # Streamlit frontend
+└── query_client.py      # CLI tool
 ```
 
-## Setup
+## Setup & Execution
 
 ```bash
-# 1. Clone and install
+# 1. Install dependencies
 pip install -r requirements.txt
 
-# 2. Get free Groq API key
-# → https://console.groq.com/  (no credit card, generous free tier)
-
-# 3. Set env var
+# 2. Add API keys
 export GROQ_API_KEY="gsk_xxxxxxxxxxxx"
 
-# 4. Download PDFs for a company
+# 3. Download & Ingest Company Data
 python screener_downloader.py RELIANCE
+python Ingest.py --symbol RELIANCE
 
-# 5. Ingest into RAG
-python ingest.py --symbol RELIANCE
-python ingest.py --symbol RELIANCE --type concall   # only concalls
-python ingest.py --symbol RELIANCE --type annual    # only annual reports
-
-# 6. Query (CLI)
-python query_client.py --symbol RELIANCE "What is the revenue growth trend over last 3 years?"
-python query_client.py --symbol RELIANCE --type concall "What did management say about capex guidance?"
-python query_client.py  "Compare Reliance and ADANIPORTS debt levels"  # cross-company
-
-# 7. Query (Web UI)
-# Start the backend server first
+# 4. Start the Backend API (FastAPI)
 python server.py
-# In a new terminal, run the Streamlit UI
+
+# 5. Launch the UI (Streamlit)
 streamlit run app.py
 ```
-
-## Groq Free Tier
-- 14,400 requests/day
-- 6,000 tokens/minute  
-- Models: llama-3.3-70b-versatile, gemma2-9b-it
-- No credit card required
