@@ -2,17 +2,6 @@
 
 Free, fully local vector DB + Groq (free cloud LLM) — no GPU, no paid APIs.
 
-## Stack
-| Component | Tool | Cost |
-|---|---|---|
-| PDF parsing | pdfplumber | Free |
-| Embeddings | sentence-transformers (CPU) | Free |
-| Vector DB | ChromaDB (local on disk) | Free |
-| Re-ranker | ms-marco-MiniLM (CPU) | Free |
-| LLM | Groq API (llama-3.3-70b) | Free tier |
-| Metadata DB | SQLite | Free |
-| Web UI | Streamlit | Free |
-
 ## Architecture
 
 ### High-Level Architecture
