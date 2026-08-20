@@ -2,9 +2,9 @@
 
 An end-to-end, highly structured Retrieval-Augmented Generation (RAG) system built specifically for Indian Equity Research (BSE/NSE). It processes Annual Reports and Earnings Concalls to answer complex financial queries with strictly cited math and qualitative context.
 
-## Stack & Architecture
+https://github.com/user-attachments/assets/1b910888-044b-401c-a680-89333f1fb5ca
 
-https://github.com/user-attachments/assets/f3ac5ca7-23b6-476f-b54d-f2b51e095870
+## Stack & Architecture
 
 | Component | Tool / Technology |
 |---|---|
