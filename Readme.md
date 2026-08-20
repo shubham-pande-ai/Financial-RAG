@@ -4,6 +4,8 @@ An end-to-end, highly structured Retrieval-Augmented Generation (RAG) system bui
 
 ## Stack & Architecture
 
+https://github.com/user-attachments/assets/f3ac5ca7-23b6-476f-b54d-f2b51e095870
+
 | Component | Tool / Technology |
 |---|---|
 | **Data Scraping** | BeautifulSoup (screener.in) |
