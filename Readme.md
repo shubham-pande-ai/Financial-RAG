@@ -1,4 +1,4 @@
-# Financial RAG — Quant CoPilot System
+# Financial RAG
 
 An end-to-end, highly structured Retrieval-Augmented Generation (RAG) system built specifically for Indian Equity Research (BSE/NSE). It processes Annual Reports and Earnings Concalls to answer complex financial queries with strictly cited math and qualitative context.
 
